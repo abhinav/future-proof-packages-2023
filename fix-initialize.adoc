@@ -1,0 +1,42 @@
+[.columns.wrap]
+== Initializing complex objects
+
+// TODO: examples and more slides
+// TODO: explain zero value for design
+
+[.column.is-full.medium]
+In-order, prefer...
+
+[.column.is-half]
+--
+Plain objects
+
+. Usable zero value
+. Exported fields
+--
+
+[.column.is-half]
+--
+Constructor
+
+[start=3]
+. Parameter object
+. Functional options
+--
+
+[.notes]
+--
+But something related I want to bring up that I think is important:
+initializing complex objects with a bunch of behavior.
+
+* If possible, make the zero value meaningful.
+  Let me just declare and use the object.
+  You can add exported fields on it to allow overriding default behaviors.
+* If some fields are absolutely required,
+  a simple object with exported fields is a good next step.
+* If those are both not options,
+  if you need to do some work at initialization, for example,
+  then use a constructor.
+** For constructors, prefer a parameter object -- it's simpler.
+** If the overhead is worth it, use functional options.
+--

@@ -1,0 +1,37 @@
+= Big interfaces
+
+[.notes]
+--
+Big interfaces for something you define and return
+can be indicative of tight coupling between components.
+
+There are some ways you can make these smaller.
+
+TODO
+--
+
+== Focus on the request path
+
+[.notes]
+--
+When deciding what goes on the interface,
+don't just list all the methods of the object on the interface.
+Think about the request path --
+methods that will be called many times per object.
+
+For example, don't add the Close method on the interface for TODO.
+Leave that exposed on the struct.
+--
+
+== Build around an engine
+
+[.notes]
+--
+For some objects where all methods have the same backend,
+one cool thing you can do is define the powerful base method:
+I call it the engine here.
+
+It's the thing that everything else relies on.
+
+Take that engine, put a struct around it, implement methods on it.
+--

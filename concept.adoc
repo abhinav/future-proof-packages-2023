@@ -1,0 +1,84 @@
+[.medium]
+= What makes a package future-proof?
+
+[quote]
+The ability to evolve in functionality
+without disrupting the code base.
+
+[.notes]
+--
+What do I mean when I say future-proof package?
+
+For this talk, I'm going to go with this definition.
+
+A package is future-proof if it has the ability to
+evolve in functionality
+without disrupting rest of code base.
+--
+
+== Disruption
+
+TODO
+
+[.notes]
+--
+I'm defining disruption as having to
+modify otherwise unrelated code
+that previously worked (compiled or ran)
+as a result of a change you made.
+
+Disruptions are bad.
+
+* They reduce your velocity;
+  you have to make a bunch of meaningless mechanical changes.
+* They reduce your team's velocity;
+  they increase the size of your PRs, increasing what has to be reviewed,
+  as well as increasing the chances of a conflict.
+* They increase risk of a breakage in production
+  because something got missed.
+--
+
+== What causes disruption?
+
+[%step]
+[.step.fade-out]#Changes to packages with# +
+a design that *leaks complexity*
+
+[.notes]
+--
+Why does this happen?
+What prevents us from evolving packages without disruptions?
+
+This is my main thesis of my talk today:
+(*next*)
+code disruptions are caused by changes to packages
+with a design that leaks complexity.
+
+I'm using the term package here to refer to
+an independent, modular, composible unit of code.
+Or at least one intended to have those properties.
+
+(*next*)
+A design that leaks complexity.
+
+Let me elaborate on that.
+--
+
+== Leaking complexity
+
+* complexity exists _somewhere_
+* good design hides complexity
+* leaking complexity causes fragility
+* fragility causes disruption
+
+[.notes]
+--
+The existence of complexity is unavoidable.
+Non-trivial systems deal with it at _some_ layer
+so it has to exist somewhere.
+
+The purpose of good design is to hide this complexity.
+
+When it fails to do so, you get a fragile system,
+and that fragility causes the disruptions we're talking about.
+--

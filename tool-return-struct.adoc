@@ -1,0 +1,17 @@
+= `struct` returns
+
+TODO
+
+[.notes]
+--
+This may seem odd, but how interface upcasting
+allows us to increase what an input can do,
+returning a stuct allows you to increase what an output can do.
+
+Just by returning a struct instead of an interface value,
+you're left free to add new methods to the struct.
+
+Again, as with interface upcasting, this is a bit specific in its usage.
+I'm intentionally referring to this as a tool rather than a solution.
+It doesn't fit everywhere.
+--

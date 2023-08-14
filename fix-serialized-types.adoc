@@ -1,0 +1,33 @@
+= Exposed wire form
+
+[.notes]
+--
+I just talked about how maps at package boundaries
+can represent leak of implementation.
+This is similar.
+
+Packages accepting or returning data types
+that also represent what gets serialized
+and sent over the wire or stored in a database.
+
+Unless the point of that package is the wire form,
+e.g. a client library or a database layer,
+this is almost always a leak that should be avoided
+as your application grows.
+
+For example, if the package happens to store `[something]`
+as a JSON blob, and we expose that, that's a leak.
+The package is no longer free to change how it stores this information.
+It cannot switch to, say, Protobufs, without disrupting
+or possibly even breaking a bunch of things.
+
+To fix this, we often need to define separate domain types.
+These establish the package's terminology -- its language,
+and are convert to and from the wire form by the package as needed
+as an implementation detail.
+
+If you've ever heard of hexagonal architecture or clean architecture,
+this might sound familiar to their concept of mapping entities.
+
+// TODO: Verify^
+--

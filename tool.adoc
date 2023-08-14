@@ -1,0 +1,56 @@
+= Tools
+
+// TODO: picture of a toolbox
+
+[%step]
+* Inputs
+* Outputs
+
+[.notes]
+--
+So how to fix this?
+
+Well, before we start fixing things,
+let's look inside our toolbox
+for things that'll help us do it.
+
+// This list is by no means exhaustive,
+// but it's something to work with.
+
+I'll talk about two categories of these today:
+(*step*)
+tools that deal with inputs
+and those that deal with outputs.
+
+Let's talk about inputs first.
+--
+
+// TODO: tools are for functions or abstractions
+// TODO: table or a better visualization
+
+include::tool-params.adoc[]
+include::tool-results.adoc[]
+include::tool-func-opts.adoc[]
+include::tool-upcast.adoc[]
+include::tool-return-struct.adoc[]
+
+[.columns]
+= Tool summary
+
+[.column.is-half]
+--
+*Expanding inputs*
+
+* Parameter objects
+* Functional options
+* Interface upcasts
+--
+
+[.column.is-half]
+--
+*Expanding outputs*
+
+* Result objects
+* Functional options
+* `struct` returns
+--

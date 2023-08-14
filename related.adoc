@@ -1,0 +1,12 @@
+= See also
+
+// TODO: Image
+
+_A Philosophy of Software Design_ by John Ousterhout
+
+[.notes]
+--
+I highly recommend this book,
+It helped me better articulate some of the ideas I had for this talk.
+// Especially the idea of module depth.
+--

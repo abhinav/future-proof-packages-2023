@@ -1,0 +1,38 @@
+[%notitle]
+= Functional options
+
+TODO: functional options
+
+[.notes]
+--
+Another common pattern in Go for dealing with
+large collections of optional parameters is functional options.
+
+I won't cover the implementation here;
+there's plenty of literature on them out there.
+
+TODO: these can expand both parameters and results.
+--
+
+== Don't mix the two
+
+TODO
+
+// TODO: different styling?
+
+[.notes]
+--
+Quick side note:
+It should be rare to mix parameter objects and functional options
+in the same function's parameters.
+
+Some tips on picking:
+
+* Prefer parameter objects where API ergonomics allow for it.
+  They're simple and understandable.
+* If you have like one or two required parameters
+  and a tonne of optional parameters,
+  or alternatively, if the optional parameters are "extra" annotations
+  no top of the core business parameters,
+  functional options might be a good fit.
+--

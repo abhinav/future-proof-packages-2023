@@ -1,0 +1,34 @@
+= Maps at boundaries
+
+[.notes]
+--
+Maps accepted or returned at package boundaries
+are very often a leaking implementation detail.
+
+Do we actually need to accept/return a map there
+or is that just how it's implemented internally
+so it's easy to re-use?
+
+I'll talk about a couple cases where you might leak maps:
+
+A function accepting, say, a `map[string]T` // TODO
+because that's how we store it internally.
+Does `T` have a name field that you're keying on?
+Why not accept a `[]T` and build the map internally?
+TODO: explain, examples
+
+An interesting one that I've run into is enforcing uniqueness on name
+when that's actually not a requirement. (TODO health waitset example.)
+A technique we could've employed here is using handles:
+NewGate returns an object that represents the gate,
+and that's enough to refer to it and do things with it in the future.
+TODO better explain
+
+Lastly, on the other side, returning maps when it's an implementation detail.
+If the uniqueness isn't a hard requirement now and forever,
+and just how we're representing information for ease, don't return the map.
+
+Also, if you do, be careful about accepting or returning a map
+at boundaries where the caller may then mutate the map.
+TODO
+--

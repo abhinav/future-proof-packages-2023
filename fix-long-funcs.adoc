@@ -1,0 +1,35 @@
+= Really long functions
+
+// TODO: diagram
+
+[.notes]
+--
+Next, if you have a really long function,
+you might hear the obvious advice:
+just break it down into multiple functions.
+
+I'm here to suggest that don't *just* do that -- don't stop there.
+So take this example:
+TODO; break a function down, repeated parameters.
+
+* The parameters of the original function are repeated in all N functions
+* Information calculated by prior functions is passed onto others
+* TODO
+
+Instead, do this: try to find a named abstraction here.
+
+* Move parameters with "big scope" into struct fields
+* Add methods for each stage here (which you might've used functions for)
+* If multiple functions feed back information, use a struct field again
+
+// TODO
+
+If you have a really long function, this direction is a good place
+for you to start decomposing the responsibilities of the function
+into meaningful subcomponents.
+This makes for a better first step to "find the abstraction" in there
+than just converting it into multiple functions.
+
+It also has a very nice benefit of allowing injection of any global dependency
+so that you can more easily test that really long function.
+--

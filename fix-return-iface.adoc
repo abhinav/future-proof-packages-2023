@@ -1,0 +1,44 @@
+= Returning premature interfaces
+
+// TODO: better title
+
+[.notes]
+--
+You might find code that takes this shape:
+a constructor that returns an interface defined right above,
+and returns a private implementation defined down below.
+
+This is quite common for folks coming from another language
+or if you're just trying to prematurely define an interface
+so that you can mock and test it later.
+
+Those who've been around this ecosystem a while
+might recognize the Go proverb I'm about to use now.
+--
+
+== !
+
+// TODO: center title
+
+[quote]
+Accept interfaces, return structs.
+
+[.notes]
+--
+Accept interfaces, return structs.
+
+This is not a hard-and-fast rule but it's good advice to start with.
+For this discussion, I'm narrowing it down to "big interfaces".
+Objects with lots of business logic on them
+that you've wrapped an interface around.
+
+For complex objects with lots of behavior,
+start by returning the pointer-to-struct for them.
+You can more easily add new methods to it.
+
+Where you want to use it, define an interface on demand.
+
+If there are more than a couple places where you need to define
+the same interface, or you have multiple implementations of this behavior,
+*then* define think about defining the interface.
+--

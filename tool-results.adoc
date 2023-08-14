@@ -1,0 +1,39 @@
+[.columns]
+== Result objects
+
+// TODO
+
+[.column.is-half]
+--
+[source,go]
+----
+func list() ([]*Item, string, error)
+// where
+// string is a pagination token.
+
+----
+
+[step=1]
+Add a struct
+--
+
+[%step.column.is-half, step=1]
+--
+[source,go]
+----
+type ListResult struct {
+  Items []*Item
+  Token string
+}
+
+func list() (*ListResult, error)
+----
+--
+
+
+[.notes]
+--
+The same applies for return values.
+If you have too many return values,
+add a struct.
+--

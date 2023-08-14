@@ -1,0 +1,13 @@
+= Conclusion
+
+[.notes]
+--
+So just to summarize,
+
+* Disruptions are bad
+* Leaking complexity causes disruptions
+* You can design to prevent leaks
+* Writing before coding helps you think
+
+Thanks!
+--

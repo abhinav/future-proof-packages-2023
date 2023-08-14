@@ -1,10 +1,12 @@
 = Future-Proof Go Packages
 Abhinav Gupta
 2023-09-27
+:revealjs_controls: false
+:revealjs_controlsTutorial: false
 :revealjs_fragmentInURL: true
 :revealjs_hash: true
 :revealjs_navigationMode: linear
-:revealjs_pdfseparatefragments: false
+:revealjs_pdfseparatefragments: true
 :revealjs_plugin_zoom: disabled
 :revealjs_progress: false
 :revealjs_theme: night
@@ -20,4 +22,10 @@ Abhinav Gupta
 [.small.text-right]
 {revdate}
 
-== TODO
+include::intro.adoc[leveloffset=+1]
+include::agenda.adoc[leveloffset=+1]
+include::concept.adoc[leveloffset=+1]
+include::tool.adoc[leveloffset=+1]
+include::fix.adoc[leveloffset=+1]
+include::conclusion.adoc[leveloffset=+1]
+include::related.adoc[leveloffset=+1]

@@ -58,16 +58,18 @@ span.small {
 /*
 Based on https://stackoverflow.com/a/58206339,
 the following pins the title of each slide to the top of the page
-and centers the contents inside the rest.
+and centers the contents inside the rest
+but only if there is non-header content on the page.
+If it's just a header, it gets centered in the middle of the page.
 */
-section {
+section:has(> .slide-content > div) {
     display: flex !important;
     flex-direction: column;
     top: unset !important;
-    height: 100vh;
+    height: 100%;
 }
 
-section .slide-content {
+section .slide-content:has(> div) {
     margin-top: auto !important;
     margin-bottom: auto !important;
 }

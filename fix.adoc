@@ -1,0 +1,261 @@
+= Fixing leaks
+
+[.notes]
+--
+So how to fix this?
+
+* I'll start by talking about some of the straightforward stuff;
+  patterns you can use to help you towards future-proof code
+* After that, I'll zoom out a little
+  and talk about some of the higher level things you can do
+  to avoid leaking complexity
+
+As I get into this section,
+please be aware that I'll be making some generalizations here.
+I'm not saying "code that looks like this is leaky" but
+"code that looks like this tends to leak."
+// TODO: probably don't need to hedge here.
+
+// TODO: explain how each thing might leak complexity
+
+Okay, let's get into it.
+
+TODO:
+
+* Closure or callback heavy APIs
+** You can implement a class a closure doesn't mean you should.
+** Isolate concepts, give them names, add interfaces (middleware example)
+** Related: If there's an interface, prefer an object over closure. More maintainable.
+*** Closure want to be objects when they grow up
+* Unstoppable goroutines
+** Add a means of stopping them -- context or otherwise
+** Never spawn in `init()`
+
+Maybe:
+
+* Naming: names and scopes
+** Inconsistency in naming
+** Stuttering
+** Document public API of internal types with exported names
+** Consistency above all else
+* Errors: structured and sentinel
+* Bidirectional channels at boundaries / channels are rare
+--
+
+include::fix-initialize.adoc[]
+include::fix-long-funcs.adoc[]
+// TODO: many functions, adapt the long-funcs strategy
+include::fix-primitives.adoc[]
+// TODO: closures and objects
+// TODO: callbacks and interfaces (even for functional options)
+include::fix-return-iface.adoc[]
+include::fix-big-iface.adoc[]
+include::fix-map.adoc[]
+include::fix-serialized-types.adoc[]
+include::fix-global.adoc[]
+
+= Zooming out
+
+[.notes]
+--
+A lot of what I've talked so far has been fairly specific advice.
+It's intended to help you recognize patterns indicative of complexity leaks
+but it doesn't fix them. Not really.
+
+Fixing it requires a more holistic view of the application.
+--
+
+= Flow of information
+
+[.notes]
+--
+Flow of information --
+this is the path data takes through an application.
+
+// TODO
+
+Stack a bunch of packages on top of each other (you know, as a stack)
+with main at the top, pick a scenario,
+and trace the path information takes through these packages.
+
+// TODO: maybe
+// You can do this even within a single package.
+// If a package contains a lot of overly specific helper functions
+// and there's a lot of zigzagging around them,
+// you may be approaching spaghetti territory.
+--
+
+== Surface area
+
+// TODO: diagram, box with highlighted line
+// TODO: wider box with more things
+
+[.notes]
+--
+Surface area refers to the number of things exported from a package
+and the complexity of using them.
+Each exported function, type, and method adds to the surface area of the
+package.
+Each special condition in using them -- call this, and only then this --
+also adds to the surface area.
+
+Visualizing the code inside a package as a box,
+surface area is the part of it that is available for other components to
+interact with. The different entry points.
+
+Surface area does not necessarily correspond to how much functionality
+the package offers.
+
+That's a job for...
+--
+
+== Depth
+
+[.notes]
+--
+Building on the idea of packages as boxes with a surface area,
+depth refers to how much work is done by exported components in the package.
+
+In combination, these represent the functionality offered by the package.
+--
+
+== !
+
+// TODO: visualizations
+
+[.notes]
+--
+For example, a package with lots of small helper functions
+has a wide surface area and is shallow in functionality.
+Think `strings`, or `slices`. Lots of small helper functions.
+
+On the other hand, a package with only a handful of exported functions
+hiding a bunch of complex work
+has a narrow surface area and is deep in functionality.
+Think `go/parser`, `archive/tar`.
+
+One isn't objectively better than the other.
+I'm not going to suggest that we should aim for either extreme.
+In real applications, there's a good balance to be had.
+
+*However*, when it comes to flow of information through an application,
+--
+
+== Business packages should be deep
+
+[.notes]
+--
+Packages that implement business logic of your application should be deep,
+not wide.
+
+Let me clarify.
+--
+
+== !
+
+[.notes]
+--
+I advised earlier against a zigzagging flow of information.
+
+So let's take two packages from some application:
+
+// TODO realistic example
+
+* Package A is closer to the entry point (main)
+  and is trying to do [thing]
+* Package B exposes a bunch of functions to help package A accomplish this.
+  Package B is wide, but shallow.
+* A calls B.GetUsers, then for each user, [TODO]
+
+This is bad. TODO
+This is a made up example,
+but it's close to code I've seen and fixed before.
+
+Some indications that a package is shallow:
+
+* Lots of top-level functions implementing heavy business functionality;
+  making HTTP and RPC requests, storing stuff to disk, etc.
+* These functions will tend to rely on global state
+  for anything that isn't directly passed to them as an argument
+* They might have a _bunch_ of arguments -- because otherwise they'd need
+  globals
+* They do their thing, return the result,
+  and then the caller calls another function in the same package
+  to do something else with that information.
+
+Basically, you end up with a package with a complex and wide surface area.
+Information zigzags in and out of that package.
+This is a module leaking lots of unnecessarily complexity.
+
+* There are a bunch of problems with the package above,
+  but one of the things that happens as a result of this kind of design
+  is that authors and users of the package don't have a good grasp
+  of the flow of information through it.
+* It's not uncommon to find that, say these two entry points
+
+So going back to my point earlier.
+This package should be deep.
+
+Let's talk about how it could've looked.
+
+TODO
+
+The idea is to find a deep abstraction with a narrow surface area.
+Information flows in one direction -- it goes in, stuff happens to it,
+the results goes out.
+--
+
+== !
+
+[.notes]
+--
+Unfortunately, I don't have a list of rules that we can follow
+to always get the right abstraction.
+But I have some tools that'll help you find it.
+
+TODO
+
+* currying as a tool for building abstractions
+* start with the contract when adding a new type/function
+** document the contract before you implement it
+** make the contract inform the implementation, not the other way around
+** there's no such thing as self-documenting code
+** I'm a big fan of the old golint rule:
+   every exported entity must be documented.
+* Use tests to help inform abstractions
+* Application-scoped vs request-scoped information
+** Use scope of information to inform abstraction design.
+   Things that change rarely, vs things that change often.
+** Tip: Argument order based on scope
+*** Exception: context
+* maybe: sometimes code repetition is okay
+** DRY vs DAMP; tests
+
+// TODO: tie ideas here back into the guidance from prior section.
+--
+
+= Tangent: Libraries
+
+Maybe
+
+[.notes]
+--
+* be deliberate about features
+** You can't just "add" a feature. Cross-product.
+--
+
+= Fixing legacy code
+
+// TODO: Picture of David Winterbottom's tweet
+// https://codeinthehole.com/
+
+[.notes]
+--
+* pay your debts in installments
+** don't try to rewrite legacy code from scratch
+** don't be afraid of changing things
+** leave it better than you found it
+* Testing is a design problem
+** Maybe: Use pattern from before to abstract away
+   global dependencies
+--

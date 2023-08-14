@@ -1,0 +1,16 @@
+= Interface upcasts
+
+TODO
+
+[.notes]
+--
+Interface upcasting allows you to take a value that satisfies an interface
+and cast it to a more specific interface.
+
+Maybe:
+This happens at runtime --
+the value doesn't even have to know that the interface exists.
+
+This is a useful tool, but it's limited.
+If the value is wrapped in the middle, it cannot fit anymore.
+--

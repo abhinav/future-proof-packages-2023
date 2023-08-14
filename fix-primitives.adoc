@@ -1,0 +1,50 @@
+= Over-reliance on primitives
+
+[.notes]
+--
+TODO
+--
+
+== Repeated primitives
+
+[.notes]
+--
+If you find yourself repeating the same group of primitives
+over and over again as arguments, fields, etc. use a struct.
+--
+
+== Overly specific booleans
+
+[.notes]
+--
+This is a common mistake.
+
+You have functionality, it works fine.
+Someone wants to customize a specific behavior for their specific need,
+and so you add an overly specific boolean flag.
+
+// TODO: example
+
+Avoid this.
+Find the behavior being replaced, extract it,
+and then make it an interface or an enum.
+--
+
+== String matching
+
+[.notes]
+--
+TODO: strings everywhere.
+String matching instead of parsing.
+
+Bad: Extracting scheme with "search for first `:`".
+
+Parsing is how we interface with the untyped world.
+
+In short...
+--
+
+== Use types effectively
+
+// TODO: option style override
+// to center the header.
