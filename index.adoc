@@ -1,0 +1,23 @@
+= Future-Proof Go Packages
+Abhinav Gupta
+2023-09-27
+:revealjs_fragmentInURL: true
+:revealjs_hash: true
+:revealjs_navigationMode: linear
+:revealjs_pdfseparatefragments: false
+:revealjs_plugin_zoom: disabled
+:revealjs_progress: false
+:revealjs_theme: night
+:revealjs_totalTime: 2700
+:revealjs_transition: none
+:customcss: css/style.css
+:icons: font
+:idprefix:
+:idseparator: -
+:source-highlighter: highlightjs
+:font-awesome-version: 5.15.4
+
+[.small.text-right]
+{revdate}
+
+== TODO

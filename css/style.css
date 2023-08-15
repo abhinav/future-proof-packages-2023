@@ -1,0 +1,73 @@
+@font-face {
+	font-family: "Iosevka";
+	src: url("../fonts/iosevka-regular-minimal.woff2") format("woff2");
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+:root {
+	--r-heading2-size: 1.5em;
+}
+
+.reveal code {
+	font-family: "Iosevka", monospace;
+}
+
+.reveal pre code {
+	font-size: 20px;
+	line-height: 22px;
+}
+
+.reveal .medium pre code {
+	font-size: 16px;
+	line-height: 18px;
+}
+
+.medium p, span.medium {
+	font-size: 0.8em;
+}
+
+div.openblock.medium {
+	font-size: 0.8em;
+	line-height: 0.8em;
+}
+
+span.small {
+	font-size: 0.6em;
+	vertical-align: middle;
+}
+
+.attribution {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	font-size: 0.33em;
+}
+
+.medium > h2 { font-size: 1.2em; }
+.small > h2 { font-size: 0.8em; }
+
+/*
+ * Hack: asciidoctor-revealjs auto-animate requires linenums to be enabled,
+ * but we don't care about line numbers in our examples,
+ * so make them invisible.
+ */
+.listingblock .hljs-ln-numbers { display: none; }
+
+/*
+Based on https://stackoverflow.com/a/58206339,
+the following pins the title of each slide to the top of the page
+and centers the contents inside the rest.
+*/
+section {
+    display: flex !important;
+    flex-direction: column;
+    top: unset !important;
+    height: 100vh;
+}
+
+section .slide-content {
+    margin-top: auto !important;
+    margin-bottom: auto !important;
+}

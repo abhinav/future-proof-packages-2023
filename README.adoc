@@ -1,0 +1,32 @@
+= Future-Proof Go Packages
+
+This repository contains the source code for a presentation
+that I gave at Gophercon in September 2023.
+
+The rendered slides are available at
+https://abhinav.github.io/presentation-future-proof-packages-2023/.
+
+== Building
+
+Build the slides from source by running:
+
+[source,console]
+----
+$ make site
+----
+
+Build them with speaker notes on the side with:
+
+[source,console]
+----
+$ SPEAKER_NOTES=1 make site
+----
+
+== License
+
+:url-license: https://creativecommons.org/licenses/by-sa/4.0/
+
+image::https://i.creativecommons.org/l/by-sa/4.0/88x31.png[alt="CC-BY-SA-4.0", link={url-license}]
+
+This work is licensed under a
+{url-license}[Creative Commons Attribution-ShareAlike 4.0 International License].
