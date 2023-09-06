@@ -1,74 +1,128 @@
-[.columns]
+[%auto-animate]
 = Parameter objects
 
-// TODO: less shit examples
-// TODO: notes
 // TODO: accept a struct and return a struct, and the signature will never break.
 
-[.column.is-half]
---
-[source,go]
+[source%linenums,go,data-id=new]
 ----
-func New(
-  url string,
-  token string,
-  log *zap.Logger,
-) *Client
-----
-
-[.text-left, step=1]
-[.medium]#Use a parameter object# +
-[.small]#for more than three parameters#
---
-
-[%step.column.is-half, step=1]
---
-[source,go]
-----
-type Config struct {
-  URL   string
-  Token string
-  Log   *zap.Logger
+func New(url string, token string) *Client {
+  return &Client{
+    // ...
+  }
 }
-
-func New(cfg *Config) *Client
 ----
---
-
-// TODO: auto-animate
 
 [.notes]
 --
 Parameter objects.
-This is a fairly straightforward tool.
+This is a fairly straightforward concept.
 
-Put the parameters of your function in a struct.
+The idea is that you take the parameters of your function...
+--
+
+[%auto-animate.columns]
+== Parameter objects
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=new]
+----
+func New(cfg *Config) *Client {
+  return &Client{
+    // ...
+  }
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=config]
+----
+type Config struct {
+  URL   string
+  Token string
+}
+----
+--
+
+
+[.notes]
+--
+...and put them in a struct
+with an exported field for each parameter.
+
 This gives you the ability to add new *optional* parameters
 without disrupting callers.
 
-This is usually a good idea
-once you cross the three parameter mark.
+For example, suppose I wanted to start logging:
 --
 
-[.small]
-== Adding new parameters
+[%auto-animate.columns]
+== Parameter objects
 
-* Must be optional
+[.column.is-half]
+--
+[source%linenums,go,data-id=new]
+----
+func New(cfg *Config) *Client {
+  log := cfg.Log
+  if log == nil {
+    log = DiscardLogger
+  }
+
+  return &Client{
+    log: log,
+    // ...
+  }
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=config]
+----
+type Config struct {
+  URL   string
+  Token string
+  Log   *slog.Logger
+}
+----
+--
+
+[.notes]
+--
+I could add a new `Log` field to `Config`,
+and handle the case when it's nil in the constructor.
+--
+
+== Using parameter objects
+
+* Use at >3 parameters
+* New parameters are optional
 * Use the zero value
 
 [.notes]
 --
-Some quick tips for adding new parameters
-to a parameter object:
+Some quick tips for using parameter objects:
 
-* New parameters must be optional.
-  Without this, all callers will break.
-* For the new parameter, pick something with a zero value
-  that matches the old behavior.
-  That is, if the new parameter is at its zero value
-  your code shouldn't do the thing that the new parameter allows.
-** As an example, if you have something that TODO
-   add `EnabledNewBehavior bool`, not `DisableNewBehavior bool`.
-** On the other hand, if the behavior has already been active,
-   and this is a means of opting out or changing it, TODO.
+* These are usually a good idea
+  for functions that cross the three parameter mark.
+* Secondly, new parameters *must* be optional;
+  this might be obvious but it's worth calling out.
+* You can use the zero value of a type to help you define the new parameter.
+  You want the zero value of the new field to match the old behavior
+  or a reasonable fallback.
+** For example, in the previous example I added a logger parameter.
+   The zero value of `slog.Logger` is nil.
+   I used that to provide a no-op logger to match the old behavior.
+   Falling back to slog's default global logger was also an option there.
+** Especially consider the zero value when adding primitive fields.
+   For example, if you're adding an opt-in or opt-out for a feature,
+   first consider what the old behavior is:
+   was the feature previously enabled or disabled?
+   That informs whether the new field is EnableFeature or DisableFeature.
+
+// TODO: Maybe break zero value into its own slide.
 --
