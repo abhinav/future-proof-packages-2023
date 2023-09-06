@@ -25,7 +25,16 @@ Abhinav Gupta
 include::intro.adoc[leveloffset=+1]
 include::agenda.adoc[leveloffset=+1]
 include::concept.adoc[leveloffset=+1]
+
+== Future-proofing packages
+
+[.notes]
+--
+So how can we go about future-proofing packages?
+--
+
 include::tool.adoc[leveloffset=+1]
 include::fix.adoc[leveloffset=+1]
+
 include::conclusion.adoc[leveloffset=+1]
 include::related.adoc[leveloffset=+1]

@@ -6,7 +6,7 @@
 I'm Abhinav
 
 [.medium]
-I work at Rippling
+Gopher @ Rippling
 
 [.small]
 Previously: Pulumi, Uber
@@ -30,10 +30,11 @@ Before that,
 I worked at Pulumi, helping with their Go SDK,
 and at Uber, leading the Go Frameworks team.
 
-You can find me on my website, GitHub, and Mastodon.
+You can find me on my blog, GitHub, and Mastodon.
 
-I've been working on Go libraries and frameworks
-in one form or another for the past 8 years of my career,
-and in that period I've developed some opinions
-on how packages can be made future-proof.
+I've been working on libraries and frameworks,
+primarily in Go, for several years now,
+and in that period I've developed opinions
+on maintainability and future-proofing.
+I want to share some of that with you all today.
 --

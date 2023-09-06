@@ -3,54 +3,66 @@
 // TODO: picture of a toolbox
 
 [%step]
-* Inputs
-* Outputs
+* Functions
+* Abstractions
 
 [.notes]
 --
-So how to fix this?
-
 Well, before we start fixing things,
 let's look inside our toolbox
 for things that'll help us do it.
 
-// This list is by no means exhaustive,
-// but it's something to work with.
-
-I'll talk about two categories of these today:
-(*step*)
-tools that deal with inputs
-and those that deal with outputs.
-
-Let's talk about inputs first.
+I'll talk about two kinds of tools (*step*):
+tools for expanding functions, (*step*)
+and tools for expanding abstractions.
 --
 
-// TODO: tools are for functions or abstractions
-// TODO: table or a better visualization
+= Tools for functions
+
+[.notes]
+--
+Let's talk about functions first.
+--
 
 include::tool-params.adoc[]
 include::tool-results.adoc[]
 include::tool-func-opts.adoc[]
-include::tool-upcast.adoc[]
+
+= Tools for abstractions
+
+include::tool-accept-iface.adoc[]
 include::tool-return-struct.adoc[]
 
-[.columns]
-= Tool summary
+// TODO: accept interfaces, return structs as a practice
 
-[.column.is-half]
+= Expansion tools
+
+[.medium, cols=">.^2h,^3,^3", frame=none]
+|====
+| | Input | Output
+
+.2+| Functions
+| Parameter Objects
+| Result Objects
+2.+^d| Functional options
+
+| Abstractions
+| Accept interfaces
+| Return structs
+
+|====
+
+[.notes]
 --
-*Expanding inputs*
+So to summarize, the starting toolbox contains:
 
-* Parameter objects
-* Functional options
-* Interface upcasts
---
-
-[.column.is-half]
---
-*Expanding outputs*
-
-* Result objects
-* Functional options
-* `struct` returns
+* Parameters objects and result objects
+  for expanding function inputs and outputs
+* Functional objects for expanding both
+* The practice of accepting interfaces,
+  and the ability to upcast them,
+  for expanding input abstractions
+* And the practice of returning structs
+  and adding methods to them,
+  for expanding output abstractions
 --

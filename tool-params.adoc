@@ -4,7 +4,6 @@
 // TODO: less shit examples
 // TODO: notes
 // TODO: accept a struct and return a struct, and the signature will never break.
-// TODO: result structs
 
 [.column.is-half]
 --

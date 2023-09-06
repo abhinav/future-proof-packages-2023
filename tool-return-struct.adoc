@@ -1,4 +1,4 @@
-= `struct` returns
+= Return ``struct``s
 
 TODO
 

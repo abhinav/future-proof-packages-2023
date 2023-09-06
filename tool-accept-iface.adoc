@@ -1,4 +1,6 @@
-= Interface upcasts
+= Accept ``interface``s
+
+== Interface upcasting
 
 TODO
 

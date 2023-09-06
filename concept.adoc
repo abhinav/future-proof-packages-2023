@@ -3,13 +3,13 @@
 
 [quote]
 The ability to evolve in functionality
-without disrupting the code base.
+without disrupting the code base
 
 [.notes]
 --
 What do I mean when I say future-proof package?
 
-For this talk, I'm going to go with this definition.
+For this talk, I'm making up this definition.
 
 A package is future-proof if it has the ability to
 evolve in functionality
@@ -18,14 +18,17 @@ without disrupting rest of code base.
 
 == Disruption
 
-TODO
+[quote]
+Being forced to modify code +
+as a result of an unrelated change
 
 [.notes]
 --
-I'm defining disruption as having to
+Disruption here is being forced to
 modify otherwise unrelated code
-that previously worked (compiled or ran)
-as a result of a change you made.
+that previously worked
+as a result of a change you made
+elsewhere in the codebase.
 
 Disruptions are bad.
 
@@ -61,15 +64,17 @@ Or at least one intended to have those properties.
 (*next*)
 A design that leaks complexity.
 
-Let me elaborate on that.
+Let me expand that.
 --
 
-== Leaking complexity
+== On complexity
 
-* complexity exists _somewhere_
-* good design hides complexity
-* leaking complexity causes fragility
-* fragility causes disruption
+* Complexity is inevitable
+* Good design hides complexity
+* Complexity leaks causes fragility
+* Fragility causes disruption
+
+// TODO: Diagram of hidden vs leaking complexity visualization
 
 [.notes]
 --

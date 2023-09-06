@@ -2,7 +2,9 @@
 
 * What are future-proof packages
 * What gets in the way
-* How to fix it
+* Future-proofing packages
+** Tools for future-proofing
+** Finding and fixing problems
 
 [.notes]
 --
@@ -11,4 +13,6 @@ Rough agenda for the next 40 or so minutes:
 * I'll talk about the concept of future-proof packages
 * what prevents packages from being future-proof
 * and lastly how to fix it
+
+Okay, let's get into it.
 --
