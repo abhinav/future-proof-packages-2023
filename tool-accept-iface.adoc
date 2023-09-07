@@ -29,7 +29,7 @@ instead of accepting a file...
 --
 
 [%auto-animate.columns]
-= Accept ``interface``s
+== Accept ``interface``s
 
 [.column.is-half]
 --
@@ -60,7 +60,7 @@ Even when you're dealing with a type you don't own or control...
 --
 
 [%auto-animate.columns]
-= Accept ``interface``s
+== Accept ``interface``s
 
 [.column.is-half]
 --

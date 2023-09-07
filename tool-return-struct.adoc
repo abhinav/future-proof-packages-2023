@@ -1,17 +1,142 @@
+[%auto-animate.columns]
 = Return ``struct``s
 
-TODO
+[.column.is-half%step]
+--
+Don't
+
+[.medium]
+[source%linenums,go,data-id=iface]
+----
+type Client interface {
+  List() (ListResult, error)
+}
+
+func New() Client {
+  return &impl{/* ... */}
+}
+
+type impl struct{/* ... */}
+
+func (*impl) List() (ListResult, error) {
+  /* ... */
+}
+----
+--
+
+[.column.is-half%step]
+--
+Do
+
+[.medium]
+[source%linenums,go,data-id=struct]
+----
+type Client struct {
+  /* ... */
+}
+
+func New() *Client {
+  return &Client{/* ... */}
+}
+
+
+func (*Client) List() (ListResult, error) {
+  /* ... */
+}
+----
+--
 
 [.notes]
 --
-This may seem odd, but how interface upcasting
-allows us to increase what an input can do,
-returning a stuct allows you to increase what an output can do.
+Return structs.
+This is the other end of Accept Interfaces.
 
-Just by returning a struct instead of an interface value,
-you're left free to add new methods to the struct.
+The idea is straightforward:
+when returning an instance of an abstraction --
+a complex object implementing various behaviors --
+don't do this (*step*) defining an interface and returning that.
+Instead, do this (*step*) return the concrete type.
+
+Consumers of this value will define an interface
+if they need to -- per the previous section.
+
+Then, if you need to expand functionality --
+to return an object that does more --
+you can add a method to the returned object...
+--
+
+[%auto-animate.columns]
+== Return ``struct``s
+
+[.column.is-half]
+--
+Don't
+
+[.medium]
+[source%linenums,go,data-id=iface]
+----
+type Client interface {
+  List() (ListResult, error)
+  Put(PutRequest) error
+}
+
+func New() Client {
+  return &impl{/* ... */}
+}
+
+type impl struct{/* ... */}
+
+func (*impl) List() (ListResult, error) {
+  /* ... */
+}
+
+func (*impl) Put(PutRequest) error {
+  /* ... */
+}
+----
+
+[%step.small]
+Disruptive: +
+Breaks mocks and other implementations
+--
+
+[.column.is-half]
+--
+Do
+
+[.medium]
+[source%linenums,go,data-id=struct]
+----
+type Client struct {
+  /* ... */
+}
+
+func New() *Client {
+  return &Client{/* ... */}
+}
+
+
+func (*Client) List() (ListResult, error) {
+  /* ... */
+}
+
+func (*Client) Put(PutRequest) error {
+  /* ... */
+}
+----
+--
+
+[.notes]
+--
+Here, I'm adding a Put method to the client object.
+
+Note that attempting to do the same on the interface version (*step*)
+is disruptive because it breaks other implementations of that interface --
+including mocks and wrapper types.
 
 Again, as with interface upcasting, this is a bit specific in its usage.
 I'm intentionally referring to this as a tool rather than a solution.
 It doesn't fit everywhere.
 --
+
+// TODO: "Using" section necessary?
