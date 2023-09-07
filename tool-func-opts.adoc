@@ -1,38 +1,303 @@
-[%notitle]
+[%auto-animate.columns]
 = Functional options
 
-TODO: functional options
+[.column.is-half]
+--
+[source%linenums,go,data-id=Option,step=1]
+----
+type Option func(*clientOptions)
+----
+
+[source%linenums,go,data-id=New,step=2]
+----
+func New(opts ...Option) *Client {
+  var options clientOptions
+  for _, opt := range opts {
+    opt(&options)
+  }
+  /* ... */
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums.medium,go,data-id=options,step=1]
+----
+type clientOptions struct {
+  /* ... */
+}
+----
+--
 
 [.notes]
 --
-Another common pattern in Go for dealing with
-large collections of optional parameters is functional options.
+Finally, there's Functional Options.
+This is a pretty popular pattern that provides
+a flexible, super-customizable DSL
+to pass parameters or even extract results to a function.
 
-I won't cover the implementation here;
-there's plenty of literature on them out there.
+The general shape of functional options is:
 
-TODO: these can expand both parameters and results.
+* There's an Option type that manipulates a private data structure
+* The function the options are for accepts a variable number of these
+  and applies them over an instance of the private data structure
+* For each option,
+  you add a field to the private data structure,
+  and an Option constructor that sets that field.
 --
 
-== Don't mix the two
+[%auto-animate.columns]
+== Functional options
 
-TODO
+[.column.is-half]
+--
+[source%linenums,go,data-id=Option]
+----
+type Option func(*clientOptions)
+----
 
-// TODO: different styling?
+[source%linenums,go,data-id=New]
+----
+func New(opts ...Option) *Client {
+  var options clientOptions
+  for _, opt := range opts {
+    opt(&options)
+  }
+  /* ... */
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums.medium,go,data-id=options]
+----
+type clientOptions struct {
+  logger *slog.Logger
+  /* ... */
+  httpClient *http.Client
+}
+
+func WithLogger(l *slog.Logger) Option {
+  return func(o *clientOptions) {
+    o.logger = l
+  }
+}
+
+func WithHTTPClient(c *http.Client) Option {
+  return func(o *clientOptions) {
+    o.httpClient = c
+  }
+}
+----
+--
 
 [.notes]
 --
-Quick side note:
-It should be rare to mix parameter objects and functional options
-in the same function's parameters.
+There's room for unlimited growth here.
 
-Some tips on picking:
-
-* Prefer parameter objects where API ergonomics allow for it.
-  They're simple and understandable.
-* If you have like one or two required parameters
-  and a tonne of optional parameters,
-  or alternatively, if the optional parameters are "extra" annotations
-  no top of the core business parameters,
-  functional options might be a good fit.
+A quick note about the `Option` type.
 --
+
+[%auto-animate.columns]
+== Functional options
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=Option]
+----
+type Option func(*clientOptions)
+----
+--
+
+[.column.is-half]
+--
+[source%linenums.medium,go,data-id=options]
+----
+func WithLogger(l *slog.Logger) Option {
+  return func(o *clientOptions) {
+    o.logger = l
+  }
+}
+----
+--
+
+[.notes]
+--
+The type's shape is also up to you.
+In the example above, I used a `func`,
+but there's nothing stopping it from being an interface instead.
+--
+
+[%auto-animate.columns]
+== Functional options
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=Option]
+----
+type Option interface {
+  apply(*clientOptions)
+}
+----
+
+[source%linenums.medium,go,step=1]
+----
+func (o *loggerOption) String() string {
+  return fmt.Sprintf("WithLogger(%v)", o.l)
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums.medium,go,data-id=options]
+----
+type loggerOption struct{ l *slog.Logger }
+
+func WithLogger(l *slog.Logger) Option {
+  return &loggerOption{l}
+}
+
+func (o *loggerOption) apply(co *clientOptions) {
+  co.logger = o.l
+}
+----
+--
+
+[.notes]
+--
+Doing so allows you to provide
+a readable string representation of the options,
+if you want.
+
+// TODO: move to next to diagram?
+
+This is super flexible:
+
+* You can add an option that takes a pointer to something
+  and fills that with a result when the operation finishes.
+  This is how you can produce new outputs from functions
+  that use functional options.
+* You can provide options that are composed of other options,
+  or transform, scope, or unset other options.
+* You can even decide that options are fallible,
+  and have the option type return an error,
+  which you then inspect in the function that consumes it.
+
+All in all, this is a pretty powerful tool.
+--
+
+== !
+
+// TODO: make sure we like the diagram
+
+[pikchr, height=500px]
+....
+movewid = 0.3in
+boxrad = 0.05in
+linerad = 0.1in
+
+down
+box "WithLogger" fit wid 0.9in
+move
+box "WithHTTPClient" same
+move
+Dots: box "..." same
+
+box "New" at 1in east of 2nd box fit
+arrow from 1st box right then to New.nw chop
+arrow from 2nd box to New chop
+arrow from 3rd box right then to New.sw chop
+
+Options: box "clientOptions" fit at (New.x, WithLogger.y+movewid)
+
+arrow dotted chop \
+  from last box left until even with WithLogger \
+  then down to WithLogger
+arrow dotted chop from WithLogger to WithHTTPClient
+arrow dotted chop from WithHTTPClient to Dots
+arrow dotted chop from Dots down movewid \
+  then right until even with New \
+  then up to New
+
+line chop invis from Options left until even with WithLogger \
+  "defaults" above
+line chop invis from movewid south of Dots right until even with New \
+  "final" above
+....
+
+[.columns.wrap]
+== Using functional options
+
+[.column.is-half.medium]
+--
+Don't use by default
+
+* High boilerplate
+* Harder to test
+* Corner cases
+--
+
+[.column.is-half.medium]
+--
+Good for
+
+* Several options
+* Few required parameters
+* Composability
+--
+
+[.column.is-full%step]
+Prefer parameter objects
+
+[.notes]
+--
+Some tips on using functional options:
+
+* First, don't use by default.
+  That is, don't reach for this tool first.
+  Functional options are great when they fit, but otherwise:
+** The cost in boilerplate is very high
+** For consumers, they make testing difficult
+** There are corner cases in how options combine
+   that are usually not a problem:
+*** What happens if loggers are provided twice?
+    Do you overwrite or merge?
+*** If you merge, how do you unset an option that a caller has supplied?
+** Remember, these are just opaque interfaces or function references.
+   They aren't comparable or introspectable.
+   Harder to test, harder to inspect and modify.
+* Functional options are usually a good fit for functions where:
+** you have a *bunch* of options -- and these must be optional.
+   No required options --
+** and you have very few required parameters.
+** If the operations that the options perform are composable,
+   functional options are probably a good fit.
+
+Basically, (*step*) prefer parameter objects by default
+--
+
+// == Don't mix the two
+//
+// TODO
+//
+// // TODO: different styling?
+//
+// [.notes]
+// --
+// Quick side note:
+// It should be rare to mix parameter objects and functional options
+// in the same function's parameters.
+//
+// Some tips on picking:
+//
+// * Prefer parameter objects where API ergonomics allow for it.
+//   They're simple and understandable.
+// * If you have like one or two required parameters
+//   and a tonne of optional parameters,
+//   or alternatively, if the optional parameters are "extra" annotations
+//   no top of the core business parameters,
+//   functional options might be a good fit.
+// --
