@@ -1,5 +1,5 @@
 [%auto-animate]
-== Result objects
+= Result objects
 
 [source%linenums,go,data-id=list]
 ----

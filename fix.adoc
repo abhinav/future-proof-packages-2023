@@ -226,6 +226,7 @@ TODO
 * Application-scoped vs request-scoped information
 ** Use scope of information to inform abstraction design.
    Things that change rarely, vs things that change often.
+** Accepted interfaces should be request scoped
 ** Tip: Argument order based on scope
 *** Exception: context
 * maybe: sometimes code repetition is okay

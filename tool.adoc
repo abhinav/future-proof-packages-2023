@@ -30,6 +30,13 @@ include::tool-func-opts.adoc[]
 
 = Tools for abstractions
 
+[.notes]
+--
+I just covered tools for expanding function inputs and outputs.
+
+I'll cover abstractions now.
+--
+
 include::tool-accept-iface.adoc[]
 include::tool-return-struct.adoc[]
 

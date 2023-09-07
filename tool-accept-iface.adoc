@@ -1,18 +1,200 @@
+[%auto-animate.columns]
 = Accept ``interface``s
 
-== Interface upcasting
-
-TODO
+[.column.is-half]
+--
+[source%linenums,go,data-id=Parse,step=1]
+----
+func Parse(f *os.File) (Node, error) {
+  /* ... */
+}
+----
+--
 
 [.notes]
 --
-Interface upcasting allows you to take a value that satisfies an interface
-and cast it to a more specific interface.
+Before you can start expanding an abstraction you consume,
+you have to make sure you're consuming the right thing.
 
-Maybe:
-This happens at runtime --
-the value doesn't even have to know that the interface exists.
+If you're accepting a concrete type for an object that implements behavior,
+that doesn't leave you much room for expansion.
 
-This is a useful tool, but it's limited.
-If the value is wrapped in the middle, it cannot fit anymore.
+If two components have a very loose coupling --
+the consumer doesn't need to know the concrete implementation --
+it's best to accept an interface
+for just the functionality of that object that you use.
+
+For example, if I'm writing a parser for something (*step*)
+instead of accepting a file...
+--
+
+[%auto-animate.columns]
+= Accept ``interface``s
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=Parse]
+----
+func Parse(r io.Reader) (Node, error) {
+  /* ... */
+}
+----
+--
+
+[%step.column.is-half.medium]
+--
+[source%linenums,go,data-id=Login]
+----
+func Login(c *http.Client) (Token, error) {
+  /* ... */
+}
+----
+--
+
+[.notes]
+--
+I should accept an io.Reader.
+
+Note that this isn't limited to pre-defined interfaces. (*step*)
+Even when you're dealing with a type you don't own or control...
+--
+
+[%auto-animate.columns]
+= Accept ``interface``s
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=Parse]
+----
+func Parse(r io.Reader) (Node, error) {
+  /* ... */
+}
+----
+--
+
+[.column.is-half.medium]
+--
+[source%linenums,go,data-id=Login]
+----
+func Login(c HTTPClient) (Token, error) {
+  /* ... */
+}
+----
+
+[source,go]
+----
+type HTTPClient interface {
+  Do(*http.Request) (*http.Response, error)
+}
+----
+--
+
+[.notes]
+--
+You can introduce an interface
+for just the functionality you need.
+--
+
+[%auto-animate%auto-animate-restart.columns]
+== Interface upcasting
+
+[%step.column.is-half]
+--
+[source%linenums,go,data-id=Parse]
+----
+func Parse(r io.Reader) (Node, error) {
+  /* ... */
+}
+----
+--
+
+[.notes]
+--
+Once you're accepting interfaces for a loosely coupled dependency,
+and you want to upgrade its behavior somehow --
+you want to expect more in what it can do --
+you can do so with the help of upcasting the interface.
+
+For example, consider the Parse example again. (*step*)
+Suppose I need the file name during parsing.
+If I was using `*os.File`, I could just call `File.Name`.
+But with the interface, I have to upcast it like so:
+--
+
+[%auto-animate.columns]
+== Interface upcasting
+
+[column]
+--
+[source%linenums,go,data-id=Parse]
+----
+func Parse(r io.Reader) (Node, error) {
+  name := "<unknown>"
+  if src, ok := r.(Source); ok {
+    name = src.Name()
+  }
+  /* ... */
+}
+----
+--
+
+[column]
+--
+[source%linenums,go,data-id=Source]
+----
+type Source interface {
+  Name() string
+}
+----
+--
+
+[.notes]
+--
+Here I've defined a new interface `Source` with a `Name()` method
+that has the same signature as `*os.File.Name()`.
+
+If the reader I'm given happens to implement this method,
+I'll use that name.
+Otherwise, I'll use a fallback.
+
+This method basically allows me to *optionally*
+expect more from the abstraction I'm consuming.
+--
+
+[.columns.wrap]
+== Using upcast
+
+[.column.is-full.highlight-red%step]
+Breaks if wrapped
+
+[.column.is-half]
+Make it obvious
+
+[.column.is-half]
+Use small interfaces
+
+[.notes]
+--
+This is a pretty powerful tool;
+with it, a function can provide optional upgrade paths on any input interface.
+It can support optional hooks into the business logic
+without polluting the core interface.
+
+However, it's not magic. It's easily breakable. (*step*)
+
+If the concrete type that implements the optional interface,
+is accidentally wrapped in another object (like a middleware)
+that does not implement that optional functionality,
+then we can't do anything about it.
+That upgrade path is lost.
+
+To help mitigate that, if you use this tool:
+
+* First, make the presence of the upgrade path obvious
+  with documentation and convention.
+  When a caller loses the upgrade path with wrapping,
+  it should always be intentional.
+* Second, use small interfaces.
+  It's easier to talk about the upgrade path
+  when the upgrade path interface has only one method.
 --
