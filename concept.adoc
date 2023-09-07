@@ -69,12 +69,12 @@ Let me expand that.
 
 == On complexity
 
+// TODO: Diagram of hidden vs leaking complexity visualization
+
 * Complexity is inevitable
 * Good design hides complexity
 * Complexity leaks causes fragility
 * Fragility causes disruption
-
-// TODO: Diagram of hidden vs leaking complexity visualization
 
 [.notes]
 --

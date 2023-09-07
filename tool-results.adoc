@@ -1,39 +1,108 @@
-[.columns]
+[%auto-animate]
 == Result objects
 
-// TODO
-
-[.column.is-half]
---
-[source,go]
+[source%linenums,go,data-id=list]
 ----
-func list() ([]*Item, string, error)
-// where
-// string is a pagination token.
-
-----
-
-[step=1]
-Add a struct
---
-
-[%step.column.is-half, step=1]
---
-[source,go]
-----
-type ListResult struct {
-  Items []*Item
-  Token string
+func ListPage() (items []*Item, continueAt ItemID, err error) {
+  /* ... */
 }
-
-func list() (*ListResult, error)
 ----
---
-
 
 [.notes]
 --
-The same applies for return values.
-If you have too many return values,
-add a struct.
+Result objects.
+These are the return value analog of parameter objects.
+
+If you're producing too many results from a function...
+--
+
+[%auto-animate.columns]
+== Result objects
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=list]
+----
+func ListPage() (*ListPageResult, error) {
+  /* ... */
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=result]
+----
+type ListPageResult struct {
+  Items      []*Item
+  ContinueAt ItemID
+}
+----
+--
+
+[.notes]
+--
+...put them in a struct.
+
+You can add new results as necessary.
+
+For example, if I wanted to start reporting
+the total number of items remaining in this listing...
+--
+
+[%auto-animate.columns]
+== Result objects
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=list]
+----
+func ListPage() (*ListPageResult, error) {
+  /* ... */
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=result]
+----
+type ListPageResult struct {
+  Items      []*Item
+  ContinueAt ItemID
+  Remaining  int
+}
+----
+--
+
+[.notes]
+--
+I can just add a field for that.
+--
+
+[.columns]
+== Using result objects
+
+[.column.text-center]
+Use for >2 returns +
+[.step.medium]#not counting `error`#
+
+[.column.text-center]
+Readable field names
+
+[.notes]
+--
+As with result objects, some tips:
+
+* These are a good idea for functions that produce
+  more than two results (*step*)
+  not counting the `error` return.
+* Use the field names of your result objects
+  to enforce reasonable/readable usage of your return values.
+** In my example above, before I switched to result objects,
+   I was using named returns for documentation.
+   It's going to be easy for a caller to accidentally
+   stick that into a variable named "tmp" and confuse their readers.
+** The name of the field leaves no confusion for readers
+   as to what this is.
 --

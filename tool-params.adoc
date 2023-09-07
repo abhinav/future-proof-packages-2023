@@ -97,18 +97,26 @@ I could add a new `Log` field to `Config`,
 and handle the case when it's nil in the constructor.
 --
 
+[.columns]
 == Using parameter objects
 
-* Use at >3 parameters
-* New parameters are optional
-* Use the zero value
+[.column.text-left.medium]
+Use for >3 parameters +
+[.step.small]#not counting `context.Context`#
+
+[.column.text-center.medium]
+New parameters must be optional
+
+[.column.text-right.medium]
+Use the zero value
 
 [.notes]
 --
 Some quick tips for using parameter objects:
 
 * These are usually a good idea
-  for functions that cross the three parameter mark.
+  for functions that cross the three parameter mark (*step*)
+  not counting the context argument, if present.
 * Secondly, new parameters *must* be optional;
   this might be obvious but it's worth calling out.
 * You can use the zero value of a type to help you define the new parameter.
