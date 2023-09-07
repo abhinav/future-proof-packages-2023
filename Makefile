@@ -8,6 +8,7 @@ ASCIIDOCTOR_ARGS = \
 	   -r ./lib/analytics.rb \
 	   -a imagesdir=images \
 	   -a docinfo=shared \
+	   -a pikchr="$(shell pwd)/scripts/pikchr.sh" \
 	   -t
 
 ifneq ($(SPEAKER_NOTES),)
@@ -18,11 +19,8 @@ ifneq ($(CLOUDFLARE_WA_TOKEN),)
 ASCIIDOCTOR_ARGS += -a cloudflare-wa-token=$(CLOUDFLARE_WA_TOKEN)
 endif
 
-index.html: index.adoc
-	$(ASCIIDOCTOR) $(ASCIIDOCTOR_ARGS) index.adoc
-
 .PHONY: site
-site:
+site: third_party
 	@rm -rf _site && mkdir -p _site/reveal.js/plugin
 	$(ASCIIDOCTOR) -D _site $(ASCIIDOCTOR_ARGS) index.adoc
 	cp -R css _site/css
@@ -32,9 +30,13 @@ site:
 	cp -R reveal.js/plugin/{highlight,notes} _site/reveal.js/plugin
 
 .PHONY: build-dev
-build-dev:
+build-dev: third_party
 	$(ASCIIDOCTOR) $(ASCIIDOCTOR_ARGS) index.adoc
 
 .PHONY: serve
-serve:
+serve: third_party
 	@go run ./scripts/serve
+
+.PHONY: third_party
+third_party:
+	make -C third_party
