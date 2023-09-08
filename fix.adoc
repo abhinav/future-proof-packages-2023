@@ -52,11 +52,11 @@ Okay, let's get into it.
 // TODO: include::fix-initialize.adoc[] rename to premature-constructors?
 // TODO: many functions, adapt the long-funcs strategy
 include::fix-primitives.adoc[]
+include::fix-map.adoc[]
 // TODO: closures and objects
 // TODO: callbacks and interfaces (even for functional options)
 include::fix-return-iface.adoc[]
 include::fix-big-iface.adoc[]
-include::fix-map.adoc[]
 include::fix-serialized-types.adoc[]
 include::fix-global.adoc[]
 

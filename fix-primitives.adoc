@@ -2,17 +2,426 @@
 
 [.notes]
 --
-TODO
+Something that makes it easy to leak complexity is
+an over-reliance on primitive types in your core logic.
+
+strings, bools, and ints are available everywhere -- they're so easy to use --
+so I use them everywhere because defining a type "adds complexity" to my code.
+As a result of that, I end up leaking that complexity outside.
+
+I think this is better Demonstrated with an example.
 --
 
-== Repeated primitives
+[%auto-animate.columns]
+== String typing
+
+[.column.medium]
+--
+[source%linenums,go,data-id=isProto]
+----
+func isHTTP(addr string) bool {
+  ok := strings.HasPrefix(addr, "http://")
+  return ok
+}
+----
+--
+
+[.column.medium]
+--
+[source%linenums,go,data-id=download]
+----
+func download(addr string) {
+   if isHTTP(addr) {
+      http.Get(addr)
+   } else {
+     log.Panic("unsupported:", addr)
+   }
+   /* ... */
+}
+----
+--
 
 [.notes]
 --
-If you find yourself repeating the same group of primitives
-over and over again as arguments, fields, etc. use a struct.
+My system needs to download a file.
+I implement a `download` function --
+it takes a URL, makes sure that it's HTTP, and downloads it.
 
-TODO: primitves with repeated prefixes
+(Forgive the error handling in this example.)
+
+Otherwise, this is straightforward.
+Except https exists.
+--
+
+[%auto-animate.columns]
+== String typing
+
+[.column.medium]
+--
+[source%linenums,go,data-id=isProto]
+----
+func isHTTP(addr string) bool {
+  ok := strings.HasPrefix(addr, "http://")
+  ok ||= strings.HasPrefix(addr, "https://")
+  return ok
+}
+----
+--
+
+[.column.medium]
+--
+[source%linenums,go,data-id=download]
+----
+func download(addr string) {
+   if isHTTP(addr) {
+      http.Get(addr)
+   } else {
+     log.Panic("unsupported:", addr)
+   }
+   /* ... */
+}
+----
+--
+
+[.notes]
+--
+This is already a bit problematic.
+But imagine I add support for downloading from SSH.
+--
+
+[%auto-animate.columns]
+== String typing
+
+[.column.medium]
+--
+[source%linenums,go,data-id=isProto]
+----
+func isHTTP(addr string) bool {
+  ok := strings.HasPrefix(addr, "http://")
+  ok ||= strings.HasPrefix(addr, "https://")
+  return ok
+}
+
+func isSSH(addr string) bool {
+  ok := strings.HasPrefix(addr, "ssh://")
+  return ok
+}
+----
+--
+
+[.column.medium]
+--
+[source%linenums,go,data-id=download]
+----
+func download(addr string) {
+   if isHTTP(addr) {
+      http.Get(addr)
+   } else if isSSH(addr) {
+      sshDownload(addr)
+   } else {
+     log.Panic("unsupported:", addr)
+   }
+   /* ... */
+}
+
+func sshDownload(addr string) {
+   addr = strings.TrimPrefix(addr, "ssh://")
+   /* ... */
+}
+----
+--
+
+[.notes]
+--
+Not only am I matching on the string in download,
+I'm doing it again inside `sshDownload`.
+
+This example isn't entirely hypothetical;
+this is stuff I've seen in the wild.
+
+There's a better way...
+--
+
+== String typing
+
+> Parse, don't validate
+>
+> -- https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/[Alexis King]
+
+[.notes]
+--
+You may have heard of this, or a variant of this before.
+Parse, not validate.
+
+// TODO: diagram?
+
+The blog post I'm referencing is more detailed,
+but here's how I visualize it:
+I take chaotic data (in this case, a string) and pass it through a box.
+It either gets rejected, or the box reorganizes it into a richer format.
+
+And I do that *as early as I possibly can*
+so that the rest of my code has as much information available as possible.
+
+Going back to the example:
+--
+
+[%auto-animate.columns]
+== String typing
+
+[.column]
+--
+[source%linenums.small,go,data-id=dont]
+----
+func isHTTP(addr string) bool {
+  ok := strings.HasPrefix(addr, "http://")
+  ok ||= strings.HasPrefix(addr, "https://")
+  return ok
+}
+
+func isSSH(addr string) bool {
+  ok := strings.HasPrefix(addr, "ssh://")
+  return ok
+}
+
+func download(addr string) {
+   if isHTTP(addr) {
+      http.Get(addr)
+   } else if isSSH(addr) {
+      sshDownload(addr)
+   } else {
+     log.Panic("unsupported:", addr)
+   }
+   /* ... */
+}
+
+func sshDownload(addr string) {
+   addr = strings.TrimPrefix(addr, "ssh://")
+   /* ... */
+}
+----
+--
+
+[.column%step]
+--
+[source%linenums.small,go,data-id=do]
+----
+func isHTTP(addr *url.URL) bool {
+  ok := addr.Scheme == "http"
+  ok ||= addr.Scheme == "https"
+  return ok
+}
+
+func isSSH(addr *url.URL) bool {
+  ok := addr.Scheme == "ssh"
+  return ok
+}
+
+func download(addr string) {
+   u, err := url.Parse(addr)
+   if err != nil {
+      log.Panic(err)
+   }
+   if isHTTP(u) {
+      httpGet(u)
+   } else if isSSH(u) {
+      sshDownload(u)
+   } else {
+     log.Panic("unsupported:", addr)
+   }
+   /* ... */
+}
+
+func sshDownload(addr *url.URL) {
+   /* ... */
+}
+----
+--
+
+[.notes]
+--
+I should forget that `addr` is a string as early as I can.
+I can use `net/url.Parse` here... (*step*)
+
+That's better.
+I convert the string into a richer representation once,
+and then I use that same information everywhere.
+
+At this point, it's also worth questioning
+why `isHTTP` and `isSSH` even need to exist...
+--
+
+[%auto-animate.columns]
+== String typing
+
+[.column]
+--
+[source%linenums.small,go,data-id=dont]
+----
+func isHTTP(addr string) bool {
+  ok := strings.HasPrefix(addr, "http://")
+  ok ||= strings.HasPrefix(addr, "https://")
+  return ok
+}
+
+func isSSH(addr string) bool {
+  ok := strings.HasPrefix(addr, "ssh://")
+  return ok
+}
+
+func download(addr string) {
+   if isHTTP(addr) {
+      http.Get(addr)
+   } else if isSSH(addr) {
+      sshDownload(addr)
+   } else {
+     log.Panic("unsupported:", addr)
+   }
+   /* ... */
+}
+
+func sshDownload(addr string) {
+   addr = strings.TrimPrefix(addr, "ssh://")
+   /* ... */
+}
+----
+--
+
+[.column]
+--
+[source%linenums.small,go,data-id=do]
+----
+func download(addr string) {
+   u, err := url.Parse(addr)
+   if err != nil {
+      log.Panic(err)
+   }
+   switch u.Scheme {
+   case "http", "https":
+      httpGet(u)
+   case "ssh":
+      sshDownload(u)
+   default:
+     log.Panic("unsupported:", addr)
+   }
+   /* ... */
+}
+
+func sshDownload(addr *url.URL) {
+   /* ... */
+}
+----
+--
+
+[.notes]
+--
+Ah, that's better.
+
+In this example, `url.Parse` already existed,
+but the point I'm making here doesn't hold just for that.
+
+// TODO: Other examples:
+// UUID, timestamps, ${FOO}, etc.
+// other parse functions
+
+// TODO: this might be a good injection point
+--
+
+[.columns.wrap]
+== String typing
+
+[.column.is-half.small]
+Untyped
+
+[.column.is-half.small]
+Typed
+
+[.column.is-half]
+--
+[source, go]
+----
+strings.HasPrefix(addr, "ssh://")
+----
+--
+
+[.column.is-half]
+--
+[source, go]
+----
+u, err := url.Parse(addr)
+----
+--
+
+[.column.is-half]
+--
+[source, go]
+----
+var uuid string
+----
+--
+
+[.column.is-half]
+--
+[source, go]
+----
+type UUID [16]byte
+func ParseUUID(string) (UUID, error)
+----
+--
+
+[.column.is-half]
+--
+[source, go]
+----
+var ts int64
+----
+--
+
+[.column.is-half]
+--
+[source, go]
+----
+t := time.UnixMilli(ts)
+----
+--
+
+[.column.is-half]
+--
+[source, go]
+----
+strings.Replace(s, "%VAR%", val)
+----
+--
+
+[.column.is-half.medium]
+--
+[source, go]
+----
+type Node struct{ Var, Str string }
+type Template []Node
+func Parse(string) Template
+
+tmpl := Parse(s)
+tmpl.Render(map[string]string{"VAR": val})
+----
+--
+
+[.notes]
+--
+Anything where you receive chaotic data as input,
+and do something ordered with it is in scope.
+
+* Matching on URLs? Parse it.
+* Storing UUIDs? Parse it into the 128-bit number it is.
+* Comparing timestamps? Is that milliseconds or seconds?
+  At some point, the two blocks will disagree on that,
+  and everything will break.
+  Convert it to a `time.Time` at the entry point.
+* Even for home-grown, string-replacement based templating,
+  if it leaks outside, it can be worth it to parse it into a structure early
+  and operate on that.
+
+Turn the chaos to order as early as possible.
 --
 
 == Overly specific booleans
@@ -33,21 +442,18 @@ Find the behavior being replaced, extract it,
 and then make it an interface or an enum.
 --
 
-== String matching
+// == Repeated primitives
+//
+// [.notes]
+// --
+// If you find yourself repeating the same group of primitives
+// over and over again as arguments, fields, etc. use a struct.
+//
+// TODO: primitves with repeated prefixes
+// --
 
-[.notes]
---
-TODO: strings everywhere.
-String matching instead of parsing.
+== !
 
-Bad: Extracting scheme with "search for first `:`".
+[quote]
+Use types effectively
 
-Parsing is how we interface with the untyped world.
-
-In short...
---
-
-== Use types effectively
-
-// TODO: option style override
-// to center the header.

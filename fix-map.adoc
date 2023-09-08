@@ -2,6 +2,10 @@
 
 [.notes]
 --
+TODO: this is just an extension of over-reliance on primitives
+
+TODO: `map[string][]string` tells me basically nothing.
+
 Maps accepted or returned at package boundaries
 are very often a leaking implementation detail.
 
