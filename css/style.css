@@ -24,6 +24,11 @@
 	line-height: 18px;
 }
 
+.reveal .small pre code {
+	font-size: 12px;
+	line-height: 14px;
+}
+
 .medium p, span.medium {
 	font-size: 0.8em;
 }
@@ -33,9 +38,14 @@ div.openblock.medium {
 	line-height: 0.8em;
 }
 
-span.small {
+.small p, span.small {
 	font-size: 0.6em;
 	vertical-align: middle;
+}
+
+div.openblock.small {
+	font-size: 0.6em;
+	line-height: 0.6em;
 }
 
 .attribution {
