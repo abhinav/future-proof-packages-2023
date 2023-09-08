@@ -51,14 +51,42 @@ Okay, let's get into it.
 
 // TODO: include::fix-initialize.adoc[] rename to premature-constructors?
 // TODO: many functions, adapt the long-funcs strategy
-include::fix-primitives.adoc[]
-include::fix-map.adoc[]
-// TODO: closures and objects
+
+= Over-reliance on primitives
+
+[.notes]
+--
+Something that makes it easy to leak complexity is
+an over-reliance on primitive types in your core logic.
+
+strings, bools, and ints are available everywhere -- they're so easy to use --
+so I use them everywhere because defining a type "adds complexity" to my code.
+As a result of that, I end up leaking that complexity outside.
+
+I think this is better demonstrated with an example.
+--
+
+include::fix-string.adoc[]
+include::fix-bool.adoc[]
+// TODO: injecting behavior into boolean
 // TODO: callbacks and interfaces (even for functional options)
+// TODO: closures and objects
+
+include::fix-map.adoc[]
 include::fix-return-iface.adoc[]
 include::fix-big-iface.adoc[]
 include::fix-serialized-types.adoc[]
 include::fix-global.adoc[]
+
+// == Repeated primitives
+//
+// [.notes]
+// --
+// If you find yourself repeating the same group of primitives
+// over and over again as arguments, fields, etc. use a struct.
+//
+// TODO: primitves with repeated prefixes
+// --
 
 = Zooming out
 
@@ -236,9 +264,11 @@ But I have some tools that'll help you find it.
 //    every exported entity must be documented.
 // * Use tests to help inform abstractions
 // * Application-scoped vs request-scoped information
+// ** Request scope can be a single HTTP request, a single invocation of a CLI,
+//    or one "entry" into a library.
 // ** Use scope of information to inform abstraction design.
 //    Things that change rarely, vs things that change often.
-// ** Accepted interfaces should be request scoped
+// ** Accepted interfaces should be equest scoped
 // ** Tip: Argument order based on scope
 // *** Exception: context
 // * maybe: sometimes code repetition is okay

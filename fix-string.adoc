@@ -1,19 +1,5 @@
-= Over-reliance on primitives
-
-[.notes]
---
-Something that makes it easy to leak complexity is
-an over-reliance on primitive types in your core logic.
-
-strings, bools, and ints are available everywhere -- they're so easy to use --
-so I use them everywhere because defining a type "adds complexity" to my code.
-As a result of that, I end up leaking that complexity outside.
-
-I think this is better Demonstrated with an example.
---
-
 [%auto-animate.columns]
-== String typing
+= String typing
 
 [.column.medium]
 --
@@ -421,39 +407,6 @@ and do something ordered with it is in scope.
   if it leaks outside, it can be worth it to parse it into a structure early
   and operate on that.
 
+Untyped strings are chaos.
 Turn the chaos to order as early as possible.
 --
-
-== Overly specific booleans
-
-[.notes]
---
-This is a common mistake.
-
-You have functionality, it works fine.
-Someone wants to customize a specific behavior for their specific need,
-and so you add an overly specific boolean flag.
-
-// TODO: Zap SkipLineEnding vs LineEnding byte/enum, versus inject behavior
-// TODO: doc2go: AddTrailingSlashOnLinks vs LinkStyle enum
-
-Avoid this.
-Find the behavior being replaced, extract it,
-and then make it an interface or an enum.
---
-
-// == Repeated primitives
-//
-// [.notes]
-// --
-// If you find yourself repeating the same group of primitives
-// over and over again as arguments, fields, etc. use a struct.
-//
-// TODO: primitves with repeated prefixes
-// --
-
-== !
-
-[quote]
-Use types effectively
-

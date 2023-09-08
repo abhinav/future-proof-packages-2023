@@ -1,0 +1,192 @@
+= Overly specific booleans
+
+[source%step,go]
+----
+type SiteGen struct {
+   /* ... */
+}
+
+func (g *SiteGen) RelativeURL(dst *Page) string {
+   u := /* ... */
+   return u + "/"
+}
+
+g.RelativeURL(p) // "path/to/dst/"
+----
+
+[.notes]
+--
+In similar vein to string typing is overly specific booleans.
+This is pretty common.
+
+I have functionality, and it works fine.
+A user wants to customize something for their specific need.
+To keep the fingerprint of this request small,
+I add a boolean flag for that case.
+
+This is a trap, and again, best demonstrated with an example.
+(*step*)
+
+Suppose I'm building a static website generator.
+I want the generated HTML to be relocatable,
+so I generate relative URLs to other pages.
+
+I chose to make these URLs always end with a trailing slash.
+
+However, a user complains that their static website host
+does not like these trailing slashes and they'd like an opt-out.
+--
+
+[.columns]
+== Overly specific booleans
+
+[.column%step]
+--
+[source,go]
+----
+func (...) RelativeURL(
+   dst *Page,
+   slash bool,
+) string
+----
+
+Poorly scoped
+--
+
+[.column%step]
+--
+[source,go]
+----
+type SiteGen struct {
+  /* ... */
+  AddSlash bool
+}
+----
+
+Disruptive
+--
+
+[.column%step]
+--
+[source,go]
+----
+type SiteGen struct {
+  /* ... */
+  OmitSlash bool
+}
+----
+
+Rigid
+--
+
+[.notes]
+--
+Some options for what I could do there:
+
+* (*step*) Add a `slash` parameter to RelativeURL.
+** This is a non-starter. It's disruptive.
+   Every call to `RelativeURL` across the code base will have to be fixed.
+   If there are interfaces matching RelativeURL,
+   they and their implementations will also have to be fixed.
+** On top of that, and arguably more importantly, it's also poorly scoped:
+*** Even without looking at its implementation,
+    we can guess from ``SiteGen``'s name that it's the site generator.
+    It's scoped to a single website.
+*** On the other hand,
+    `RelativeURL` will be called many times during the process of generating.
+*** Whether URLs end with slashes is not something that changes for each URL;
+    it's a site-level property. It's site-scoped, not URL scoped.
+* (*step*) Okay, let's move that into a `SiteGen` level boolean.
+** That's still not good enough.
+   It's disruptive because the zero value -- the default value --
+   of this new optional field is the new behavior, not the old.
+   You might recall from the parameter objects discussion
+   that new fields should keep the zero value in mind.
+* (*step*) Fine, let's flip it. An `OmitSlash` field.
+** That's better, but it's still not good.
+** It's rigid. By being so specific, it limits any room for expansion.
+   What if in the future we want to support adding `.html` as an option?
+   Would that be another boolean? `AddHTML`?
+   What happens when both booleans are set?
+
+What's a better option?
+To figure that out, we have to stop thinking of this in isolation.
+This behavior has to be considered as part of the bigger SiteGen abstraction.
+The choice isn't a binary "add a slash or not",
+but "how do you want your links to be rendered"?
+
+And we have a great tool to pick from one of N already...
+--
+
+[%auto-animate.columns]
+== Enums
+
+[.column, step=1]
+--
+[source%linenums,go,data-id=LinkStyle]
+----
+type LinkStyle int
+
+const (
+   DirLinkStyle   LinkStyle = iota
+   PlainLinkStyle
+)
+----
+--
+
+[.column, step=1]
+--
+[source%linenums,go,data-id=SiteGen]
+----
+type SiteGen struct {
+  /* ... */
+  LinkStyle LinkStyle
+}
+----
+--
+
+[.notes]
+--
+Enums.
+
+I define an enum of how links should be rendered (*step*)
+and plug that into my site generator (*step*).
+
+Note that the zero value is DirLinkStyle -- which adds trailing slashes --
+because that's my original behavior. No disruption.
+
+When in the future I add the .html version...
+--
+
+[%auto-animate.columns]
+== Enums
+
+[.column]
+--
+[source%linenums,go,data-id=LinkStyle]
+----
+type LinkStyle int
+
+const (
+   DirLinkStyle   LinkStyle = iota
+   PlainLinkStyle
+   HTMLLinkStyle
+)
+----
+--
+
+[.column]
+--
+[source%linenums,go,data-id=SiteGen]
+----
+type SiteGen struct {
+  /* ... */
+  LinkStyle LinkStyle
+}
+----
+--
+
+[.notes]
+--
+That's just another entry in the enum.
+--
