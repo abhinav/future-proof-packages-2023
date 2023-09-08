@@ -10,47 +10,46 @@ if changing them causes disruptions,
 and I claimed that that's a symptom of a design that leaks complexity.
 
 So how do we go about fixing these leaks?
+I will talk about this at two levels:
 
-* I'll start by talking about some of the straightforward stuff;
-  patterns you can use to help you towards future-proof code
-* After that, I'll zoom out a little
-  and talk about some of the higher level things you can do
-  to avoid leaking complexity
+* First, low-level closer to the code.
+  Patterns you should keep an eye out for
+  that *probably* leak complexity.
+* After that, I'll zoom out and talk about design at a higher level.
 
-As I get into this section,
-please be aware that I'll be making some generalizations here.
-I'm not saying "code that looks like this is leaky" but
-"code that looks like this tends to leak."
+As I get into the first section,
+please be aware that I'll be making generalizations.
+The way to interpret this is
+"code that looks like this tends to leak complexity".
+
 // TODO: probably don't need to hedge here.
-
 // TODO: explain how each thing might leak complexity
 
 Okay, let's get into it.
 
-TODO:
-
-* Closure or callback heavy APIs
-** You can implement a class a closure doesn't mean you should.
-** Isolate concepts, give them names, add interfaces (middleware example)
-** Related: If there's an interface, prefer an object over closure. More maintainable.
-*** Closure want to be objects when they grow up
-* Unstoppable goroutines
-** Add a means of stopping them -- context or otherwise
-** Never spawn in `init()`
-
-Maybe:
-
-* Naming: names and scopes
-** Inconsistency in naming
-** Stuttering
-** Document public API of internal types with exported names
-** Consistency above all else
-* Errors: structured and sentinel
-* Bidirectional channels at boundaries / channels are rare
+// TODO:
+//
+// * Closure or callback heavy APIs
+// ** You can implement a class a closure doesn't mean you should.
+// ** Isolate concepts, give them names, add interfaces (middleware example)
+// ** Related: If there's an interface, prefer an object over closure. More maintainable.
+// *** Closure want to be objects when they grow up
+// * Unstoppable goroutines
+// ** Add a means of stopping them -- context or otherwise
+// ** Never spawn in `init()`
+//
+// Maybe:
+//
+// * Naming: names and scopes
+// ** Inconsistency in naming
+// ** Stuttering
+// ** Document public API of internal types with exported names
+// ** Consistency above all else
+// * Errors: structured and sentinel
+// * Bidirectional channels at boundaries / channels are rare
 --
 
-// TODO: include::fix-initialize.adoc[]
-include::fix-long-funcs.adoc[]
+// TODO: include::fix-initialize.adoc[] rename to premature-constructors?
 // TODO: many functions, adapt the long-funcs strategy
 include::fix-primitives.adoc[]
 // TODO: closures and objects
@@ -65,12 +64,16 @@ include::fix-global.adoc[]
 
 [.notes]
 --
-A lot of what I've talked so far has been fairly specific advice.
-It's intended to help you recognize patterns indicative of complexity leaks
-but it doesn't fix them. Not really.
+As promised, I'm going to zoom out now.
+I outlined some patterns for code that *looks* like it leaks complexity.
+However, there isn't really a hard list of rules we can build out of that.
 
-Fixing it requires a more holistic view of the application.
+Instead, I want to talk about an application holistically
+which may help you find and hide complexity better.
 --
+
+// TODO: incorporate into flow of information somehow
+include::fix-long-funcs.adoc[]
 
 = Flow of information
 
@@ -220,26 +223,26 @@ Unfortunately, I don't have a list of rules that we can follow
 to always get the right abstraction.
 But I have some tools that'll help you find it.
 
-TODO
-
-* single point of entry for modules that do one thing
-* look for conditionals
-* currying as a tool for building abstractions
-* start with the contract when adding a new type/function
-** document the contract before you implement it
-** make the contract inform the implementation, not the other way around
-** there's no such thing as self-documenting code
-** I'm a big fan of the old golint rule:
-   every exported entity must be documented.
-* Use tests to help inform abstractions
-* Application-scoped vs request-scoped information
-** Use scope of information to inform abstraction design.
-   Things that change rarely, vs things that change often.
-** Accepted interfaces should be request scoped
-** Tip: Argument order based on scope
-*** Exception: context
-* maybe: sometimes code repetition is okay
-** DRY vs DAMP; tests
+// TODO
+//
+// * single point of entry for modules that do one thing
+// * look for conditionals
+// * currying as a tool for building abstractions
+// * start with the contract when adding a new type/function
+// ** document the contract before you implement it
+// ** make the contract inform the implementation, not the other way around
+// ** there's no such thing as self-documenting code
+// ** I'm a big fan of the old golint rule:
+//    every exported entity must be documented.
+// * Use tests to help inform abstractions
+// * Application-scoped vs request-scoped information
+// ** Use scope of information to inform abstraction design.
+//    Things that change rarely, vs things that change often.
+// ** Accepted interfaces should be request scoped
+// ** Tip: Argument order based on scope
+// *** Exception: context
+// * maybe: sometimes code repetition is okay
+// ** DRY vs DAMP; tests
 
 // TODO: tie ideas here back into the guidance from prior section.
 --

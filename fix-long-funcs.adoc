@@ -1,22 +1,136 @@
 = Really long functions
 
-// TODO: diagram
+[pikchr, height=500px]
+....
+boxwid = 1in
+down
+
+A: [
+  box ht 0.5in
+  box ht 0.3in
+  box ht 0.6in
+  box ht 0.2in
+  box ht 0.4in
+]
+
+B: [
+  down
+  box ht 0.5in fill 0xEE9B00
+  move 0.1in
+  box ht 0.3in fill 0xBB3E03
+  move 0.1in
+  box ht 0.6in fill 0x9B2226
+  move 0.1in
+  box ht 0.2in fill 0xCA6702
+  move 0.1in
+  box ht 0.4in fill 0xAE2012
+] with nw at (A.e.x+1in, A.n.y+0.2in)
+
+arrow from 0.1in east of A.e to 0.1in west of B.w
+....
 
 [.notes]
 --
-Next, if you have a really long function,
-you might hear the obvious advice:
+Okay, so if we have a really long function,
+the obvious starting advice is:
 just break it down into multiple functions.
-
 I'm here to suggest that don't *just* do that -- don't stop there.
-So take this example:
-TODO; break a function down, repeated parameters.
 
-* The parameters of the original function are repeated in all N functions
-* Information calculated by prior functions is passed onto others
-* TODO
+There's usually some shared information between these functions;
+that's why they were all part of one big function.
 
-Instead, do this: try to find a named abstraction here.
+--
+
+[.columns]
+== Really long functions
+
+[.column]
+--
+[pikchr, height=500px]
+....
+boxwid = 1in
+
+down
+A: box ht 0.5in fill 0xEE9B00
+move 0.1in
+B: box ht 0.3in fill 0xBB3E03
+move 0.1in
+C: box ht 0.6in fill 0x9B2226
+move 0.1in
+D: box ht 0.2in fill 0xCA6702
+move 0.1in
+E: box ht 0.4in fill 0xAE2012
+
+box wid 0.1in fill 0x94D2BD ht D.ht with nw at A.nw
+box same with nw at B.nw
+box same with nw at C.nw
+box same with nw at D.nw
+box same with nw at E.nw
+
+
+linerad = 0.1in
+arrow from A.e right 0.3in then down until even with B then to B.e
+arrow from A.e right 0.15in then down until even with 0.1in north of C then left until even with C.e
+arrow from 0.1 south of C.e right 0.3in then down until even with E then to E.e
+arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
+....
+--
+
+[.column%step]
+--
+[pikchr, height=500px]
+....
+boxwid = 0.9in
+
+down
+A: box ht 0.5in fill 0xEE9B00
+move 0.1in
+B: box ht 0.3in fill 0xBB3E03
+move 0.1in
+C: box ht 0.6in fill 0x9B2226
+move 0.1in
+D: box ht 0.2in fill 0xCA6702
+move 0.1in
+E: box ht 0.4in fill 0xAE2012
+
+S: box wid 0.3in ht 0.5in fill 0x001219 with e at 0.5in west of A.w
+box wid 0.1in fill 0x94D2BD ht D.ht with nw at last.nw+(0.1in,-0.1in)
+
+linerad = 0.1in
+arrow <-> from S to A chop
+arrow from S right 0.35in then down until even with B then right to B chop
+arrow from S right 0.35in then down until even with E then right to E chop
+
+arrow from A.e right 0.15in then down until even with 0.1in north of C then left until even with C.e
+arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
+....
+--
+
+[.notes]
+--
+For example, you may find that:
+
+* some parameters are repeated between these functions
+* or that there's a fair bit of information passing between them;
+  something calculated by one is passed to others
+
+This is usually a good place to find an abstraction
+for the functionality implemented by the large function.
+(*step*)
+
+* A shared object could be defined here tracking the parameters
+  that are duplicated across functions
+* Each "stage" of the larger function becomes a method on the object.
+* Information is shared between functions via parameters,
+  but they may also feed information back to the larger abstraction's scope.
+
+// So take this example:
+// TODO; break a function down, repeated parameters.
+//
+// * The parameters of the original function are repeated in all N functions
+// * Information calculated by prior functions is passed onto others
+// * TODO
+// Instead, do this: try to find a named abstraction here.
 
 * Move parameters with "big scope" into struct fields
 * Add methods for each stage here (which you might've used functions for)
