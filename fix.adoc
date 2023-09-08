@@ -1,8 +1,15 @@
-= Fixing leaks
+= Finding and fixing problems
 
 [.notes]
 --
-So how to fix this?
+Finding and fixing problems.
+
+First, just to recap,
+I said earlier that packages aren't future-proof
+if changing them causes disruptions,
+and I claimed that that's a symptom of a design that leaks complexity.
+
+So how do we go about fixing these leaks?
 
 * I'll start by talking about some of the straightforward stuff;
   patterns you can use to help you towards future-proof code
@@ -42,7 +49,7 @@ Maybe:
 * Bidirectional channels at boundaries / channels are rare
 --
 
-include::fix-initialize.adoc[]
+// TODO: include::fix-initialize.adoc[]
 include::fix-long-funcs.adoc[]
 // TODO: many functions, adapt the long-funcs strategy
 include::fix-primitives.adoc[]
@@ -215,6 +222,8 @@ But I have some tools that'll help you find it.
 
 TODO
 
+* single point of entry for modules that do one thing
+* look for conditionals
 * currying as a tool for building abstractions
 * start with the contract when adding a new type/function
 ** document the contract before you implement it

@@ -11,6 +11,8 @@ TODO
 --
 If you find yourself repeating the same group of primitives
 over and over again as arguments, fields, etc. use a struct.
+
+TODO: primitves with repeated prefixes
 --
 
 == Overly specific booleans
@@ -23,7 +25,8 @@ You have functionality, it works fine.
 Someone wants to customize a specific behavior for their specific need,
 and so you add an overly specific boolean flag.
 
-// TODO: example
+// TODO: Zap SkipLineEnding vs LineEnding byte/enum, versus inject behavior
+// TODO: doc2go: AddTrailingSlashOnLinks vs LinkStyle enum
 
 Avoid this.
 Find the behavior being replaced, extract it,

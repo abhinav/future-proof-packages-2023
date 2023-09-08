@@ -42,7 +42,7 @@ include::tool-return-struct.adoc[]
 
 // TODO: accept interfaces, return structs as a practice
 
-= Expansion tools
+= Tools for future-proofing
 
 [.medium, cols=">.^2h,^3,^3", frame=none]
 |====

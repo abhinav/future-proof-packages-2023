@@ -23,6 +23,10 @@ A technique we could've employed here is using handles:
 NewGate returns an object that represents the gate,
 and that's enough to refer to it and do things with it in the future.
 TODO better explain
+Depending on the needs,
+the handle implementation can hold its own state,
+or a pointer to the parent object and an index into a slice in the parent
+with relevant state.
 
 Lastly, on the other side, returning maps when it's an implementation detail.
 If the uniqueness isn't a hard requirement now and forever,
