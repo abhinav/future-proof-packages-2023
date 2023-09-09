@@ -169,12 +169,12 @@ func (o *loggerOption) apply(co *clientOptions) {
 [.notes]
 --
 Doing so allows you to provide
-a readable string representation of the options,
+a readable string representation of the options (*step*),
 if you want.
 
 // TODO: move to next to diagram?
 
-This is super flexible:
+Interface or not, the pattern is quite flexible:
 
 * You can add an option that takes a pointer to something
   and fills that with a result when the operation finishes.

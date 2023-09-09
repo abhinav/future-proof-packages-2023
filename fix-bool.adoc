@@ -128,8 +128,8 @@ And we have a great tool to pick from one of N already...
 type LinkStyle int
 
 const (
-   DirLinkStyle   LinkStyle = iota
-   PlainLinkStyle
+   LinkStyleDir   LinkStyle = iota
+   LinkStylePlain
 )
 ----
 --
@@ -152,7 +152,7 @@ Enums.
 I define an enum of how links should be rendered (*step*)
 and plug that into my site generator (*step*).
 
-Note that the zero value is DirLinkStyle -- which adds trailing slashes --
+Note that the zero value is LinkStyleDir -- which adds trailing slashes --
 because that's my original behavior. No disruption.
 
 When in the future I add the .html version...
@@ -168,9 +168,9 @@ When in the future I add the .html version...
 type LinkStyle int
 
 const (
-   DirLinkStyle   LinkStyle = iota
-   PlainLinkStyle
-   HTMLLinkStyle
+   LinkStyleDir   LinkStyle = iota
+   LinkStylePlain
+   LinkStyleHTML
 )
 ----
 --
@@ -189,4 +189,20 @@ type SiteGen struct {
 [.notes]
 --
 That's just another entry in the enum.
+
+A significant advantage of modeling this behavior like this
+is that this RelativeURL method probably isn't the only place
+where I need to know our link rendering scheme.
+Especially with the .html version, that changes
+file names and directory paths that the system generates.
+
+Before I go further, I should say -- this is pretty good.
+Enums are a good fit for this.
+
+But there's another direction we could've gone with this.
+Suppose that the array of behaviors we wanted to support
+was too varied and we don't want to hard-code them.
+
+Instead of introducing an enum, we could've allowed the caller
+to inject the behavior. Something like..
 --

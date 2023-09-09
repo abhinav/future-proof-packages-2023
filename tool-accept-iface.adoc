@@ -143,6 +143,7 @@ func Parse(r io.Reader) (Node, error) {
 [source%linenums,go,data-id=Source]
 ----
 type Source interface {
+  io.Reader
   Name() string
 }
 ----

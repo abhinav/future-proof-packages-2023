@@ -1,0 +1,156 @@
+[%auto-animate.columns]
+= Injected callback
+
+[.column]
+--
+[source%linenums,go,data-id=LinkStyle]
+----
+func LinkStyleDir(string) string {
+  /* ... */
+}
+
+func LinkStylePlain(string) string {
+  /* ... */
+}
+
+func LinkStyleHTML(string) string {
+  /* ... */
+}
+----
+--
+
+[.column]
+--
+[source%linenums,go,data-id=SiteGen]
+----
+type SiteGen struct {
+  /* ... */
+  LinkStyle func(string) string
+}
+----
+
+[source%linenums.medium,go]
+----
+func (g *SiteGen) RelativeURL(dst *Page) string {
+  styleLink := g.FormatURL
+  if styleLink == nil {
+    styleLink = LinkStyleDir // default
+  }
+  /* ... */
+}
+----
+--
+
+[.notes]
+--
+Over here, `SiteGen` has a `FormatURL` field.
+This is any function that takes a string and returns a string.
+
+Users can write their own, or use one of the pre-defined ones.
+I can use the old behavior as the default if the field is unset.
+
+This is not bad, but it's not great:
+
+* It's very opaque; I don't know what's in a URL formatter.
+  It's just a function reference.
+  I can't inspect it, analyze it, compare it.
+* I can't expand it. For example,
+  if in the future, I decide that the thing that formats links
+  needs to know metadata about the page the link is for,
+  I can't do that easily.
+
+Earlier in the talk,
+I mentioned we can accept interfaces instead of concrete implementations
+to decouple from that implementation and allow ourselves to grow abstractions.
+We can apply that here too!
+--
+
+[%auto-animate.columns]
+== Injected interface
+
+[.column]
+--
+[source%linenums,go,data-id=LinkStyler]
+----
+type LinkStyler interface {
+   StyleLink(string) string
+}
+----
+
+[source%linenums.medium,go,data-id=LinkStyle]
+----
+type LinkStyle int
+
+const (
+   LinkStyleDir   LinkStyle = iota
+   LinkStylePlain
+   LinkStyleHTML
+)
+
+func (LinkStyle) StyleLink(*url.URL) string
+----
+--
+
+[.column]
+--
+[source%linenums,go,data-id=SiteGen]
+----
+type SiteGen struct {
+  /* ... */
+  LinkStyler LinkStyler
+}
+----
+--
+
+[.notes]
+--
+I replaced the callback with a single method interface.
+I already had a name for that behavior -- I reused it.
+A LinkStyler.
+
+This also allows me to re-use that LinkStyle enum from before.
+I implement the interface for LinkStyle
+and then my pre-defined list of behaviors has meaningful names
+and comparable values for them.
+
+And then if I decide to expand the abstraction,
+I can upcast.
+--
+
+[%auto-animate.columns]
+== Injected interface
+
+[.column]
+--
+[source%linenums,go,data-id=LinkStyler]
+----
+type LinkStyler interface {
+   StyleLink(string) string
+}
+
+type PageLinkStyler interface {
+  StylePageLink(*Page, string) string
+}
+----
+--
+
+[.column]
+--
+[source%linenums.medium,go]
+----
+link := /* ... */
+if pl, ok := styler.(PageLinkStyler); ok {
+  link = pl.LinkPage(page, link)
+} else {
+  link = linkStyler.StyleLink(link)
+}
+----
+--
+
+[.notes]
+--
+For example,
+suppose I decide that the link styler needs to be able to inspect the page;
+I can add an upgrade to the `LinkStyler` interface that takes precedence
+and has the new type signature.
+--
