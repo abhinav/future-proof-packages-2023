@@ -73,12 +73,13 @@ include::fix-string.adoc[]
 include::fix-map.adoc[]
 include::fix-bool.adoc[]
 include::fix-callback.adoc[]
-// TODO: maybe: closures and objects
+// TODO: maybe: closures vs objects
 include::fix-premature-iface.adoc[]
 
 // ---
 
 include::fix-big-iface.adoc[]
+// TODO: maybe serialized types after maps as another example of leak
 include::fix-serialized-types.adoc[]
 include::fix-global.adoc[]
 

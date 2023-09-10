@@ -42,7 +42,7 @@ func (*Client) List() ([]*Post, error) {
 }
 ----
 
-[source%linenums.small,go,data-id=iface,step=3]
+[source%linenums.medium,go,data-id=iface,step=3]
 ----
 type PostClient interface {
   List() ([]*Post, error)
