@@ -1,29 +1,101 @@
 = Big interfaces
 
+[%step]
+--
+> The bigger the interface, the weaker the abstraction.
+>
+> -- Rob Pike, https://www.youtube.com/watch?v=PAAkCSZUG1c&t=5m17s&themeRefresh=1[Gopherfest 2015]
+--
+
 [.notes]
 --
-Big interfaces for something you define and return
-can be indicative of tight coupling between components.
+Once we're defining interfaces,
+one risk to be aware of is overly large interfaces.
 
-There are some ways you can make these smaller.
+Big interfaces indicate a tight coupling
+between the producer of the abstraction and the consumer.
+Or as Rob Pike put it, (*step*)
+the bigger the interface, the weaker the abstraction.
 
-TODO
+Aim to make interfaces smaller.
+Let me cover a couple tips to help with that.
 --
 
-== Focus on the request path
+[.columns]
+== Follow the request path
+
+[.column%step]
+--
+[source.medium,go]
+----
+type RedisStore struct{ /* ... */ }
+
+func NewRedisStore(addr string) *RedisStore {
+  /* ... */
+}
+
+func (*RedisStore) Get([]byte) ([]byte, error) {
+  /* ... */
+}
+
+func (*RedisStore) Set(k, v []byte) error {
+  /* ... */
+}
+
+func (*RedisStore) Close() {
+  /* ... */
+}
+----
+--
+
+[.column%step]
+--
+[source,go]
+----
+type Store interface {
+  Get([]byte) ([]byte, error)
+  Set(k, v []byte) error
+}
+----
+
+No `Close()`
+
+[source%step,go]
+----
+s := NewRedisStore(addr)
+defer s.Close()
+consume(s)
+// Given,
+//   func consume(Store)
+----
+--
 
 [.notes]
 --
 When deciding what goes on the interface,
 don't just list all the methods of the object on the interface.
-Think about the request path --
-methods that will be called many times per object.
 
-For example, don't add the Close method on the interface for TODO.
-Leave that exposed on the struct.
+Think about the request path:
+methods of the object that consumers will want to call --
+probably many times.
+
+For example, (*step*) suppose you have a Redis-based key-value store.
+You have Get and Set, and maybe a Close method to clean up the connection.
+
+The interface for the key value store should include (*step*):
+Get, Set, but not Close.
+
+Close is not part of the request path for a regular consumer.
+They'll call Get and Set, but not Close.
+Plus, if you think about it, not every store will have a Close method.
+An in-memory data store won't have a meaningful close method.
+
+So leave Close out of the interface.
+It's accessible only if you have the actual `RedisStore` object,
+which you do (*step*) outside the request path -- when you instantiated it.
 --
 
-== Build a powerful core
+== Build a strong core
 
 [.notes]
 --

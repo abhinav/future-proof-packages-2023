@@ -128,6 +128,7 @@ At least, not usually. When should it?
 
 * Single operation interfaces
 * Multiple implementations
+* Wrapped abstractions
 * Others
 
 [.notes]
@@ -139,7 +140,9 @@ I'm sure there are others, but a couple I can think of are:
   basically just a step above a function reference.
   Think back to the callbacks vs interfaces part of this talk.
 * You've got multiple implementations of the interface
-  and *it's common* for consumers to be polymorphic over these implementations.
+  and it's common for consumers to be polymorphic over these implementations.
+* You expect consumers to commonly wrap the abstraction you're producing
+  before using it or passing it on.
 
 Again, I'm sure there are others;
 I don't have the time to make this comprehensive.
