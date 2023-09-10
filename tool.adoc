@@ -1,6 +1,7 @@
 = Tools
 
 // TODO: picture of a toolbox
+// TODO: Drop the do/don't for tools. Just show the tool.
 
 [%step]
 * Functions

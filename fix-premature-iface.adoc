@@ -1,46 +1,148 @@
-= Premature interfaces
+[.columns.wrap]
+= Unwarranted interfaces
 
-// TODO: Technically already covered with accept interfaces
+[.column.is-half]
+--
+[.small]
+Don't
 
-// TODO: better title
+[source.medium,go]
+----
+type Client interface {
+  List() ([]*Post, error)
+}
+
+func New() Client {
+  return &impl{/* ... */}
+}
+
+type impl struct{/* ... */}
+
+func (*impl) List() ([]*Post, error) {
+  /* ... */
+}
+----
+--
+
+[.column.is-half, step=2]
+--
+[.small]
+Do
+
+[source%linenums.medium,go,data-id=struct]
+----
+type Client struct{/* ... */}
+
+func New() *Client {
+  return &Client{/* ... */}
+}
+
+func (*Client) List() ([]*Post, error) {
+  /* ... */
+}
+----
+
+[source%linenums.small,go,data-id=iface,step=3]
+----
+type PostClient interface {
+  List() ([]*Post, error)
+}
+
+func NewHandler(pc PostClient) *Handler {
+  /* ... */
+}
+----
+--
+
+[column.medium.is-full.fade-in-then-semi-out, step=1]
+--
+Accept interfaces, return structs
+--
 
 [.notes]
 --
-You might find code that takes this shape:
+Unwarranted interfaces.
+
+I already covered this to some degree in "return structs" earlier,
+but I want to call it out explicitly.
+
+I'm talking about code that takes this shape:
 a constructor that returns an interface defined right above,
 and returns a private implementation defined down below.
 
-This is quite common for folks coming from another language
-or if you're just trying to prematurely define an interface
-so that you can mock and test it later.
+You might make this choice if you're coming from another language
+where interfaces that a type satisfies must be specified
+when the type is declared.
+Maybe you want the interface in place
+so that you can mock this object later,
+in other objects that consume it.
 
-Those who've been around this ecosystem a while
-might recognize the Go proverb I'm about to use now.
+Either way, there's a better way to go at this.
+
+I mentioned this before in the tools section as two separate points
+but it bears repeating as its own mantra... (*step*)
+
+Accept interfaces, return structs.
+
+This is not a hard-and-fast rule, and there's nuance to it,
+so for this discussion, I'm narrowing it down to
+objects with business logic on them
+that we've wrapped an interface around.
+
+The idea is this:
+For complex objects with lots of behavior,
+don't prematurely declare and return an interface.
+Instead (*step*) export and return the concrete type
+that implements the functionality.
+
+Why? It lets you expand the abstraction.
+It lets you add more functionality on the object
+without disrupting consumers --
+adding new methods to an interface is disruptive.
+
+What if a consumer needs to mock this object?
+That's fine (*step*) they can declare their own interface for it.
 --
 
-== !
+[.columns]
+== Unwarranted interfaces
 
-// TODO: center title
+[.column]
+Producers expose concrete types
 
-[quote]
-Accept interfaces, return structs.
+[.column]
+Consumers define interfaces
 
 [.notes]
 --
-Accept interfaces, return structs.
+In short, by default, for complex abstractions,
+producers expose the concrete types,
+and the consumers define interfaces for the functionality that they need.
 
-This is not a hard-and-fast rule but it's good advice to start with.
-For this discussion, I'm narrowing it down to "big interfaces".
-Objects with lots of business logic on them
-that you've wrapped an interface around.
+I'm effectively saying that a package that produces a complex abstraction
+should not define an interface for that abstraction.
+At least, not usually. When should it?
+--
 
-For complex objects with lots of behavior,
-start by returning the pointer-to-struct for them.
-You can more easily add new methods to it.
+== When should producers define interfaces?
 
-Where you want to use it, define an interface on demand.
+* Single operation interfaces
+* Multiple implementations
+* Others
 
-If there are more than a couple places where you need to define
-the same interface, or you have multiple implementations of this behavior,
-*then* define think about defining the interface.
+[.notes]
+--
+When can producers of abstractions define their own interfaces?
+I'm sure there are others, but a couple I can think of are:
+
+* Interfaces that represent a single operation --
+  basically just a step above a function reference.
+  Think back to the callbacks vs interfaces part of this talk.
+* You've got multiple implementations of the interface
+  and *it's common* for consumers to be polymorphic over these implementations.
+
+Again, I'm sure there are others;
+I don't have the time to make this comprehensive.
+
+The point I'm making is that by default, don't declare that interface.
 --

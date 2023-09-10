@@ -49,7 +49,10 @@ Okay, let's get into it.
 // * Bidirectional channels at boundaries / channels are rare
 --
 
-// TODO: include::fix-initialize.adoc[] rename to premature-constructors?
+// TODO: include::fix-initialize.adoc[]
+// move to after tools (func-opts)
+// or "forgetting the zero value"
+
 // TODO: many functions, adapt the long-funcs strategy
 
 = Over-reliance on primitives
@@ -67,13 +70,14 @@ I think this is better demonstrated with an example.
 --
 
 include::fix-string.adoc[]
+include::fix-map.adoc[]
 include::fix-bool.adoc[]
 include::fix-callback.adoc[]
-// TODO: closures and objects (maybe?)
-
-// TODO: maybe map should be right after string.
-include::fix-map.adoc[]
+// TODO: maybe: closures and objects
 include::fix-premature-iface.adoc[]
+
+// ---
+
 include::fix-big-iface.adoc[]
 include::fix-serialized-types.adoc[]
 include::fix-global.adoc[]
