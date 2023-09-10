@@ -34,11 +34,11 @@ func NewRedisStore(addr string) *RedisStore {
   /* ... */
 }
 
-func (*RedisStore) Get([]byte) ([]byte, error) {
+func (*RedisStore) Get(string) (string, error) {
   /* ... */
 }
 
-func (*RedisStore) Set(k, v []byte) error {
+func (*RedisStore) Set(k, v string) error {
   /* ... */
 }
 
@@ -53,8 +53,8 @@ func (*RedisStore) Close() {
 [source,go]
 ----
 type Store interface {
-  Get([]byte) ([]byte, error)
-  Set(k, v []byte) error
+  Get(string) (string, error)
+  Set(k, v string) error
 }
 ----
 
@@ -95,15 +95,184 @@ It's accessible only if you have the actual `RedisStore` object,
 which you do (*step*) outside the request path -- when you instantiated it.
 --
 
-== Build a strong core
+[%auto-animate]
+== Compose with functions
+
+[source%linenums,go,data-id=SetMany]
+----
+func (s *RedisStore) SetMany(ks, vs []string) error {
+  for i, k := range ks {
+    err := s.Set(k, vs[i])
+    if err != nil {
+      return nil, err
+    }
+  }
+  return nil
+}
+----
 
 [.notes]
 --
-For some objects where all methods have the same backend,
-one cool thing you can do is define the powerful base method:
-I call it the engine here.
+This brings up the question of convenient functionality
+that you added to your abstraction.
 
-It's the thing that everything else relies on.
+Suppose the Redis Store also supported a SetMany method.
+We could add this to the Store interface -- it's on the hot path --
+but also note that the implementation is entirely composed
+from the API we already expose from the Store interface.
 
-Take that engine, put a struct around it, implement methods on it.
+We could just turn it into a function...
+--
+
+[%auto-animate]
+== Compose with functions
+
+[source%linenums,go,data-id=SetMany]
+----
+func SetMany(s Store, ks, vs []string) error {
+  for i, k := range ks {
+    err := s.Set(k, vs[i])
+    if err != nil {
+      return nil, err
+    }
+  }
+  return nil
+}
+----
+
+[.notes]
+--
+As an added benefit, this works with any Store,
+not just RedisStore.
+
+But of course, this isn't completely realistic;
+redis probably has more optimal way of setting many items.
+
+I'd like for RedisStore to use that instead.
+
+I can do that with a tool we discussed before: upcasting.
+--
+
+[%auto-animate.columns.wrap]
+== Compose with functions
+
+[.column.is-full]
+--
+[source%linenums,go,data-id=SetMany]
+----
+func SetMany(s Store, ks, vs []string) error {
+  if sm, ok := s.(SetManyStore); ok {
+    return sm.SetMany(ks, vs)
+  }
+  for i, k := range ks {
+    err := s.Set(k, vs[i])
+    if err != nil {
+      return nil, err
+    }
+  }
+  return nil
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=SetManyStore]
+----
+type SetManyStore interface {
+  Store
+  SetMany(ks, vs []string) error
+}
+----
+--
+
+[.column.is-half%step]
+--
+[source%linenums,go,data-id=RedisStoreSetMany]
+----
+func (*RedisStore) SetMany(
+  ks, vs []string,
+) error { /* ... */ }
+----
+--
+
+[.notes]
+--
+I define a new interface with the SetMany method,
+and have the SetMany function check
+if this method exists on the Store.
+
+If it does, we can use the more optimized version (*step*)
+implemented by the RedisStore.
+
+Otherwise, we'll run the standard looping behavior
+for all other stores.
+
+This is pretty useful,
+but it's not the only way to get this extension point.
+In fact, in terms of ergonomics, it might not be cleanest experience
+to have to use this top level function with your Store.
+It's a bit hard on discoverability;
+your IDE won't just auto-complete it when you write `store.`.
+
+We can use the same technique, but with a wrapper struct instead...
+--
+
+
+[%auto-animate.columns.wrap]
+== Build a strong core
+
+[.column.is-full]
+--
+[source%linenums,go,data-id=SetMany]
+----
+type DataStore struct{ s Store }
+
+func (d *DataStore) SetMany(ks, vs []string) error {
+  s := d.s
+  if sm, ok := s.(SetManyStore); ok {
+    return sm.SetMany(ks, vs)
+  }
+  for i, k := range ks {
+    /* ... */
+  }
+  return nil
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=SetManyStore]
+----
+type SetManyStore interface {
+  Store
+  SetMany(ks, vs []string) error
+}
+----
+--
+
+[.column.is-half]
+--
+[source%linenums.medium,go]
+----
+func (*DataStore) Get(k string) (string, error)
+func (*DataStore) Set(k, v string) error
+----
+--
+
+[.notes]
+--
+Here, I declare a new DataStore type that wraps a regular Store.
+
+It implements Get and Set like a regular store,
+but it also implements SetMany using the same logic as before:
+if the wrapped store provides SetMany, use that,
+otherwise loop.
+
+So you get the best of all worlds:
+
+* A small powerful interface
+* Upgrade the interface per implementation as needed
+* Operate on a rich object with convenient methods
 --

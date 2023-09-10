@@ -49,11 +49,10 @@ Okay, let's get into it.
 // * Bidirectional channels at boundaries / channels are rare
 --
 
-// TODO: include::fix-initialize.adoc[]
-// move to after tools (func-opts)
-// or "forgetting the zero value"
-
 // TODO: many functions, adapt the long-funcs strategy
+
+// TODO: partial initialization
+// TODO: include::fix-initialize.adoc[]
 
 = Over-reliance on primitives
 
