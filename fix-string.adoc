@@ -303,10 +303,6 @@ Ah, that's better.
 In this example, `url.Parse` already existed,
 but the point I'm making here doesn't hold just for that.
 
-// TODO: Other examples:
-// UUID, timestamps, ${FOO}, etc.
-// other parse functions
-
 // TODO: this might be a good injection point
 --
 

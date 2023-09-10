@@ -69,7 +69,7 @@ I think this is better demonstrated with an example.
 include::fix-string.adoc[]
 include::fix-bool.adoc[]
 include::fix-callback.adoc[]
-// TODO: closures and objects
+// TODO: closures and objects (maybe?)
 
 // TODO: maybe map should be right after string.
 include::fix-map.adoc[]

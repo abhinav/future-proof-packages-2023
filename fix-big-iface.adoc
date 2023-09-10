@@ -23,7 +23,7 @@ For example, don't add the Close method on the interface for TODO.
 Leave that exposed on the struct.
 --
 
-== Build around an engine
+== Build a powerful core
 
 [.notes]
 --
