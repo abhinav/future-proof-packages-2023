@@ -74,24 +74,7 @@ include::fix-callback.adoc[]
 // TODO: maybe: closures vs objects
 include::fix-premature-iface.adoc[]
 include::fix-big-iface.adoc[]
-
-// ---
-
 include::fix-global.adoc[]
-
-// Theme: the world outside your code is chaotic and out of your control.
-// Restrict the chaos to the boundary of your packages,
-// and control everything inside.
-
-// == Repeated primitives
-//
-// [.notes]
-// --
-// If you find yourself repeating the same group of primitives
-// over and over again as arguments, fields, etc. use a struct.
-//
-// TODO: primitves with repeated prefixes
-// --
 
 = Zooming out
 

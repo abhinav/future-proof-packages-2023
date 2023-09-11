@@ -4,92 +4,201 @@
 --
 Let's talk about global state.
 
-Yeah, we all already know that global variables should be avoided.
+Okay, yeah, you all probably already know global variables should be avoided.
 That's not what I want to talk about.
 I want to talk about...
-
-// TODO: is this better?
-// But there's more nuance to that.
-// It's partly a matter of scope and perspective.
-//
-// Let's start with a position of most global variables are bad
-// and talk about some of the exceptions.
-//
-// * Global variables that are computed once at startup
-//   and never modified again, only read -- good!
-// * Global variables that are written to at startup,
-//   for example some kind of global registry -- probably fine!
-// * Global variables that track ongoing metrics for incoming requests --
-//   not great but there are bigger fish to fry!
-// * Global variables used to communicate between functions,
-//   as in set this variable and then call this function --
-//   obviously absolutely not! That's illegal.
-//
-// The point I'm getting at is that the absolute position of
-// all global variables are bad --
-// that the mere act of reading from or writing to a global variable is bad --
-// is wrong.
 --
 
+[.columns.wrap]
 == Implicit process globals
+
+[.column.medium.is-half]
+--
+[%hardbreaks]
+`os.Stdout`, `os.Stdin`, `os.Stderr`,
+`os.Getenv(k)`, `os.Setenv(k, v)`
+--
+
+[.column.is-half]
+--
+[source%step,go]
+----
+if os.Getenv("FEATURE_MAGIC") != "" {
+  fmt.Println("You're a wizard")
+  return doMagic()
+}
+return beBoring()
+----
+--
+
+[.column.is-full]
+--
+[%step]
+* Don't touch process state outside `main`
+* Isolate business logic from process state
+--
 
 [.notes]
 --
 Implicit process globals.
 
-These refers to environment variables, stdout, stdin, etc.
-These come under global state.
+Your environment variables, stdout, stdin, stderr, etc.
+These and more are all global state for your process.
 
-// TODO examples
-For example, a little opt-in in your library or application
-where if ENV_FOO is set, then you'll use the old behavior vs new.
+It's incredibly easy to add a feature flag to your code
+with environment variables to test out experimental work.
+(*step*) If the environment variable is set,
+provide the new feature, otherwise don't.
 
-There's nothing wrong with using environment variables
-for flags and customizations like this.
-I'm claiming that using that anywhere outside `main` is a leak.
+There's nothing wrong with this;
+using environment variables to enable features,
+or overriding default behaviors -- this is good.
+
+The claim I'm making is this: (*step*)
+reading or writing process global state outside the `main` package
+is a leak.
+
+(*step*)
+You should aim to isolate your business logic from your process globals.
+Knowledge of your process state --
+environment variables, standard out, etc. --
+should remain inside main.
 
 // TODO: example code
-The knowledge of the process' environment should remain in main.
-Extract everything you need to extract from the environment
-as early as possible in main, pull that into a data structure,
-and plumb information down as needed.
-
-A pattern I like to use here a lot is (TODO show `mainCmd` pattern).
-This adds these two integration points for me to test:
-
-* Inject a fake Getenv to test the parsing of environment into the struct
-* In business logic, test just against the struct with no concern for
-  environment
-
-You probably already do this with `os.Args`:
-parse in main and pass the parsed command line arguments around.
-A random business logic component will not typically access `os.Args` directly.
-Just carry that over to Getenv, Setenv, Stdin, Stdout, Signal, and friends.
+// Extract everything you need to extract from the environment
+// as early as possible in main, pull that into a data structure,
+// and plumb information down as needed.
+//
+// A pattern I like to use here a lot is (TODO show `mainCmd` pattern).
+// This adds these two integration points for me to test:
+//
+// * Inject a fake Getenv to test the parsing of environment into the struct
+// * In business logic, test just against the struct with no concern for
+//   environment
+//
+// You probably already do this with `os.Args`:
+// parse in main and pass the parsed command line arguments around.
+// A random business logic component will not typically access `os.Args` directly.
+// Just carry that over to Getenv, Setenv, Stdin, Stdout, Signal, and friends.
 --
 
-== !
+[.columns.wrap]
+== Implicit process globals
 
-[quote]
+[.column.is-one-third]
 --
-Don't access or manipulate OS state outside the `main` package.
+[source,go]
+----
+os.Getenv("FEATURE_MAGIC")
+----
+--
+
+[.column.is-two-thirds%step]
+--
+[source,go]
+----
+func main() {
+  feats := Features{Magic: os.Getenv("FEATURE_MAGIC")}
+  run(feats)
+}
+----
+--
+
+[.column.is-one-third]
+--
+[source,go]
+----
+fmt.Println(
+  "You're a wizard",
+)
+----
+--
+
+[.column.is-two-thirds%step]
+--
+[source,go]
+----
+func main() {
+  run(os.Stdout, /* ... */)
+}
+
+func run(stdout io.Writer, /* ... */)
+----
+--
+
+[.column.is-one-third]
+--
+[source,go]
+----
+os.Getenv
+----
+--
+
+[.column.is-two-thirds%step]
+--
+[source,go]
+----
+func main() {
+  run(os.Getenv, /* ... */)
+}
+
+func run(getenv func(string) string, /* ... */)
+----
 --
 
 [.notes]
 --
-In short..
+A good way to do this is by extracting information from the process state
+as early as possible in main.
+
+For example, instead of hitting os.Getenv in your business logic,
+(*step*), early in main, extract all feature flags into a struct
+and pass that down to your logic.
+
+Similarly, (*step*) instead of printing to standard out directly,
+grab a reference to os.Stdout and pass that into your business logic.
+
+Obviously, I can't look up all environment variables at startup.
+What if I need to look up more at runtime? (*step*)
+That's fine, Go has function references.
+
+You might now be thinking that that `run` function is starting to get ungainly.
+Yeah, I agree. We can fix that.
 --
 
-== Global registries
+[.columns]
+== Implicit process globals
 
-// TODO: side-note CSS
+[.column]
+--
+[source,go]
+----
+type cliParams struct {
+  Stdout io.Writer
+  Stderr io.Writer
+  Getenv func(string) string
+}
+
+func run(*cliParams)
+----
+--
+
+[.column%step]
+--
+[source,go]
+----
+type CLI struct {
+  Stdout io.Writer
+  Stderr io.Writer
+  Getenv func(string) string
+}
+
+func (*CLI) Run() (exitCode int)
+----
+--
 
 [.notes]
 --
-A quick note on global registries.
-It's not uncommon for libraries to provide
-a global registry of [thing] -- handlers, types, whatever.
-
-If you do this,
-just be sure to provide your callers a means of "going back"
-to the point before they registered their thing.
+We talked about parameter objects before. That fits right in.
+(*step*) Or equivalently, an object with a Run method.
 --
