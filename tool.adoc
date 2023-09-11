@@ -74,3 +74,5 @@ So to summarize, the starting toolbox contains:
   and adding methods to them,
   for expanding output abstractions
 --
+
+include::tool-initialize.adoc[]

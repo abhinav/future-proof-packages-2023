@@ -1,0 +1,199 @@
+= Initializing complex objects
+
+[.notes]
+--
+As a quick tangent, I want to talk about object initialization.
+
+I just mentioned parameter objects and functional options.
+These both allow for two different ways to initialize complex objects.
+But they're not the only ways.
+
+One of the best and easiest ways to initialize objects is...
+--
+
+[.columns]
+== Usable zero value
+
+[.column]
+--
+[source, go]
+----
+var (
+  buff   bytes.Buffer
+  lock   sync.Mutex
+  client http.Client
+)
+----
+--
+
+[.column.text-left]
+--
+[%hardbreaks]
+👍 Easy
+
+[.medium]
+Prefer when possible
+--
+
+[.notes]
+--
+A `var` declaration.
+
+Where possible, objects should have a usable zero value.
+
+They may export fields to customize any of the default behaviors.
+It acts like a parameter object
+where the behaviors are on the object itself.
+
+This makes for the simplest usage experience.
+
+This isn't always possible. In fact, it's a rarity.
+--
+
+[.columns]
+== Exported required fields
+
+[.column]
+--
+[source,go]
+----
+type PrefixWriter struct {
+  Writer io.Writer /* required */
+  Prefix string
+}
+----
+--
+
+[.column.text-left]
+--
+[%hardbreaks]
+👍 Easy
+👎 Repeated validation
+
+[.medium]
+Prefer for 1-2 methods
+--
+
+[.notes]
+--
+So if there are one or two fields that must be set,
+you can still get away with just a vanilla struct with public fields.
+
+This is easy and it works well for simple objects and abstractions.
+
+The part that's annoying about it is that
+there's no way to enforce that the field is set.
+Only documentation.
+
+So you have to validate the field at every entry point
+or have the code explode in fun ways.
+
+But I think it's worth it if you have a data-only object
+or only one or two methods on the object.
+
+That brings us to constructor territory.
+--
+
+[.columns.wrap]
+== Constructors
+
+[.column.is-one-third]
+--
+Positional arguments
+
+[source,go]
+----
+func NewCore(
+  enc Encoder,
+  ws  WriteSyncer,
+  lvl LevelEnabler,
+) Core
+----
+--
+
+[.column.is-one-third]
+--
+Parameter objects
+
+[source,go]
+----
+func NewJSONEncoder(
+  cfg EncoderConfig,
+) Encoder
+----
+--
+
+[.column.is-one-third]
+--
+Functional options
+
+[source,go]
+----
+func New(
+  core zapcore.Core,
+  opts ...Option,
+) *Logger
+----
+--
+
+[.column.is-one-third.medium]
+--
+3 or fewer
+arguments
+--
+
+[.column.is-one-third.medium]
+--
+4 or more parameters
+--
+
+[.column.is-one-third.medium]
+--
+Only if worth it
+--
+
+[.notes]
+--
+For constructors,
+we can use positional arguments,
+or as just discussed,
+parameter objects or functional options.
+
+They have their tradeoffs,
+so prefer them in this order.
+--
+
+[.columns.wrap]
+== Initialization summary
+
+[.column.is-full.medium]
+In-order, prefer...
+
+[.column.is-half]
+--
+Plain objects
+
+. Usable zero value
+. Exported required fields
+--
+
+[.column.is-half]
+--
+Constructor
+
+[start=3]
+. Positional arguments
+. Parameter object
+. Functional options
+--
+
+[.notes]
+--
+In summary:
+
+* Prefer plain objects with a usable zero value
+  or with required exported fields if the number of entry points is low.
+* If you need a constructor,
+  prefer positional arguments, parameter object, or functional options,
+  in that order depending on the number of arguments and complexity.
+--

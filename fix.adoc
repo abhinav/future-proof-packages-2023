@@ -50,7 +50,6 @@ Okay, let's get into it.
 --
 
 // TODO: many functions, adapt the long-funcs strategy
-// TODO include::fix-initialize.adoc[]
 
 = Over-reliance on primitives
 
