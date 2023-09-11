@@ -12,6 +12,8 @@ Abhinav Gupta
 :revealjs_theme: night
 :revealjs_totalTime: 2700
 :revealjs_transition: none
+:revealjs_width: 1280
+:revealjs_height: 720
 :customcss: css/style.css
 :icons: font
 :idprefix:
