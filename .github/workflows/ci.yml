@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+  # To run this manually.
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: true
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1.2'
+          bundler-cache: true
+
+      - name: Build
+        run: |
+          make site
+          tar -cvf site.tar -C _site .
+          gzip site.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: site
+          path: site.tar.gz
+          retention-days: 14

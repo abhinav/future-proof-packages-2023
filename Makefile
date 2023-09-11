@@ -23,6 +23,7 @@ endif
 site: third_party
 	@rm -rf _site && mkdir -p _site/reveal.js/plugin
 	$(ASCIIDOCTOR) -D _site $(ASCIIDOCTOR_ARGS) index.adoc
+	rm -rf _site/.asciidoctor
 	cp -R css _site/css
 	cp -R fonts _site/fonts
 	cp -r images _site/images
