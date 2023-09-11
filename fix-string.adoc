@@ -311,13 +311,13 @@ but the point I'm making here doesn't hold just for that.
 [.columns.wrap]
 == String typing
 
-[.column.is-half.small]
+[.column.is-one-third.small]
 Untyped
 
-[.column.is-half.small]
+[.column.is-two-thirds.small]
 Typed
 
-[.column.is-half]
+[.column.is-one-third]
 --
 [source, go]
 ----
@@ -325,7 +325,7 @@ strings.HasPrefix(addr, "ssh://")
 ----
 --
 
-[.column.is-half]
+[.column.is-two-thirds]
 --
 [source, go]
 ----
@@ -333,7 +333,7 @@ u, err := url.Parse(addr)
 ----
 --
 
-[.column.is-half]
+[.column.is-one-third]
 --
 [source, go]
 ----
@@ -341,7 +341,7 @@ var uuid string
 ----
 --
 
-[.column.is-half]
+[.column.is-two-thirds]
 --
 [source, go]
 ----
@@ -350,7 +350,7 @@ func ParseUUID(string) (UUID, error)
 ----
 --
 
-[.column.is-half]
+[.column.is-one-third]
 --
 [source, go]
 ----
@@ -358,7 +358,7 @@ var ts int64
 ----
 --
 
-[.column.is-half]
+[.column.is-two-thirds]
 --
 [source, go]
 ----
@@ -366,7 +366,7 @@ t := time.UnixMilli(ts)
 ----
 --
 
-[.column.is-half]
+[.column.is-one-third]
 --
 [source, go]
 ----
@@ -374,18 +374,25 @@ strings.Replace(s, "%VAR%", val)
 ----
 --
 
-[.column.is-half.medium]
+[.column.is-one-third.medium]
 --
 [source, go]
 ----
 type Node struct{ Var, Str string }
 type Template []Node
 func Parse(string) Template
+----
+--
 
+[.column.is-one-third.medium]
+--
+[source, go]
+----
 tmpl := Parse(s)
 tmpl.Render(map[string]string{"VAR": val})
 ----
 --
+
 
 [.notes]
 --

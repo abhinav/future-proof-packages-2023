@@ -7,7 +7,7 @@
 ----
 func New(url string, token string) *Client {
   return &Client{
-    // ...
+    /* ... */
   }
 }
 ----
@@ -29,7 +29,7 @@ The idea is that you take the parameters of your function...
 ----
 func New(cfg *Config) *Client {
   return &Client{
-    // ...
+    /* ... */
   }
 }
 ----
@@ -73,7 +73,7 @@ func New(cfg *Config) *Client {
 
   return &Client{
     log: log,
-    // ...
+    /* ... */
   }
 }
 ----

@@ -83,3 +83,8 @@ section .slide-content:has(> div) {
     margin-top: auto !important;
     margin-bottom: auto !important;
 }
+
+/* reveal.js adds a slight shadow to code blocks. drop it. */
+.reveal pre {
+    box-shadow: none
+}

@@ -19,7 +19,7 @@ Abhinav Gupta
 :idprefix:
 :idseparator: -
 :source-highlighter: highlightjs
-:highlightjs-theme: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.3/styles/gruvbox-dark.min.css
+:highlightjs-theme: css/highlight.css
 :font-awesome-version: 5.15.4
 
 [.small.text-right]
