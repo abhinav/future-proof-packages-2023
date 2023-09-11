@@ -161,6 +161,8 @@ Let me clarify.
 --
 I advised earlier against a zigzagging flow of information.
 
+// TODO: diagram
+
 So let's take two packages from some application:
 
 // TODO realistic example

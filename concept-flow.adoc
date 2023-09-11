@@ -42,8 +42,8 @@ but the information represented is similar if not the same.
 linewid = 0.2in
 linerad = 0.1in
 
-define data { box $1 mono rad 0.1in fit  }
-define func { box $1 mono fit }
+define data { box $1 mono color 0x0A9396 rad 0.1in fit  }
+define func { box $1 mono color 0xCA6702 fit }
 
 CLI: [
   data("[]string")
@@ -102,8 +102,8 @@ lineht = 0.2in
 linerad = 0.1in
 movewid = 0.3in
 
-define data { box $1 mono rad 0.1in fit  }
-define func { box $1 mono fit }
+define data { box $1 mono color 0x0A9396 rad 0.1in fit  }
+define func { box $1 mono color 0xCA6702 fit }
 
 A: [
   String: data("string")
@@ -134,7 +134,11 @@ B: [
   line
   URL: data("url.URL")
   arrow
+  SSH: func("isSSH")
+  down
+  move 0.2in
   Download: func("sshDownload")
+  arrow chop from URL down until even with Download then to Download
 ] with .n at 0.3in south of last.s
 
 text "Good" at movewid west of B.w
@@ -157,8 +161,6 @@ like plain strings and other primitives.
 Transform that information into the shape your application needs
 as early as you can.
 
-// TODO: not sure this is the best example
-
 Think back to the download example from ages ago. (*step*)
 Before we started parsing it,
 the string went to isSSH, then to sshDownload,
@@ -167,5 +169,42 @@ then sshDownload probably parsed it to extract useful information from it,
 so that it could eventually get consumed.
 
 On the other hand, parsing the string early consumes the string early,
-transforming it into better organized information for later use.
+transforming it into better organized information.
+--
+
+== Flow of information
+
+[%step]
+--
+[pikchr, width=50%]
+....
+linewid = 0.2in
+lineht = 0.2in
+linerad = 0.1in
+movewid = 0.3in
+
+
+A: box wid 0.5in ht 0.8in
+move
+B: box same
+
+spline -> from 0.1in s of A.n to 0.1in s of B.n \
+  then to 0.2in s of A.n to 0.2in s of B.n \
+  then to 0.4in s of A.n to 0.6in s of B.n
+....
+
+Zigzagging flow indicates a leak
+--
+
+[.notes]
+--
+The flow and its direction is important at the micro,
+as well as the macro level.
+
+How does information flow between functions or packages?
+Is it going in one direction or zigzagging (*step*)?
+
+If it's zigzagging like this,
+then there's probably a leak there and we should fix that.
+But first, we need to discuss a couple other items.
 --
