@@ -42,6 +42,8 @@ Except https exists.
 [%auto-animate.columns]
 == String typing
 
+// NOTE: If this example changes, concept-flow must too.
+
 [.column.medium]
 --
 [source%linenums,go,data-id=isProto]

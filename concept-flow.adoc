@@ -1,0 +1,171 @@
+= Flow of information
+
+[pikchr, width=75%]
+....
+movewid = 0.5in
+
+right
+A: box wid 0.4in ht 1in
+B: box wid 0.5in ht 0.8in with .nw at movewid*0.8 ne of last.ne
+C: box wid 0.6in ht 0.5in with .w at movewid*0.8 se of last.e
+
+spline -> from movewid sw of A \
+  then to A then to B then to C
+....
+
+[.notes]
+--
+I don't know if there's a formal name for this, but I've been calling it
+flow of information --
+the path that information takes to go through your application.
+
+Its shape may change as it passes through,
+but the information represented is similar if not the same.
+
+// TODO
+
+// Stack a bunch of packages on top of each other (you know, as a stack)
+// with main at the top, pick a scenario,
+// and trace the path information takes through these packages.
+
+// TODO: maybe
+// You can do this even within a single package.
+// If a package contains a lot of overly specific helper functions
+// and there's a lot of zigzagging around them,
+// you may be approaching spaghetti territory.
+--
+
+== Flow of information
+
+[pikchr, width=80%]
+....
+linewid = 0.2in
+linerad = 0.1in
+
+define data { box $1 mono rad 0.1in fit  }
+define func { box $1 mono fit }
+
+CLI: [
+  data("[]string")
+  arrow
+  func("flag.Parse()")
+  line
+  data("CLIParams")
+  arrow
+  text "..."
+]
+
+HTTP: [
+  Request: data("*http.Request")
+
+  JSON: func("json.Unmarshal") with .sw at 0.2in ne of Request.ne
+  line
+  data("GetUserRequest")
+
+  Headers: func("extractHeaders") with .nw at 0.2in se of Request.se
+  line
+  data("AuthToken") same as GetUserRequest
+
+  arrow from Request.n up until even with JSON \
+    then right to JSON chop
+  arrow from Request.s down until even with Headers \
+    then right to Headers chop
+
+  func("Handle") at 0.2in e of (0.5 of the way between GetUserRequest.e and AuthToken.e)
+  arrow chop from GetUserRequest right until even with Handle then to Handle
+  arrow chop from AuthToken right until even with Handle then to Handle
+] with .n at 0.3in south of last.s
+....
+
+[.notes]
+--
+For example, when you parse your CLI arguments,
+the information gets transformed, but it's still roughly the same information.
+Or at least, the part of it that you care about.
+
+Similarly, after parsing an HTTP request,
+and maybe extracting some information from headers,
+the information flows through your application
+until it's consumed.
+--
+
+== Flow of information
+
+* Flow in one direction
+* No backtracking
+
+[%step]
+[pikchr, width=80%]
+....
+linewid = 0.2in
+lineht = 0.2in
+linerad = 0.1in
+movewid = 0.3in
+
+define data { box $1 mono rad 0.1in fit  }
+define func { box $1 mono fit }
+
+A: [
+  String: data("string")
+  arrow
+  SSH: func("isSSH")
+  down
+  move 0.2in
+  Download: func("sshDownload")
+  right
+  line
+  data("string")
+  func("url.Parse") at (last.x, String.y)
+  right
+  line
+  data("url.URL")
+  arrow
+  text "..."
+
+  arrow from 3rd last box to 2nd last box chop
+  arrow chop from String down until even with Download then to Download
+]
+
+B: [
+  right
+  String: data("string")
+  arrow
+  SSH: func("url.Parse")
+  line
+  URL: data("url.URL")
+  arrow
+  Download: func("sshDownload")
+] with .n at 0.3in south of last.s
+
+text "Good" at movewid west of B.w
+text "Bad" at (Good.x, A.y)
+....
+
+[.notes]
+--
+I'm bringing this up because it connects to some of the points I made earlier.
+
+Information should flow in one direction.
+Inputs flow inwards, outputs flow outwards.
+You don't backtrack.
+
+For example, you wouldn't go back and unmarshal the HTTP request again,
+or re-parse the command line flags.
+
+Apply the same principle when dealing with chaotic data
+like plain strings and other primitives.
+Transform that information into the shape your application needs
+as early as you can.
+
+// TODO: not sure this is the best example
+
+Think back to the download example from ages ago. (*step*)
+Before we started parsing it,
+the string went to isSSH, then to sshDownload,
+still in its chaotic form,
+then sshDownload probably parsed it to extract useful information from it,
+so that it could eventually get consumed.
+
+On the other hand, parsing the string early consumes the string early,
+transforming it into better organized information for later use.
+--

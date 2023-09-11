@@ -131,6 +131,4 @@ Some quick tips for using parameter objects:
    first consider what the old behavior is:
    was the feature previously enabled or disabled?
    That informs whether the new field is EnableFeature or DisableFeature.
-
-// TODO: Maybe break zero value into its own slide.
 --

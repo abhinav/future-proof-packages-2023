@@ -79,36 +79,12 @@ include::fix-global.adoc[]
 
 [.notes]
 --
+So I've been talking about very specific code samples.
 As promised, I'm going to zoom out now.
-I outlined some patterns for code that *looks* like it leaks complexity.
-However, there isn't really a hard list of rules we can build out of that.
-
-Instead, I want to talk about an application holistically
-which may help you find and hide complexity better.
+Now I want to talk about an application holistically.
 --
 
-// TODO: incorporate into flow of information somehow
-include::fix-long-funcs.adoc[]
-
-= Flow of information
-
-[.notes]
---
-Flow of information --
-this is the path data takes through an application.
-
-// TODO
-
-Stack a bunch of packages on top of each other (you know, as a stack)
-with main at the top, pick a scenario,
-and trace the path information takes through these packages.
-
-// TODO: maybe
-// You can do this even within a single package.
-// If a package contains a lot of overly specific helper functions
-// and there's a lot of zigzagging around them,
-// you may be approaching spaghetti territory.
---
+include::concept-flow.adoc[]
 
 == Surface area
 
@@ -165,6 +141,9 @@ In real applications, there's a good balance to be had.
 
 *However*, when it comes to flow of information through an application,
 --
+
+// TODO: incorporate into flow of information somehow
+include::fix-long-funcs.adoc[]
 
 == Business packages should be deep
 
