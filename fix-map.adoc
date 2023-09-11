@@ -358,7 +358,7 @@ They're still separate unique objects with their own state.
 
 [.notes]
 --
-Just to reiterate, my point here isn't "maps considered harmful,"
+Just to reiterate, my point here isn't "maps are bad actually,"
 but that maps crossing boundaries deserve extreme scrutiny.
 
 Often, you'll find that the map is an implementation detail,

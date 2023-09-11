@@ -50,9 +50,7 @@ Okay, let's get into it.
 --
 
 // TODO: many functions, adapt the long-funcs strategy
-
-// TODO: partial initialization
-// TODO: include::fix-initialize.adoc[]
+// TODO include::fix-initialize.adoc[]
 
 = Over-reliance on primitives
 
@@ -70,16 +68,15 @@ I think this is better demonstrated with an example.
 
 include::fix-string.adoc[]
 include::fix-map.adoc[]
+include::fix-serialized-types.adoc[]
 include::fix-bool.adoc[]
 include::fix-callback.adoc[]
 // TODO: maybe: closures vs objects
 include::fix-premature-iface.adoc[]
+include::fix-big-iface.adoc[]
 
 // ---
 
-include::fix-big-iface.adoc[]
-// TODO: serialized types after maps as another example of leak
-include::fix-serialized-types.adoc[]
 include::fix-global.adoc[]
 
 // Theme: the world outside your code is chaotic and out of your control.

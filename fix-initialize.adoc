@@ -1,3 +1,20 @@
+// == Partial initialization
+//
+// [source,go]
+// ----
+// type 
+// ----
+//
+// [.notes]
+// --
+// An easy way to leak complexity is objects that are partially initialized
+// when they touch other components.
+// This typically happens if they don't have a clearly defined life cycle.
+//
+// As a convoluted example, suppose I have a handler type
+// that implements my HTTP server.
+// --
+
 [.columns.wrap]
 == Initializing complex objects
 

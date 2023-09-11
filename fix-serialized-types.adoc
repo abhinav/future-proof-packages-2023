@@ -1,33 +1,67 @@
 = Exposed wire form
 
+[pikchr%step, width=75%]
+....
+boxwid = 0.5in
+ovalwid = 0.5in
+linewid = 0.5in
+lineht = 0.3in
+
+Bad: [
+right
+text "Bad"; move 0.1in
+text "..."
+line 0.2in
+box "Item"
+arrow
+oval "Submit"
+arrow
+cylinder wid boxwid
+]
+....
+
+[pikchr%step, width=75%]
+....
+boxwid = 0.5in
+ovalwid = 0.5in
+linewid = 0.5in
+lineht = 0.3in
+
+Good: [
+right
+text "Good"; move 0.1in
+text "..."
+line 0.2in
+box "Item"
+arrow
+oval "Submit"
+down
+arrow
+box "DBItem"
+right
+arrow
+cylinder wid boxwid
+
+line dashed from (Item.w.x, (Item.s.y+DBItem.n.y)/2) right until even with last.e
+]
+....
+
 [.notes]
 --
-I just talked about how maps at package boundaries
-can represent leak of implementation.
-This is similar.
+I just talked about how maps at boundaries can leak complexity.
+This is based on the same principle.
 
-Packages accepting or returning data types
-that also represent what gets serialized
-and sent over the wire or stored in a database.
+(*step*) If the input or output of a package is a data type
+that is also serialized or deserialized
+and crosses system boundaries --
+that is, it gets sent over the wire or stored in a database --
+that's very likely a leak.
 
-Unless the point of that package is the wire form,
-e.g. a client library or a database layer,
-this is almost always a leak that should be avoided
-as your application grows.
+Ideally, (*step*) you want an intermediate data type
+that is coupled to what gets serialized,
+and an explicit step converting the external type
+to this wire-level form.
 
-For example, if the package happens to store `[something]`
-as a JSON blob, and we expose that, that's a leak.
-The package is no longer free to change how it stores this information.
-It cannot switch to, say, Protobufs, without disrupting
-or possibly even breaking a bunch of things.
-
-To fix this, we often need to define separate domain types.
-These establish the package's terminology -- its language,
-and are convert to and from the wire form by the package as needed
-as an implementation detail.
-
-If you've ever heard of hexagonal architecture or clean architecture,
-this might sound familiar to their concept of mapping entities.
-
-// TODO: Verify^
+This effectively draws a boundary between the business logic
+and the database or wire representation.
 --
