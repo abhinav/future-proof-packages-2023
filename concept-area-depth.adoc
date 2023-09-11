@@ -1,0 +1,118 @@
+[.columns]
+= Surface area
+
+[.column.is-one-third]
+--
+--
+
+[.column.text-left]
+--
+[pikchr,height=300px]
+....
+box "package" fit ht 0.5in
+line thick color 0xEE9B00 "surface area" above from 0.05in above last.nw right until even with last.e
+....
+--
+
+[.notes]
+--
+Surface area refers to the things exported from a package.
+The part of a package that other packages can "touch".
+
+Each exported function, type, and method -- each entry point --
+adds to the surface area of the package.
+
+Surface area does not necessarily correspond to how much functionality
+the package offers.
+
+That's a job for...
+--
+
+[.columns]
+== Surface area and depth
+
+[.column.is-one-third]
+--
+--
+
+[.column.text-left]
+--
+[pikchr,height=300px]
+....
+box "package" fit ht 0.5in
+line thick color 0xEE9B00 "surface area" above from 0.05in above last.nw right until even with last.e
+
+line thick color 0x0A9396 " depth" ljust from 0.05in east of last box.ne down until even with last box.se
+....
+--
+
+[.notes]
+--
+Building on the idea of packages as boxes with a surface area,
+depth refers to how much work is done by exported components in the package.
+
+In combination, these represent the functionality offered by the package.
+--
+
+== Surface area and depth
+
+[pikchr, width=50%]
+....
+define areaAndDepth {
+  line color 0xEE9B00 from $1.nw to $1.ne
+  line color 0x0A9396 from $1.ne to $1.se
+}
+
+box "strings" fit width 2in
+areaAndDepth(last box)
+
+box "archive/tar" fit ht 1in with nw at 0.1in south of last box.sw
+areaAndDepth(last box)
+....
+
+[.notes]
+--
+A package with lots of small helper functions has a wide surface area
+and is shallow in functionality.
+
+On the other hand, a package with only a handful of exported functions
+hiding a bunch of complex work
+has a narrow surface area and is deep in functionality.
+
+One isn't objectively better than the other.
+In real applications, there's a good balance to be had.
+
+*However*, when it comes to flow of information through an application...
+--
+
+== Business packages should be deep
+
+[%step]
+Shallow packages encourage zigzagging
+
+[.notes]
+--
+Packages that implement business logic of your application should be deep,
+not wide.
+
+To expand on that, recall that
+I advised earlier against a zigzagging flow of information.
+
+(*step*)
+Shallow packages *tend* to encourage that kind of flow.
+Information comes in, gets tweaked a little,
+and then we yield back control to the caller,
+who then zigzags a bit more.
+
+There are other indicators,
+but your business package is probably shallow if:
+
+* It has lots of top-level functions implementing heavy business functionality;
+  making HTTP and RPC requests, storing stuff to disk, etc.
+* These functions either use global state or have a _bunch_ of arguments --
+  or both
+* They are related to each other:
+** Information produced by one function
+   is passed to another in the same package
+** Or they have a bunch of shared parameters
+--
