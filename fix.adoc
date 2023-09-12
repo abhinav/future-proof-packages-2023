@@ -82,13 +82,16 @@ include::concept-flow.adoc[]
 include::concept-scope.adoc[]
 include::concept-area-depth.adoc[]
 
-== !
+= Finding the abstraction
 
 [.notes]
 --
-Unfortunately, I don't have a list of rules that we can follow
-to always get the right abstraction.
-But I have some tools that'll help you find it.
+I brought this up a couple times:
+the idea of finding the abstraction.
+
+The concepts I just brought up:
+flow of information, scope, surface area, and depth.
+These are ideas to keep in mind when looking for an abstraction.
 
 // Finding the abstraction
 // * really long functions (maybe?)
@@ -100,14 +103,12 @@ But I have some tools that'll help you find it.
 // ** there's no such thing as self-documenting code
 // ** I'm a big fan of the old golint rule:
 //    every exported entity must be documented.
+// * define a domain language
 // * Use tests to help inform abstractions
 // * Application-scoped vs request-scoped information
-// ** Request scope can be a single HTTP request, a single invocation of a CLI,
-//    or one "entry" into a library.
 // ** Use scope of information to inform abstraction design.
 //    Things that change rarely, vs things that change often.
 // ** Accepted interfaces should be request scoped
-// ** Tip: Argument order based on scope
 --
 
 // TODO: this is "finding an abstraction"

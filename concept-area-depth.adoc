@@ -82,39 +82,118 @@ has a narrow surface area and is deep in functionality.
 One isn't objectively better than the other.
 In real applications, there's a good balance to be had.
 
-*However*, when it comes to flow of information through an application...
+However...
 --
 
-== Business packages should be deep
+[.columns.wrap]
+== Surface area and depth
 
-[%step]
-Shallow packages encourage zigzagging
+[.column.is-half]
+--
+Wide and shallow packages
+
+* frequent entry and exit
+* zigzagging
+--
+
+[.column.is-half]
+--
+Narrow and deep packages
+
+* few entry points
+* hide complexity
+--
+
+[.column.is-full%step]
+--
+Business packages should be narrow and deep
+--
 
 [.notes]
 --
-Packages that implement business logic of your application should be deep,
-not wide.
+Just by virtue of their design,
+wide and shallow packages encourage frequent entry and exit -- zigzagging.
+While narrow and deep packages don't.
 
-To expand on that, recall that
-I advised earlier against a zigzagging flow of information.
+Therefore, (*step*) business packages should aim to
+be narrow in surface area and deep in functionality.
+--
 
-(*step*)
-Shallow packages *tend* to encourage that kind of flow.
-Information comes in, gets tweaked a little,
-and then we yield back control to the caller,
-who then zigzags a bit more.
+[.columns]
+== Shallow business packages
 
+[.column]
+--
+Top-level functions with:
+
+* RPC and IO
+* Global state
+* Many arguments
+* Interrelated
+
+[%step]
+Might be in a 'util'
+--
+
+[.column]
+--
+[%step]
+[pikchr]
+....
+Shallow: [
+box "userutil" mono ht 0.3in wid 2in
+
+// func{Above,Below}(distance from w, name)
+define funcBelow {
+  dot at $1 east of 1st box.w
+  line thin from last dot down 1st box.ht
+  text $2 mono below at last line.s
+}
+define funcAbove {
+  dot at $1 east of 1st box.w
+  line thin from last dot up 1st box.ht
+  text $2 mono above at last line.n
+}
+
+funcBelow(0.3in, "GetUserList")
+funcAbove(0.5in, "FilterUsers")
+funcBelow(1.7in, "UserIsAdmin")
+]
+
+Deep: [
+linewid = 0.3in
+right
+text "ListAdmins" mono
+arrow
+box "UserService" mono fit ht 0.75in
+arrow
+text "[]*User" mono
+] with .n at 1in south of Shallow.s
+
+text "Wide and shallow" bold at 0.3in w of Shallow.nw
+text "Deep and narrow" bold at (last.x, Deep.n.y+0.1in)
+--
+
+[.notes]
+--
 There are other indicators,
-but your business package is probably shallow if:
+but your business package is probably wide and shallow if it:
 
-* It has lots of top-level functions implementing heavy business functionality;
-  making HTTP and RPC requests, storing stuff to disk, etc.
-* These functions either use global state or have a _bunch_ of arguments --
-  or both
-* They are related to each other:
-** Information produced by one function
-   is passed to another in the same package
-** Or they have a bunch of shared parameters
+* has a bunch of functions that do complex business logic;
+  making RPCs, writing to disk
+* they rely on global state or have a *bunch* of arguments
+* and they're mostly interrelated:
+  information produced by one function is eventually passed into another
 
-To fix this, to make a package deep, you have to find the abstraction.
+(*step*) They might all sit in a file or package called something util.
+
+
+For example (*step*), if I have a package that exports those functions --
+GetUserList, FilterUsers, UserIsAdmin --
+I will flow in and out of that package.
+It doesn't have a conceptual responsibility.
+
+On the other hand,
+if I find the purpose -- what is all this used for --
+and build a named abstraction around it, I get a narrower, deeper abstraction.
 --
