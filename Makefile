@@ -28,6 +28,7 @@ site: third_party
 	cp -R fonts _site/fonts
 	cp -R webfonts _site/webfonts
 	cp -r images _site/images
+	cp -r highlight _site/highlight
 	cp -R reveal.js/dist _site/reveal.js/dist
 	cp -R reveal.js/plugin/{highlight,notes} _site/reveal.js/plugin
 

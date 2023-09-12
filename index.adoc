@@ -21,6 +21,7 @@ Abhinav Gupta
 :idprefix:
 :idseparator: -
 :source-highlighter: highlightjs
+:highlightjsdir: highlight
 :highlightjs-theme: css/highlight.css
 
 [.small.text-right]
