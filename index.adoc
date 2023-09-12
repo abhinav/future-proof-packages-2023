@@ -9,7 +9,7 @@ Abhinav Gupta
 :revealjs_pdfseparatefragments: true
 :revealjs_plugin_zoom: disabled
 :revealjs_progress: false
-:revealjs_theme: night
+:revealjs_customtheme: css/night.css
 :revealjs_totalTime: 2700
 :revealjs_transition: none
 :revealjs_width: 1280
