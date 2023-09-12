@@ -1,28 +1,20 @@
+[.columns]
 = Really long functions
 
-[%step]
+[.column]
 [pikchr, height=500px]
 ....
-boxwid = 1in
-movewid = 0.5in
-right
+boxwid = 1in; movewid = 0.5in; right
 
 P: box ht 2in
-move
-Q: box same
+....
 
-down
-A: box same ht 0.5in with nw at (Q.e.x+movewid, Q.n.y+0.2in)
-move 0.1in
-B: box same ht 0.3in
-move 0.1in
-C: box same ht 0.6in
-move 0.1in
-D: box same ht 0.2in
-move 0.1in
-E: box same ht 0.4in
+[.column%step]
+[pikchr, height=500px]
+....
+boxwid = 1in; movewid = 0.5in; right
 
-assert (A.n.y-E.s.y == Q.ht + 0.4in)
+Q: box ht 2in
 
 markPos = 0
 define markAt {
@@ -30,23 +22,37 @@ define markAt {
   line from ($1.nw.x, $1.nw.y-markPos) right until even with $1.e
 }
 
-markAt(Q, A.ht)
-markAt(Q, B.ht)
-markAt(Q, C.ht)
-markAt(Q, D.ht)
+markAt(Q, 0.5in)
+markAt(Q, 0.3in)
+markAt(Q, 0.6in)
+markAt(Q, 0.4in)
+....
 
-arrow from 0.1in east of P.e to 0.1 west of Q.w
-arrow from 0.1in east of Q.e right until even with 0.1 west of A.w
+[.column%step]
+[pikchr, height=500px]
+....
+boxwid = 1in; movewid = 0.5in; right
+
+down
+A: box ht 0.5in
+move 0.1in
+B: box ht 0.3in
+move 0.1in
+C: box ht 0.6in
+move 0.1in
+D: box ht 0.2in
+move 0.1in
+E: box ht 0.4in
 ....
 
 [.notes]
 --
 Let me share an example.
 
-Okay, so if we have a really long function,
-the obvious starting advice is: (*step*)
-find the N concrete things it does,
-and then split it into separate functions.
+So if you have a long function,
+the obvious advice is (*step*)
+find the N separate things it does,
+and split it into separate functions for those.
 
 I'm here to suggest that don't *just* do that -- don't stop there.
 There's usually some shared information between these functions;
@@ -58,9 +64,9 @@ that's why they were all part of one big function.
 
 [.column]
 --
-[pikchr, height=500px]
+[pikchr, height=350px]
 ....
-boxwid = 1in
+boxwid = 1in; movewid = 0.5in; right
 
 down
 A: box ht 0.5in
@@ -73,26 +79,30 @@ D: box ht 0.2in
 move 0.1in
 E: box ht 0.4in
 
-box wid 0.1in ht D.ht with nw at A.nw
-box same with nw at B.nw
-box same with nw at C.nw
-box same with nw at D.nw
-box same with nw at E.nw
+Q: box invis with nw at A.nw ht A.n.y-E.s.y
 
+O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
+M: dot invis at 0.5 way between O.e and Q.w
 
 linerad = 0.1in
-arrow from A.e right 0.3in then down until even with B then to B.e
-arrow from A.e right 0.15in then down until even with 0.1in north of C then left until even with C.e
-arrow from 0.1 south of C.e right 0.3in then down until even with E then to E.e
+// arrowFromO(direction, dst)
+define arrowFromO {
+  arrow chop from O to M then $1 until even with $2 then to $2
+}
+arrowFromO(up, A)
+arrow chop from O right until even with C
+arrowFromO(down, E)
+
+arrow from A.e right 0.15in then down until even with B then to B.e
 arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
 ....
 --
 
 [.column%step]
 --
-[pikchr, height=500px]
+[pikchr, height=350px]
 ....
-boxwid = 0.9in
+boxwid = 1.0in; movewid = 0.5in; right
 
 down
 A: box ht 0.5in
@@ -105,47 +115,111 @@ D: box ht 0.2in
 move 0.1in
 E: box ht 0.4in
 
-S: box wid 0.1in ht D.ht with e at 0.5in west of A.w
+Q: box invis with nw at A.nw wid A.wid ht A.n.y-E.s.y
+
+O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
+M: dot invis at 0.5 way between O.e and Q.w
+
+define splitAt {
+  line from $2 east of $1.nw down $1.ht
+}
+splitAt(A, 0.2in)
+splitAt(B, 0.2in)
+splitAt(C, 0.2in)
+splitAt(D, 0.2in)
+splitAt(E, 0.2in)
 
 linerad = 0.1in
-arrow <-> from S to A chop
-arrow from S right 0.35in then down until even with B then right to B chop
-arrow from S right 0.35in then down until even with E then right to E chop
+// arrowFromO(direction, dst)
+define arrowFromO {
+  arrow chop from O to M then $1 until even with $2 then to $2
+}
+arrowFromO(up, A)
+arrow chop from O right until even with C
+arrowFromO(down, E)
 
-arrow from A.e right 0.15in then down until even with 0.1in north of C then left until even with C.e
+arrow from A.e right 0.15in then down until even with B then to B.e
 arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
 ....
+
+[source,go]
+----
+func f(a, b) []X {
+  c, x1 := g(a)
+  d, x2 := h(b)
+  x3 := i(a, b, c, d)
+  return [x1, x2, x3]
+}
+----
+--
+
+[.column%step]
+--
+[pikchr, height=350px]
+....
+boxwid = 0.7in; movewid = 0.5in; right
+
+down
+A: box ht 0.5in
+move 0.1in
+B: box ht 0.3in
+move 0.1in
+C: box ht 0.6in
+move 0.1in
+D: box ht 0.2in
+move 0.1in
+E: box ht 0.4in
+
+Q: box invis with nw at A.nw wid A.wid ht A.n.y-E.s.y
+O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
+box wid 0.3in ht 0.3in with ne at last .nw
+
+M: dot invis at 0.5 way between O.e and Q.w
+
+linerad = 0.1in
+// arrowFromO(direction, dst)
+define arrowFromO {
+  arrow chop $3 from O to M then $1 until even with $2 then to $2
+}
+arrowFromO(up, A)
+arrow chop from O right until even with C
+arrowFromO(down, E)
+
+arrow chop dashed from B.w left until even with O then to O
+arrow chop dashed from D.w left until even with O then to O
+....
+
+[source,go]
+----
+func f(a, b) []X {
+  st := thing{A: a, B: b}
+  c := st.g()
+  d := st.h()
+  st.i(c, d)
+  return st.xs
+}
+----
 --
 
 [.notes]
 --
-You might find that
-some parameters are repeated between these functions,
-or that flow jumps between them.
+So if you just split the function, cool,
+now the original function is calling say 3 of the extracted functions,
+which are maybe calling 2 others.
+That's not bad.
 
-This is a good place to find an abstraction
-for the functionality implemented by the large function.
-(*step*)
+But there's more we can do here.
+These extracted functions probably have some shared state. (*step*)
+For example, they probably have some parameters shared between all,
+and maybe they all feed back to the result somehow.
 
+This is a good place to start introducing an abstraction.
 For example,
 
-* A shared object could be defined here tracking the parameters
-  that are duplicated across functions
-* Each "stage" of the larger function becomes a method on the object.
-* Information is shared between functions via parameters,
-  but they may also feed information back to the larger abstraction's scope.
-
-// TODO:
-// * Move parameters with "big scope" into struct fields
-// * If multiple functions feed back information, use a struct field again
-
-// TODO
-// If you have a really long function, this direction is a good place
-// for you to start decomposing the responsibilities of the function
-// into meaningful subcomponents.
-// This makes for a better first step to "find the abstraction" in there
-// than just converting it into multiple functions.
-//
-// It also has a very nice benefit of allowing injection of any global dependency
-// so that you can more easily test that really long function.
+* you can extract the parameters that are shared --
+  the parameters with large scope --
+  into a struct
+* then you can turn these functions into methods on that struct,
+  accessing shared information,
+  as well as feeding results back to the struct.
 --

@@ -86,15 +86,14 @@ include::concept-area-depth.adoc[]
 
 [.notes]
 --
-I brought this up a couple times:
-the idea of finding the abstraction.
+Okay, so I've mentioned this a couple times.
+The idea of finding the right abstraction to hide complexity.
 
 The concepts I just brought up:
 flow of information, scope, surface area, and depth.
-These are ideas to keep in mind when looking for an abstraction.
+You can use those to help you find the abstraction.
 
 // Finding the abstraction
-// * really long functions (maybe?)
 // * look for conditionals
 // * currying as a tool for building abstractions
 // ** shared arguments => object
@@ -111,7 +110,6 @@ These are ideas to keep in mind when looking for an abstraction.
 // ** Accepted interfaces should be request scoped
 --
 
-// TODO: this is "finding an abstraction"
 include::fix-long-funcs.adoc[]
 
 // = Tangent: Libraries

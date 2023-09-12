@@ -170,8 +170,9 @@ arrow
 text "[]*User" mono
 ] with .n at 1in south of Shallow.s
 
-text "Wide and shallow" bold at 0.3in w of Shallow.nw
-text "Deep and narrow" bold at (last.x, Deep.n.y+0.1in)
+text "Wide and shallow" big bold at 0.3in w of Shallow.nw
+text "Deep and narrow" big bold at (last.x, Deep.n.y+0.1in)
+....
 --
 
 [.notes]
