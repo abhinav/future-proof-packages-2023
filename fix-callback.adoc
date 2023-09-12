@@ -68,6 +68,8 @@ We can apply that here too!
 [%auto-animate.columns]
 == Injected interface
 
+// NOTE: If this is changed, Large scoped conditions should also be updated.
+
 [.column]
 --
 [source%linenums,go,data-id=LinkStyler]
@@ -87,7 +89,7 @@ const (
    LinkStyleHTML
 )
 
-func (LinkStyle) StyleLink(*url.URL) string
+func (LinkStyle) StyleLink(string) string
 ----
 --
 

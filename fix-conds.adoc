@@ -1,0 +1,149 @@
+= Large scoped conditions
+
+*Remove* special cases based on conditions +
+that *don't change* in the *current context*
+
+[%step]
+[pikchr, height=400px]
+....
+X: [
+A: arrow <-> right 2in
+
+dot at (A.wid * 0.25, 0)
+
+line from (A.wid * 0.5, 0.1in) down 0.2in
+text "Current" with .s at last.n
+
+dot at (A.wid * 0.75, 0)
+arrow dashed rad 0.1in down 0.2in then left until even with 1st dot then up to 1st dot
+line invis "if true" mono below from 0.2in south of 1st dot right until even with last dot
+]
+
+
+Y: [
+A: arrow <-> right 2in
+
+dot at (A.wid * 0.25, 0)
+
+line from (A.wid * 0.75, 0.1in) down 0.2in
+text "Current" with .s at last.n
+
+dot at (A.wid * 0.5, 0)
+arrow dashed rad 0.1in down 0.2in then left until even with 1st dot then up to 1st dot
+line invis "if true" mono below from 0.2in south of 1st dot right until even with last dot
+] with n at 1in south of last
+
+arrow color gray from 0.3in south of X.s to Y.n
+....
+
+[.notes]
+--
+One great place to find the abstraction is by trying to eliminate
+large scoped conditions.
+
+What I mean by that is special cases -- if statements and the like --
+based on variables that have a larger scope than the current context.
+
+It makes sense that (*step*) if your condition is based on something
+that doesn't change in the current scope, it should be evaluated earlier
+and you should have an object that doesn't care about the condition.
+
+This might be better demonstrated with an example...
+--
+
+[%auto-animate.columns.wrap]
+== Large scoped conditions
+
+[.column.is-one-third]
+--
+[source%linenums,go,data-id=left]
+----
+type LinkStyle int
+
+const (
+  LinkStyleDir   LinkStyle = iota
+  LinkStylePlain
+  LinkStyleHTML
+)
+
+type SiteGen struct {
+  /* ... */
+  LinkStyle LinkStyle
+}
+----
+--
+
+[.column.is-two-thirds%step]
+--
+[source%linenums,go,data-id=right]
+----
+func (g *SiteGen) RelativeURL(dst *Page) string {
+  /* ... */
+  switch g.LinkStyle {
+  case LinkStyleDir:
+    return u + "/"
+  case LinkStylePlain:
+    return strings.TrimSuffix(u, "/")
+  case LinkStyleHTML:
+    return u + ".html"
+  }
+}
+----
+--
+
+[.notes]
+--
+Think back to the static website rendering example.
+We declared an enum and placed it inside a struct field --
+because it has scope larger than all the methods of SiteGen.
+
+If we leave it at that, (*step*) we probably have logic that looks
+something like this.
+An if-else or a switch statement rendering the link based on the style.
+
+This right here is a good place to find an abstraction.
+In fact, if you recall from that part of the presentation,
+we did find one...
+--
+
+[%auto-animate.columns.wrap]
+= Large scoped conditions
+
+[.column.is-one-third]
+--
+[source%linenums,go,data-id=left]
+----
+type LinkStyle int
+
+const (
+  LinkStyleDir   LinkStyle = iota
+  LinkStylePlain
+  LinkStyleHTML
+)
+
+type SiteGen struct {
+  /* ... */
+  LinkStyler LinkStyler
+}
+----
+--
+
+[.column.is-two-thirds]
+--
+[source%linenums,go,data-id=right]
+----
+type LinkStyler interface {
+  StyleLink(string) string
+}
+
+func (g *SiteGen) RelativeURL(dst *Page) string {
+  /* ... */
+  return g.LinkStyle.StyleLink(u)
+}
+----
+--
+
+[.notes]
+--
+The LinkStyler.
+--

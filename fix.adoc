@@ -94,7 +94,6 @@ flow of information, scope, surface area, and depth.
 You can use those to help you find the abstraction.
 
 // Finding the abstraction
-// * look for conditionals
 // * currying as a tool for building abstractions
 // ** shared arguments => object
 // * start by documenting the contract when adding a new type/function
@@ -111,6 +110,7 @@ You can use those to help you find the abstraction.
 --
 
 include::fix-long-funcs.adoc[]
+include::fix-conds.adoc[]
 
 // = Tangent: Libraries
 //
