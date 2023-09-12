@@ -1,44 +1,56 @@
 = Really long functions
 
+[%step]
 [pikchr, height=500px]
 ....
 boxwid = 1in
+movewid = 0.5in
+right
+
+P: box ht 2in
+move
+Q: box same
+
 down
+A: box same ht 0.5in with nw at (Q.e.x+movewid, Q.n.y+0.2in)
+move 0.1in
+B: box same ht 0.3in
+move 0.1in
+C: box same ht 0.6in
+move 0.1in
+D: box same ht 0.2in
+move 0.1in
+E: box same ht 0.4in
 
-A: [
-  box ht 0.5in
-  box ht 0.3in
-  box ht 0.6in
-  box ht 0.2in
-  box ht 0.4in
-]
+assert (A.n.y-E.s.y == Q.ht + 0.4in)
 
-B: [
-  down
-  box ht 0.5in fill 0xEE9B00
-  move 0.1in
-  box ht 0.3in fill 0xBB3E03
-  move 0.1in
-  box ht 0.6in fill 0x9B2226
-  move 0.1in
-  box ht 0.2in fill 0xCA6702
-  move 0.1in
-  box ht 0.4in fill 0xAE2012
-] with nw at (A.e.x+1in, A.n.y+0.2in)
+markPos = 0
+define markAt {
+  markPos += $2
+  line from ($1.nw.x, $1.nw.y-markPos) right until even with $1.e
+}
 
-arrow from 0.1in east of A.e to 0.1in west of B.w
+markAt(Q, A.ht)
+markAt(Q, B.ht)
+markAt(Q, C.ht)
+markAt(Q, D.ht)
+
+arrow from 0.1in east of P.e to 0.1 west of Q.w
+arrow from 0.1in east of Q.e right until even with 0.1 west of A.w
 ....
 
 [.notes]
 --
-Okay, so if we have a really long function,
-the obvious starting advice is:
-just break it down into multiple functions.
-I'm here to suggest that don't *just* do that -- don't stop there.
+Let me share an example.
 
+Okay, so if we have a really long function,
+the obvious starting advice is: (*step*)
+find the N concrete things it does,
+and then split it into separate functions.
+
+I'm here to suggest that don't *just* do that -- don't stop there.
 There's usually some shared information between these functions;
 that's why they were all part of one big function.
-
 --
 
 [.columns]
@@ -51,17 +63,17 @@ that's why they were all part of one big function.
 boxwid = 1in
 
 down
-A: box ht 0.5in fill 0xEE9B00
+A: box ht 0.5in
 move 0.1in
-B: box ht 0.3in fill 0xBB3E03
+B: box ht 0.3in
 move 0.1in
-C: box ht 0.6in fill 0x9B2226
+C: box ht 0.6in
 move 0.1in
-D: box ht 0.2in fill 0xCA6702
+D: box ht 0.2in
 move 0.1in
-E: box ht 0.4in fill 0xAE2012
+E: box ht 0.4in
 
-box wid 0.1in fill 0x94D2BD ht D.ht with nw at A.nw
+box wid 0.1in ht D.ht with nw at A.nw
 box same with nw at B.nw
 box same with nw at C.nw
 box same with nw at D.nw
@@ -83,18 +95,17 @@ arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
 boxwid = 0.9in
 
 down
-A: box ht 0.5in fill 0xEE9B00
+A: box ht 0.5in
 move 0.1in
-B: box ht 0.3in fill 0xBB3E03
+B: box ht 0.3in
 move 0.1in
-C: box ht 0.6in fill 0x9B2226
+C: box ht 0.6in
 move 0.1in
-D: box ht 0.2in fill 0xCA6702
+D: box ht 0.2in
 move 0.1in
-E: box ht 0.4in fill 0xAE2012
+E: box ht 0.4in
 
-S: box wid 0.3in ht 0.5in fill 0x001219 with e at 0.5in west of A.w
-box wid 0.1in fill 0x94D2BD ht D.ht with nw at last.nw+(0.1in,-0.1in)
+S: box wid 0.1in ht D.ht with e at 0.5in west of A.w
 
 linerad = 0.1in
 arrow <-> from S to A chop
@@ -108,15 +119,15 @@ arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
 
 [.notes]
 --
-For example, you may find that:
+You might find that
+some parameters are repeated between these functions,
+or that flow jumps between them.
 
-* some parameters are repeated between these functions
-* or that there's a fair bit of information passing between them;
-  something calculated by one is passed to others
-
-This is usually a good place to find an abstraction
+This is a good place to find an abstraction
 for the functionality implemented by the large function.
 (*step*)
+
+For example,
 
 * A shared object could be defined here tracking the parameters
   that are duplicated across functions
@@ -124,26 +135,17 @@ for the functionality implemented by the large function.
 * Information is shared between functions via parameters,
   but they may also feed information back to the larger abstraction's scope.
 
-// So take this example:
-// TODO; break a function down, repeated parameters.
-//
-// * The parameters of the original function are repeated in all N functions
-// * Information calculated by prior functions is passed onto others
-// * TODO
-// Instead, do this: try to find a named abstraction here.
-
-* Move parameters with "big scope" into struct fields
-* Add methods for each stage here (which you might've used functions for)
-* If multiple functions feed back information, use a struct field again
+// TODO:
+// * Move parameters with "big scope" into struct fields
+// * If multiple functions feed back information, use a struct field again
 
 // TODO
-
-If you have a really long function, this direction is a good place
-for you to start decomposing the responsibilities of the function
-into meaningful subcomponents.
-This makes for a better first step to "find the abstraction" in there
-than just converting it into multiple functions.
-
-It also has a very nice benefit of allowing injection of any global dependency
-so that you can more easily test that really long function.
+// If you have a really long function, this direction is a good place
+// for you to start decomposing the responsibilities of the function
+// into meaningful subcomponents.
+// This makes for a better first step to "find the abstraction" in there
+// than just converting it into multiple functions.
+//
+// It also has a very nice benefit of allowing injection of any global dependency
+// so that you can more easily test that really long function.
 --

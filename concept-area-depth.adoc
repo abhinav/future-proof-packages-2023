@@ -115,4 +115,6 @@ but your business package is probably shallow if:
 ** Information produced by one function
    is passed to another in the same package
 ** Or they have a bunch of shared parameters
+
+To fix this, to make a package deep, you have to find the abstraction.
 --

@@ -1,0 +1,161 @@
+[.columns]
+= Scope
+
+[.column%step]
+--
+*Application scope*
+
+Does not change between requests
+
+* Command line arguments
+* Environment variables
+--
+
+[.column%step]
+--
+*Request scope*
+
+Changes for each request
+
+* HTTP request
+* ???
+--
+
+[.notes]
+--
+I want to talk about the concept of scope.
+I don't mean this in terms of lexical scope,
+but more in terms of lifetime.
+
+Consider two kinds of scope:
+
+* (*step*) Application scope is for values that don't really change
+  while your application is running.
+  Your `os.Args`, the process' environment variables, etc.
+  Yes, we can mutate them, but practically,
+  they're constant as far as any business logic in concerned.
+* (*step*) And request scope. Things that change per request.
+  Obviously, this includes your HTTP request.
+  But what else?
+  Well, everything, really. Depends on how you look at it.
+--
+
+== Request scope is relative
+
+[%step]
+[pikchr, height=500px]
+....
+// (0, 0) is the start of the arrow
+A: arrow <-> right 2.5in
+text "big scope" "(rarely changes)" with .e at last arrow.w
+text "small scope" "(changes often)" with .w at last arrow.e
+
+BigScope1: dot invis at (0, 0.75in)
+BigScope2: dot invis at (0, -0.75in)
+
+S1: arrow <-> thin color gray from BigScope1 to (A.e.x+0.1in, 0.3in)
+S2: arrow <-> thin color gray from BigScope2 to (A.e.x+0.1in, -0.3in)
+line thin color gray from 0.2in east of BigScope1 go left 0.1in
+line thin color gray from 0.2in east of BigScope2 go left 0.1in
+line thin dotted color gray from last line to 2nd last line
+line invis "scope size" below aligned color gray from 2nd last line to 0.5 way between 2nd last line and 3rd last line
+
+dot at (0.6in, 0)
+line invis from last dot go 0.15in heading 135 "os.Args" mono aligned ljust
+
+line thin from (last dot.x-0.15in, 0.1in) down 0.2in
+text "flag.Parse" mono ljust with .s at last.n
+
+dot at (A.e.x-0.4in, 0)
+line invis from last dot go 0.15in heading 135 "http.Request" mono aligned ljust
+
+line thin from (last dot.x-0.15in, 0.1in) down 0.2in
+text "http.Handler" mono with .s at last.n
+....
+
+[.notes]
+--
+Whether something is request scope or not depends
+on which function you're looking at.
+
+I said your command line arguments were application scope.
+But to the command line parser, that's request scope.
+
+So instead of a binary definition
+it might be useful to think of scope as a gradient.
+
+(*step*)
+Things on the left change less often than things on the right.
+Things on the left have a larger scope than things on the right.
+
+`flag.Parse` views this gradient from further left of `os.Args`,
+so from its point of view, `os.Args` is variable,
+while from the point of view of `http.Handler`, it's constant.
+
+This is something that's useful to think about
+as you're designing abstractions.
+
+Things with bigger scope, that is, things that change less often,
+can be fields on an object instead of parameters of a function.
+--
+
+[.columns]
+== Using scope
+
+[.column%step]
+--
+*Designing structs*
+
+[%hardbreaks.text-left]
+Large scope: fields
+Small scope: parameters
+
+[pikchr]
+....
+// (0, 0) is the start of the arrow
+A: arrow <-> right 1.5in
+
+dot at (0.3in, 0)
+line invis from last dot go 0.15in heading 135 "Logger" mono aligned ljust
+
+line from (last dot.x+0.4in, 0.1in) down 0.2in
+text "RequestHandler" mono ljust with .s at last.n
+
+dot at (A.e-0.3in, 0)
+line invis from last dot go 0.15in heading 135 "Request" mono aligned ljust
+....
+--
+
+[.column%step]
+--
+*Parameter ordering*
+
+Sort function parameters by scope
+
+[source,go]
+----
+func GetUserDetails(
+  organization, username string,
+) *UserDetails {
+  /* ... */
+}
+----
+--
+
+[.notes]
+--
+It's valuable to think about the scope of values as you're writing code.
+
+As an example, (*step*) you can use it to help you design structs,
+things with a scope larger than the object
+can become fields of the struct instead of parameters.
+
+You can apply the same concept to help you decide on parameter ordering.
+(*step*) Just sort parameters by scope: larger to smaller.
+Things that change less often, go on the left,
+things that change more often, on the right.
+
+For example, regardless of those specific variables,
+conceptually, an organization has larger scope than username,
+so organization is to the left of username.
+--

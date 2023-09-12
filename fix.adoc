@@ -23,23 +23,16 @@ The way to interpret this is
 "code that looks like this tends to leak complexity".
 
 // TODO: probably don't need to hedge here.
-// TODO: explain how each thing might leak complexity
 
 Okay, let's get into it.
 
 // TODO:
 //
-// * Closure or callback heavy APIs
-// ** You can implement a class a closure doesn't mean you should.
-// ** Isolate concepts, give them names, add interfaces (middleware example)
-// ** Related: If there's an interface, prefer an object over closure. More maintainable.
-// *** Closure want to be objects when they grow up
+// Maybe:
+//
 // * Unstoppable goroutines
 // ** Add a means of stopping them -- context or otherwise
 // ** Never spawn in `init()`
-//
-// Maybe:
-//
 // * Naming: names and scopes
 // ** Inconsistency in naming
 // ** Stuttering
@@ -48,8 +41,6 @@ Okay, let's get into it.
 // * Errors: structured and sentinel
 // * Bidirectional channels at boundaries / channels are rare
 --
-
-// TODO: many functions, adapt the long-funcs strategy
 
 = Over-reliance on primitives
 
@@ -71,6 +62,9 @@ include::fix-serialized-types.adoc[]
 include::fix-bool.adoc[]
 include::fix-callback.adoc[]
 // TODO: maybe: closures vs objects
+// ** You can implement a class a closure doesn't mean you should.
+// ** Isolate concepts, give them names, add interfaces (middleware example)
+// *** Closure want to be objects when they grow up
 include::fix-premature-iface.adoc[]
 include::fix-big-iface.adoc[]
 include::fix-global.adoc[]
@@ -85,6 +79,7 @@ Now I want to talk about an application holistically.
 --
 
 include::concept-flow.adoc[]
+include::concept-scope.adoc[]
 include::concept-area-depth.adoc[]
 
 == !
@@ -95,13 +90,12 @@ Unfortunately, I don't have a list of rules that we can follow
 to always get the right abstraction.
 But I have some tools that'll help you find it.
 
-// TODO
-//
-// * single point of entry for modules that do one thing
+// Finding the abstraction
+// * really long functions (maybe?)
 // * look for conditionals
 // * currying as a tool for building abstractions
-// * start with the contract when adding a new type/function
-// ** document the contract before you implement it
+// ** shared arguments => object
+// * start by documenting the contract when adding a new type/function
 // ** make the contract inform the implementation, not the other way around
 // ** there's no such thing as self-documenting code
 // ** I'm a big fan of the old golint rule:
@@ -112,17 +106,11 @@ But I have some tools that'll help you find it.
 //    or one "entry" into a library.
 // ** Use scope of information to inform abstraction design.
 //    Things that change rarely, vs things that change often.
-// ** Accepted interfaces should be equest scoped
+// ** Accepted interfaces should be request scoped
 // ** Tip: Argument order based on scope
-// *** Exception: context
-// * maybe: sometimes code repetition is okay
-// ** DRY vs DAMP; tests
-
-// TODO: "shared arguments"
-// TODO: tie ideas here back into the guidance from prior section.
 --
 
-// TODO: "shallow modules" "lots of top level function"
+// TODO: this is "finding an abstraction"
 include::fix-long-funcs.adoc[]
 
 // = Tangent: Libraries
