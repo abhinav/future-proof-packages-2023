@@ -26,6 +26,7 @@ site: third_party
 	rm -rf _site/.asciidoctor
 	cp -R css _site/css
 	cp -R fonts _site/fonts
+	cp -R webfonts _site/webfonts
 	cp -r images _site/images
 	cp -R reveal.js/dist _site/reveal.js/dist
 	cp -R reveal.js/plugin/{highlight,notes} _site/reveal.js/plugin

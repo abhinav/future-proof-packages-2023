@@ -14,13 +14,14 @@ Abhinav Gupta
 :revealjs_transition: none
 :revealjs_width: 1280
 :revealjs_height: 720
+:stylesdir: css
+:!iconfont-remote:
 :customcss: css/style.css
 :icons: font
 :idprefix:
 :idseparator: -
 :source-highlighter: highlightjs
 :highlightjs-theme: css/highlight.css
-:font-awesome-version: 5.15.4
 
 [.small.text-right]
 {revdate}
