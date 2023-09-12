@@ -3,7 +3,6 @@ Abhinav Gupta
 2023-09-27
 :revealjs_controls: false
 :revealjs_controlsTutorial: false
-:revealjs_fragmentInURL: true
 :revealjs_hash: true
 :revealjs_navigationMode: linear
 :revealjs_pdfseparatefragments: true
@@ -12,9 +11,11 @@ Abhinav Gupta
 :revealjs_customtheme: css/night.css
 :revealjs_totalTime: 2700
 :revealjs_transition: none
+:revealjs_margin: 0.05
 :revealjs_width: 1280
 :revealjs_height: 720
-// :revealjs_slideNumber: c/t
+:revealjs_slideNumber: c/t
+:revealjs_showSlideNumber: speaker
 :stylesdir: css
 :!iconfont-remote:
 :customcss: css/style.css

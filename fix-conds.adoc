@@ -107,7 +107,7 @@ we did find one...
 --
 
 [%auto-animate.columns.wrap]
-= Large scoped conditions
+== Large scoped conditions
 
 [.column.is-one-third]
 --
