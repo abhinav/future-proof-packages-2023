@@ -94,7 +94,6 @@ flow of information, scope, surface area, and depth.
 You can use those to help you find the abstraction.
 
 // Finding the abstraction
-// ** shared arguments => object
 // * start by documenting the contract when adding a new type/function
 // ** make the contract inform the implementation, not the other way around
 // ** there's no such thing as self-documenting code
@@ -107,6 +106,8 @@ You can use those to help you find the abstraction.
 //    Things that change rarely, vs things that change often.
 // ** Accepted interfaces should be request scoped
 --
+
+// TODO: curry might be a better follow to long funcs
 
 include::fix-long-funcs.adoc[]
 include::fix-conds.adoc[]

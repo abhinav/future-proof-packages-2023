@@ -58,14 +58,6 @@ This might be better demonstrated with an example...
 --
 [source%linenums,go,data-id=left]
 ----
-type LinkStyle int
-
-const (
-  LinkStyleDir   LinkStyle = iota
-  LinkStylePlain
-  LinkStyleHTML
-)
-
 type SiteGen struct {
   /* ... */
   LinkStyle LinkStyle
@@ -91,6 +83,20 @@ func (g *SiteGen) RelativeURL(dst *Page) string {
 ----
 --
 
+[.column.is-one-third]
+--
+[source,go]
+----
+type LinkStyle int
+
+const (
+  LinkStyleDir   LinkStyle = iota
+  LinkStylePlain
+  LinkStyleHTML
+)
+----
+--
+
 [.notes]
 --
 Think back to the static website rendering example.
@@ -113,14 +119,6 @@ we did find one...
 --
 [source%linenums,go,data-id=left]
 ----
-type LinkStyle int
-
-const (
-  LinkStyleDir   LinkStyle = iota
-  LinkStylePlain
-  LinkStyleHTML
-)
-
 type SiteGen struct {
   /* ... */
   LinkStyler LinkStyler
@@ -130,12 +128,8 @@ type SiteGen struct {
 
 [.column.is-two-thirds]
 --
-[source%linenums,go,data-id=right]
+[source,go]
 ----
-type LinkStyler interface {
-  StyleLink(string) string
-}
-
 func (g *SiteGen) RelativeURL(dst *Page) string {
   /* ... */
   return g.LinkStyle.StyleLink(u)
@@ -143,7 +137,56 @@ func (g *SiteGen) RelativeURL(dst *Page) string {
 ----
 --
 
+[.column.is-one-third]
+--
+[source,go]
+----
+type LinkStyler interface {
+  StyleLink(string) string
+}
+
+type (
+  DirLinkStyler   /* ... */
+  PlainLinkStyler /* ... */
+  HTMLLinkStyler  /* ... */
+)
+----
+--
+
+[.column.is-two-thirds]
+--
+[source%linenums,go,data-id=right]
+----
+func (DirLinkStyler) StyleLink(u string) string {
+    return u + "/"
+}
+
+func (PlainLinkStyler) StyleLink(u string) string {
+    return strings.TrimSuffix(u, "/")
+}
+
+func (HTMLLinkStyler) StyleLink(u string) string {
+    return u + ".html"
+}
+----
+--
+
 [.notes]
 --
 The LinkStyler.
+This is slightly different from what I showed before,
+but it follows the same idea.
+
+The condition of which style is being used is no longer a concern
+for the site generator.
+It's evaluated in a scope larger than SiteGen,
+and SiteGen just gets an object that it can use unconditionally
+to style links.
+
+This same concept of removing conditions with larger scope
+applies in other contexts.
+For example, instead of `if production { .. }` in 5 different places,
+decide whether you're in production well in advance,
+and pass in an object that behaves as one should in production or development
+as the case may be.
 --
