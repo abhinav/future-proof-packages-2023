@@ -1,0 +1,164 @@
+= Partial function application
+
+Find large scoped function parameters +
+that are constant for an application
+
+Wrap them into objects
+
+[.notes]
+--
+Another tool to help you find the abstraction is
+partially filling in functions.
+
+Recall the idea of scope and how you can sort function parameters by scope.
+If you find that some of the larger scoped parameters
+don't really change in invocations to the function,
+you can build an object holding those parameters,
+and turn the function into a method on that object.
+
+This is kind of like applying the function on the first parameter,
+promising to provide the rest later.
+
+Let me demonstrate:
+--
+
+== Partial function application
+
+[pikchr, height=300px]
+....
+// boxAround(A, B)
+define boxAround {
+  box with .nw at $1.nw+(-0.05in,0.05in) width ($2.e.x-$1.w.x+0.1in) ht ($1.n.y-$2.s.y+0.1in)
+}
+
+[
+right
+
+box invis "GetProfile" mono big fit
+Param1: box "client *http.Client" mono fit
+box "org string" mono fit
+Param3: box "login string" mono fit
+boxAround(GetProfile, Param3)
+
+line dotted from 0.5in north of Param1.w to 0.25in north of Param3.e
+line dotted from 0.5in south of Param1.w to 0.25in south of Param3.e
+]
+....
+
+[.notes]
+--
+I have a function with parameters sorted by scope.
+
+The HTTP client has bigger scope than the organization,
+which has a bigger scope than the login name.
+--
+
+[.columns.wrap]
+== Partial function application
+
+[.column.is-full]
+[pikchr]
+....
+// boxAround(A, B)
+define boxAround {
+  box with .nw at $1.nw+(-0.05in,0.05in) width ($2.e.x-$1.w.x+0.1in) ht ($1.n.y-$2.s.y+0.1in)
+}
+
+[
+right
+
+box invis "GetProfile" mono big fit
+Param1: box "client *http.Client" mono fit
+box "org string" mono fit
+Param3: box "login string" mono fit
+boxAround(GetProfile, Param3)
+]
+
+[
+right
+
+box invis "ListProfiles" mono big fit
+Param1: box "client *http.Client" mono fit
+Param3: box "org string" mono fit
+boxAround(ListProfiles, Param3)
+] with .nw at 0.1in south of last.sw
+....
+
+[%step]
+[.column.is-half]
+[pikchr]
+....
+// boxAround(A, B)
+define boxAround {
+  box with .nw at $1.nw+(-0.05in,0.05in) width ($2.e.x-$1.w.x+0.1in) ht ($1.n.y-$2.s.y+0.1in)
+}
+
+[
+right
+
+box invis "ProfileGateway" mono big fit
+Param3: box "client *http.Client" mono fit
+boxAround(ProfileGateway, Param3)
+PGWAnchor: dot invis at last box.sw
+
+box invis "GetProfile" mono fit with nw at 0.2in se of PGWAnchor
+box "org string" mono fit
+box "login string" mono fit
+boxAround(GetProfile, last box)
+line chop rad 0.1in from PGWAnchor down until even with last box then to last box
+
+right
+box invis "ListProfiles" mono fit with nw at 0.1in s of GetProfile.sw
+box "org string" mono fit
+boxAround(ListProfiles, last box)
+line chop rad 0.1in from PGWAnchor down until even with last box then to last box
+
+]
+....
+
+[%step]
+[.column.is-half]
+[pikchr]
+....
+// boxAround(A, B)
+define boxAround {
+  box with .nw at $1.nw+(-0.05in,0.05in) width ($2.e.x-$1.w.x+0.1in) ht ($1.n.y-$2.s.y+0.1in)
+}
+
+[
+right
+
+box invis "OrgProfileGateway" mono big fit
+box "client *http.Client" mono fit
+Param3: box "org string" mono fit wid last.wid with nw at last.sw
+boxAround(OrgProfileGateway, Param3)
+PGWAnchor: dot invis at last box.sw
+
+box invis "GetProfile" mono fit with nw at 0.2in se of PGWAnchor
+box "login string" mono fit
+boxAround(GetProfile, last box)
+line chop rad 0.1in from PGWAnchor down until even with last box then to last box
+
+box "ListProfiles" mono fit with nw at last box.sw
+line chop rad 0.1in from PGWAnchor down until even with last box then to last box
+
+]
+....
+
+[.notes]
+--
+Given a couple functions like this, or even with just the first function,
+I might find that the HTTP client never changes once the application starts.
+
+That's a good place to build an abstraction. (*step*)
+We put the HTTP client into a struct,
+and turn GetProfile and ListProfiles into methods on it.
+
+It's like if we called GetProfile and ListProfiles
+with just the HTTP client at startup,
+and then passed the remaining parameters later.
+
+We can even take this further.
+If the organization is also constant (*step*)
+we could even move that into the struct.
+--
