@@ -1,7 +1,7 @@
 [.columns]
 = Hello!
 
-[.column.is-half.has-text-left]
+[.column.is-one-third.has-text-left]
 --
 I'm Abhinav
 
@@ -12,11 +12,9 @@ Gopher @ Rippling
 Previously: Pulumi, Uber
 --
 
-[.column.is-half.has-text-left]
+[.column.is-two-thirds.has-text-left]
 --
-Find me at
-
-[.medium%hardbreaks]
+[%hardbreaks]
 icon:globe[size=fw] https://abhinavg.net[abhinavg.net]
 icon:github-alt[size=fw] https://github.com/abhinav[@abhinav]
 icon:mastodon[size=fw, set=fab] https://hachyderm.io/@abhinav[@\abhinav@hachyderm.io]
@@ -24,8 +22,10 @@ icon:mastodon[size=fw, set=fab] https://hachyderm.io/@abhinav[@\abhinav@hachyder
 
 [.notes]
 --
-Quick intro.
-I'm Abhinav. I work at Rippling.
+First, about me.
+
+Hi, I'm Abhinav. I work at Rippling.
+
 Before that,
 I worked at Pulumi, helping with their Go SDK,
 and at Uber, leading the Go Frameworks team.
@@ -36,5 +36,6 @@ I've been working on libraries and frameworks,
 primarily in Go, for several years now,
 and in that period I've developed opinions
 on maintainability and future-proofing.
-I want to share some of that with you all today.
+
+I'm going to share some of those opinions with you today.
 --

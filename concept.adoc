@@ -11,8 +11,8 @@ What do I mean when I say future-proof package?
 
 For this talk, I'm making up this definition.
 
-A package is future-proof if it has the ability to
-evolve in functionality
+A package is future-proof
+if it has the ability to evolve in functionality
 without disrupting rest of code base.
 --
 
@@ -24,21 +24,22 @@ as a result of an unrelated change
 
 [.notes]
 --
-Disruption here is being forced to
-modify otherwise unrelated code
-that previously worked
-as a result of a change you made
-elsewhere in the codebase.
+What do I mean by disruption here?
+
+Being forced to modify code that previously worked,
+and is otherwise unrelated,
+as a result of a change elsewhere in the codebase.
 
 Disruptions are bad.
 
-* They reduce your velocity;
-  you have to make a bunch of meaningless mechanical changes.
-* They reduce your team's velocity;
-  they increase the size of your PRs, increasing what has to be reviewed,
-  as well as increasing the chances of a conflict.
-* They increase risk of a breakage in production
-  because something got missed.
+* They reduce your velocity:
+  you're left doing unnecessary mechanical work
+* They reduce your team's velocity:
+  they have to make their own disruptive changes,
+  they have to review these mechanical changes,
+  and they have to deal with the resulting merge conflicts.
+
+All in all, they're inconvenient.
 --
 
 == What causes disruption?
@@ -57,10 +58,6 @@ This is my main thesis of my talk today:
 code disruptions are caused by changes to packages
 with a design that leaks complexity.
 
-I'm using the term package here to refer to
-an independent, modular, composible unit of code.
-Or at least one intended to have those properties.
-
 (*next*)
 A design that leaks complexity.
 
@@ -69,7 +66,43 @@ Let me expand that.
 
 == On complexity
 
-// TODO: Diagram of hidden vs leaking complexity visualization
+[pikchr, height=250px]
+....
+X: [
+A: box invis wid 0.7in ht 1in
+
+line rad 0.02in color 0x94D2BD \
+  from A.nw go 0.15in s \
+  then 0.1in w then 0.1in s then 0.1in e then 0.1in s \
+  then 0.1in w then 0.1in s then 0.1in e then 0.1in s \
+  then 0.1in w then 0.1in s then 0.1in e then 0.1in s \
+  then 0.1in w then 0.1in s then 0.1in e then 0.1in s \
+  then to A.sw to A.se \
+  then 0.3in n \
+  then 0.3in w then 0.3in n then 0.3in e \
+  then to A.ne to A.nw
+]
+
+Y: [
+A: box invis wid 0.7in ht 1in
+
+line rad 0.02in color 0xEE9B00 \
+  from A.nw go 0.15in s \
+  then 0.1in w then 0.1in s then 0.1in e then 0.1in s \
+  then 0.1in w then 0.1in s then 0.1in e then 0.1in s \
+  then 0.1in w then 0.1in s then 0.1in e then 0.1in s \
+  then 0.1in w then 0.1in s then 0.1in e then 0.1in s \
+  then to A.sw to A.se \
+  then 0.2in n \
+  then 0.2in w then 0.2in n then 0.2in e then 0.1in n \
+  then 0.1in w then 0.1in n then 0.1in e then 0.1in n \
+  then 0.1in w then 0.1in n then 0.1in e then 0.1in n \
+  then to A.ne to A.nw
+] with ne at 0.7in w of last.nw
+
+text "Hidden Complexity" big with s at X.n
+text "Leaking Complexity" big with s at Y.n
+....
 
 * Complexity is inevitable
 * Good design hides complexity

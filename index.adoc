@@ -29,7 +29,13 @@ Abhinav Gupta
 [.small.text-right]
 {revdate}
 
-include::intro.adoc[leveloffset=+1]
+[.notes]
+--
+Hey, today I'll talk about future-proof Go packages.
+Let's get started.
+--
+
+include::about.adoc[leveloffset=+1]
 include::agenda.adoc[leveloffset=+1]
 include::concept.adoc[leveloffset=+1]
 
