@@ -1,12 +1,12 @@
 = See also
 
-// TODO: Image
+image::philosophy-of-software-design.jpg[height=400px]
 
 _A Philosophy of Software Design_ by John Ousterhout
 
 [.notes]
 --
-I highly recommend this book,
+Lastly, on my way out, I highly recommend checking out this book.
+
 It helped me better articulate some of the ideas I had for this talk.
-// Especially the idea of module depth.
 --

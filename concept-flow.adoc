@@ -21,18 +21,6 @@ the path that information takes to go through your application.
 
 Its shape may change as it passes through,
 but the information represented is similar if not the same.
-
-// TODO
-
-// Stack a bunch of packages on top of each other (you know, as a stack)
-// with main at the top, pick a scenario,
-// and trace the path information takes through these packages.
-
-// TODO: maybe
-// You can do this even within a single package.
-// If a package contains a lot of overly specific helper functions
-// and there's a lot of zigzagging around them,
-// you may be approaching spaghetti territory.
 --
 
 == Flow of information

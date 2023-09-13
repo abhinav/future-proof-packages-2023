@@ -26,18 +26,11 @@ The way to interpret this is
 
 Okay, let's get into it.
 
-// TODO:
-//
-// Maybe:
+// TODO Maybe:
 //
 // * Unstoppable goroutines
 // ** Add a means of stopping them -- context or otherwise
 // ** Never spawn in `init()`
-// * Naming: names and scopes
-// ** Inconsistency in naming
-// ** Stuttering
-// ** Document public API of internal types with exported names
-// ** Consistency above all else
 // * Errors: structured and sentinel
 // * Bidirectional channels at boundaries / channels are rare
 --
@@ -92,19 +85,6 @@ The idea of finding the right abstraction to hide complexity.
 The concepts I just brought up:
 flow of information, scope, surface area, and depth.
 You can use those to help you find the abstraction.
-
-// Finding the abstraction
-// * start by documenting the contract when adding a new type/function
-// ** make the contract inform the implementation, not the other way around
-// ** there's no such thing as self-documenting code
-// ** I'm a big fan of the old golint rule:
-//    every exported entity must be documented.
-// * define a domain language
-// * Use tests to help inform abstractions
-// * Application-scoped vs request-scoped information
-// ** Use scope of information to inform abstraction design.
-//    Things that change rarely, vs things that change often.
-// ** Accepted interfaces should be request scoped
 --
 
 // TODO: curry might be a better follow to long funcs
@@ -113,25 +93,159 @@ include::fix-long-funcs.adoc[]
 include::fix-conds.adoc[]
 include::fix-curry.adoc[]
 
-// = Tangent: Libraries
-//
-// Maybe
-//
-// [.notes]
-// --
-// * be deliberate about features
-// ** You can't just "add" a feature. Cross-product.
-// --
-// = Fixing legacy code
-// TODO: Picture of David Winterbottom's tweet
-// https://codeinthehole.com/
-// [.notes]
-// --
-// * pay your debts in installments
-// ** don't try to rewrite legacy code from scratch
-// ** don't be afraid of changing things
-// ** leave it better than you found it
-// * Testing is a design problem
-// ** Maybe: Use pattern from before to abstract away
-//    global dependencies
-// --
+= Writing the abstraction
+
+[.notes]
+--
+Some tips for writing the abstraction once you've found it.
+--
+
+== Start on the outside
+
+* Don't implement right away
+* Decide the contract first
+
+[.notes]
+--
+Start on the outside:
+
+* Don't jump into the implementation right away.
+* Figure out the purpose of the abstraction,
+  and its contract before you start implementing it.
+** By contract, I mean, what's the input, what's the output --
+   where do the responsibilities of this object start versus end.
+--
+
+== Plan for expansion
+
+include::expansion-table.adoc[]
+
+[.notes]
+--
+Use the tools we discussed earlier
+to plan for expansion of the abstraction, its inputs, and outputs.
+--
+
+== Name things clearly
+
+* Don't be redundant
+* Don't build a kitchen sink
+** No 'helper' or 'util'
+* Consistency over all else
+
+[.notes]
+--
+TODO
+
+* Kitchen sink
+** 'helper' is uninformative
+** 'util' will always be wide and shallow
+* Consistency
+** New terms have to be incorporated by a reader
+   into their mental model of an abstraction.
+** Re-use similar names for similar concepts.
+** If you have something called UserDetails already,
+   don't introduce PostData. Call it PostDetails.
+--
+
+== Document it
+
+* Write down the contract
+* No self-documenting code
+* Document all exported objects
++
+[%step]
+[source,yaml]
+----
+# .golangci.yml
+
+issues:
+  # Re-enable requiring all exported entities
+  # to be documented.
+  exclude-use-default: false
+----
+
+[.notes]
+--
+* Document it. Many people miss this part.
+* There's no such thing as self-documenting code.
+* I'm personally a big fan of the old golint rule
+  that requires all exported things must be documented.
+  I still enable it in my code.
+** Revive has it enabled by default.
+** golangci-lint disables that check by default,
+   but you can enable it with this snippet (*step*),
+   although it drops a few other default exclusions too.
+   Personally, I haven't found that to be a problem.
+--
+
+[.columns]
+== Make the implementation match the contract
+
+[.column.is-one-third]
+--
+--
+
+[.column.is-two-thirds.text-left]
+--
+👎 "This is what it does" +
+👍 "This is what it's supposed to do"
+--
+
+[.notes]
+--
+I may be repeating myself here,
+but it's important that the contract inform the implementation,
+not the other way around.
+--
+
+== Don't leak the implementation
+
+* Insulate internals from the outside world
+* Avoid primitive obsession
+* Define domain objects
+
+// TODO: diagram
+
+[.notes]
+--
+--
+
+== Don't backtrack the flow of information
+
+Information fed once should not be fed again
+
+// TODO: diagram
+
+[.notes]
+--
+--
+
+== Don't add features, incorporate
+
+* Features do not exist in isolation
+* Adjust the mental model
++
+[source,go]
+----
+type SiteGen struct{ AddSlash bool }
+/* versus */
+type SiteGen struct{ LinkStyle LinkStyle }
+----
+* It's okay to say No
+
+[.notes]
+--
+Don't just 'add' a feature.
+Features don't exist in isolation.
+Consider how the feature interacts with other features.
+
+See how it fits into your mental model of the abstraction.
+Can you adjust the mental model to account for it?
+Think back to the site generator example.
+An "AddSlash" boolean does not fit there for me,
+but an object responsible for styling links does.
+
+If it breaks the model, if you can't incorporate it,
+it's okay to say no.
+--

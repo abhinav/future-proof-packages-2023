@@ -1,13 +1,31 @@
+[.columns]
 = Conclusion
+
+[.column.text-left]
+--
+[%hardbreaks]
+Future-breaking code
+leaks complexity
+causes disruption
+--
+
+[.column]
+--
+* Find the abstraction
+* Watch the flow
+* Plan for expansion
+--
 
 [.notes]
 --
-So just to summarize,
+So in conclusion!
 
-* Disruptions are bad
-* Leaking complexity causes disruptions
-* You can design to prevent leaks
-* Writing before coding helps you think
+* Leaking complexity causes disruptive code
+* You can tame this complexity by finding the right abstraction
+** with deep modules a consistent flow of information
+** and a plan for expansion
+
+Hope you all found this informative.
 
 Thanks!
 --

@@ -136,12 +136,12 @@ There's a better way...
 >
 > -- https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/[Alexis King]
 
+// TODO: diagram
+
 [.notes]
 --
 You may have heard of this, or a variant of this before.
 Parse, not validate.
-
-// TODO: diagram?
 
 The blog post I'm referencing is more detailed,
 but here's how I visualize it:
@@ -304,8 +304,6 @@ Ah, that's better.
 
 In this example, `url.Parse` already existed,
 but the point I'm making here doesn't hold just for that.
-
-// TODO: this might be a good injection point
 --
 
 [.columns.wrap]

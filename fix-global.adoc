@@ -63,23 +63,6 @@ You should aim to isolate your business logic from your process globals.
 Knowledge of your process state --
 environment variables, standard out, etc. --
 should remain inside main.
-
-// TODO: example code
-// Extract everything you need to extract from the environment
-// as early as possible in main, pull that into a data structure,
-// and plumb information down as needed.
-//
-// A pattern I like to use here a lot is (TODO show `mainCmd` pattern).
-// This adds these two integration points for me to test:
-//
-// * Inject a fake Getenv to test the parsing of environment into the struct
-// * In business logic, test just against the struct with no concern for
-//   environment
-//
-// You probably already do this with `os.Args`:
-// parse in main and pass the parsed command line arguments around.
-// A random business logic component will not typically access `os.Args` directly.
-// Just carry that over to Getenv, Setenv, Stdin, Stdout, Signal, and friends.
 --
 
 [.columns.wrap]
@@ -201,4 +184,17 @@ func (*CLI) Run() (exitCode int)
 --
 We talked about parameter objects before. That fits right in.
 (*step*) Or equivalently, an object with a Run method.
+
+// TODO:
+// A pattern I like to use here a lot is (TODO show `mainCmd` pattern).
+// This adds these two integration points for me to test:
+//
+// * Inject a fake Getenv to test the parsing of environment into the struct
+// * In business logic, test just against the struct with no concern for
+//   environment
+//
+// You probably already do this with `os.Args`:
+// parse in main and pass the parsed command line arguments around.
+// A random business logic component will not typically access `os.Args` directly.
+// Just carry that over to Getenv, Setenv, Stdin, Stdout, Signal, and friends.
 --

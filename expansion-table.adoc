@@ -1,0 +1,14 @@
+[.medium, cols=">.^2h,^3,^3", frame=none]
+|====
+| | Input | Output
+
+.2+| Functions
+| Parameter Objects
+| Result Objects
+2.+^d| Functional options
+
+| Abstractions
+| Accept interfaces
+| Return structs
+
+|====

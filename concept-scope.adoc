@@ -99,10 +99,10 @@ Things with bigger scope, that is, things that change less often,
 can be fields on an object instead of parameters of a function.
 --
 
-[.columns]
+[.columns.wrap]
 == Using scope
 
-[.column%step]
+[.column.is-half%step]
 --
 *Designing structs*
 
@@ -126,8 +126,22 @@ line invis from last dot go 0.15in heading 135 "Request" mono aligned ljust
 ....
 --
 
-[.column%step]
+[.column.is-half%step]
 --
+*Designing interfaces*
+
+Request scoped methods on accepted interfaces
+
+[source,go]
+----
+type Store interface {
+  Get(string) (string, error)
+  Set(k, v string) error
+}
+----
+
+[%step]
+====
 *Parameter ordering*
 
 Sort by scope (big to small)
@@ -135,11 +149,12 @@ Sort by scope (big to small)
 [source,go]
 ----
 func GetUserDetails(
-  organization, username string,
+  org, username string,
 ) *UserDetails {
   /* ... */
 }
 ----
+====
 --
 
 [.notes]
@@ -150,12 +165,15 @@ As an example, (*step*) you can use it to help you design structs,
 things with a scope larger than the object
 can become fields of the struct instead of parameters.
 
-You can apply the same concept to help you decide on parameter ordering.
+Similarly, you can use it to design interfaces. (*step*)
+If you're defining a new interface for your input,
+only put request-scoped methods on it.
+Think back to the RedisStore example, and how the Store interface
+didn't have a Close method.
+
+Finally, you can even use it to
+help you decide on parameter ordering.
 (*step*) Just sort parameters by scope: larger to smaller.
 Things that change less often, go on the left,
 things that change more often, on the right.
-
-For example, regardless of those specific variables,
-conceptually, an organization has larger scope than username,
-so organization is to the left of username.
 --

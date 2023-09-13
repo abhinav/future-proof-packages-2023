@@ -1,8 +1,6 @@
 [%auto-animate]
 = Parameter objects
 
-// TODO: accept a struct and return a struct, and the signature will never break.
-
 [source%linenums,go,data-id=new]
 ----
 func New(url string, token string) *Client {
