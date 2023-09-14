@@ -1,104 +1,81 @@
-[%auto-animate.columns]
+[%auto-animate]
 = Accept ``interface``s
 
-[.column.is-half]
---
-[source%linenums,go,data-id=Parse,step=1]
+Dependencies should be interfaces +
+*not* concrete implementations
+
+[.noborder, cols=">.^1,<.^2a",frame=none]
+|====
+
+| 🙁
+| [source,go]
 ----
-func Parse(f *os.File) (Node, error) {
-  /* ... */
-}
+func Parse(f *os.File) (Node, error)
 ----
---
+
+| 🙂
+| [source%linenums,go]
+----
+func Parse(r io.Reader) (Node, error)
+----
+
+|====
 
 [.notes]
 --
-Before you can start expanding an abstraction you consume,
-you have to make sure you're consuming the right thing.
+When you're accepting an abstraction as input,
+it should be an interface, not a concrete implementation.
+Otherwise you're left with no room for expansion.
 
-If you're accepting a concrete type for an object that implements behavior,
-that doesn't leave you much room for expansion.
+This is generally a good choice if two components
+are very loosely coupled.
+For example, my parser doesn't *have* to know that it's reading from a file.
 
-If two components have a very loose coupling --
-the consumer doesn't need to know the concrete implementation --
-it's best to accept an interface
-for just the functionality of that object that you use.
-
-For example, if I'm writing a parser for something (*step*)
-instead of accepting a file...
+This doesn't apply only to interfaces that already exist.
 --
 
-[%auto-animate.columns]
+[%auto-animate]
 == Accept ``interface``s
 
-[.column.is-half]
---
-[source%linenums,go,data-id=Parse]
-----
-func Parse(r io.Reader) (Node, error) {
-  /* ... */
-}
-----
---
+[.noborder, cols=">.^1,<.^2a",frame=none]
+|====
 
-[%step.column.is-half.medium]
---
-[source%linenums,go,data-id=Login]
+| 🙁
+| [source,go]
 ----
-func Login(c *http.Client) (Token, error) {
-  /* ... */
-}
-----
---
-
-[.notes]
---
-I should accept an io.Reader.
-
-Note that this isn't limited to pre-defined interfaces. (*step*)
-Even when you're dealing with a type you don't own or control...
---
-
-[%auto-animate.columns]
-== Accept ``interface``s
-
-[.column.is-half]
---
-[source%linenums,go,data-id=Parse]
-----
-func Parse(r io.Reader) (Node, error) {
-  /* ... */
-}
-----
---
-
-[.column.is-half.medium]
---
-[source%linenums,go,data-id=Login]
-----
-func Login(c HTTPClient) (Token, error) {
-  /* ... */
-}
+func Login(c *http.Client) (Token, error)
 ----
 
-[source,go]
+| 🙂
+| [source%linenums,go]
 ----
 type HTTPClient interface {
   Do(*http.Request) (*http.Response, error)
 }
+
+func Login(c *HTTPClient) (Token, error)
 ----
---
+
+|====
 
 [.notes]
 --
-You can introduce an interface
-for just the functionality you need.
+You can define and accept interfaces even for types you don't own
+with only those methods that you need.
+
+Doing this allows you to extend your input with upcasting.
 --
 
 [%auto-animate%auto-animate-restart.columns]
-== Interface upcasting
+== Accept ``interface``s
 
-[%step.column.is-half]
+[.column.medium]
+--
+Extend by upcasting interfaces
+--
+
+
+[column]
 --
 [source%linenums,go,data-id=Parse]
 ----
@@ -110,19 +87,34 @@ func Parse(r io.Reader) (Node, error) {
 
 [.notes]
 --
-Once you're accepting interfaces for a loosely coupled dependency,
-and you want to upgrade its behavior somehow --
-you want to expect more in what it can do --
-you can do so with the help of upcasting the interface.
+For example, if my old Parse function
+wanted to know the file name to use in error messages,
+if I was using `*os.File`, I could just call `File.Name`.
 
-For example, consider the Parse example again. (*step*)
-Suppose I need the file name during parsing.
-If I was using `*os.File`, I could just call `File.Name`.
-But with the interface, I have to upcast it like so:
+But with the interface, I have to upcast it like so...
 --
 
 [%auto-animate.columns]
-== Interface upcasting
+== Accept ``interface``s
+
+[.column]
+--
+Extend by upcasting interfaces
+
+[%step.medium.text-left]
+====
+Breaks if wrapped
+[source,go]
+----
+type countLines struct{ io.Reader }
+Parse(&countLines{file}) // oops!
+----
+====
+
+[%step.medium]
+* Make it obvious
+* Use small interfaces
+--
 
 [column]
 --
@@ -136,10 +128,7 @@ func Parse(r io.Reader) (Node, error) {
   /* ... */
 }
 ----
---
 
-[column]
---
 [source%linenums,go,data-id=Source]
 ----
 type Source interface {
@@ -151,51 +140,66 @@ type Source interface {
 
 [.notes]
 --
-Here I've defined a new interface `Source` with a `Name()` method
-that has the same signature as `*os.File.Name()`.
+I define a new interface named `Source`.
+Its `Name()` method matches `os.File.Name()`.
 
-If the reader I'm given happens to implement this method,
-I'll use that name.
-Otherwise, I'll use a fallback.
+So if the `io.Reader` passed into `Parse` implements this method,
+I'll use the file name.
+Otherwise, I'll fall back to unknown.
 
-This method basically allows me to *optionally*
-expect more from the abstraction I'm consuming.
---
-
-[.columns.wrap]
-== Using upcast
-
-[.column.is-full.highlight-red%step]
-Breaks if wrapped
-
-[.column.is-half]
-Make it obvious
-
-[.column.is-half]
-Use small interfaces
-
-[.notes]
---
-This is a pretty powerful tool;
-with it, a function can provide optional upgrade paths on any input interface.
-It can support optional hooks into the business logic
-without polluting the core interface.
+This method is great;
+it allows me to *optionally* upgrade an abstraction I'm consuming
+and make it richer.
 
 However, it's not magic. It's easily breakable. (*step*)
+If a user wraps the interface in an object
+that doesn't know to implement the optional functionality,
+that upgrade path is lost.
 
-If the concrete type that implements the optional interface,
-is accidentally wrapped in another object (like a middleware)
-that does not implement that optional functionality,
-then we can't do anything about it.
-That upgrade path is lost.
+To help mitigate that:
 
-To help mitigate that, if you use this tool:
-
-* First, make the presence of the upgrade path obvious
-  with documentation and convention.
-  When a caller loses the upgrade path with wrapping,
-  it should always be intentional.
-* Second, use small interfaces.
+* (*step*)
+  Make the upgrade path obvious with documentation and convention.
+  Make it so that a caller loses the upgrade path only if they intended to.
+*  (*step*) And prefer to use smaller interfaces.
   It's easier to talk about the upgrade path
-  when the upgrade path interface has only one method.
+  when there's only one method to talk about.
 --
+
+// [.columns.wrap]
+// == Using upcast
+//
+// [.column.is-full.highlight-red%step]
+// Breaks if wrapped
+//
+// [.column.is-half]
+// Make it obvious
+//
+// [.column.is-half]
+// Use small interfaces
+//
+// [.notes]
+// --
+// This is a pretty powerful tool;
+// with it, a function can provide optional upgrade paths on any input interface.
+// It can support optional hooks into the business logic
+// without polluting the core interface.
+//
+// However, it's not magic. It's easily breakable. (*step*)
+//
+// If the concrete type that implements the optional interface,
+// is accidentally wrapped in another object (like a middleware)
+// that does not implement that optional functionality,
+// then we can't do anything about it.
+// That upgrade path is lost.
+//
+// To help mitigate that, if you use this tool:
+//
+// * First, make the presence of the upgrade path obvious
+//   with documentation and convention.
+//   When a caller loses the upgrade path with wrapping,
+//   it should always be intentional.
+// * Second, use small interfaces.
+//   It's easier to talk about the upgrade path
+//   when the upgrade path interface has only one method.
+// --

@@ -36,9 +36,10 @@ include::expand-func-opts.adoc[]
 
 [.notes]
 --
-I just covered tools for expanding function inputs and outputs.
+Okay, that covers functions. Let's talk about abstractions.
 
-I'll cover abstractions now.
+There are two standard practices you can follow here
+to plan for expansion of abstractions.
 --
 
 include::expand-accept-iface.adoc[]
