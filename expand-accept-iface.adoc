@@ -35,7 +35,7 @@ This doesn't apply only to interfaces that already exist.
 --
 
 [%auto-animate]
-== Accept ``interface``s
+= Accept ``interface``s
 
 [.noborder, cols=">.^1,<.^2a",frame=none]
 |====
@@ -67,7 +67,7 @@ Doing this allows you to extend your input with upcasting.
 --
 
 [%auto-animate%auto-animate-restart.columns]
-== Accept ``interface``s
+= Accept ``interface``s
 
 [.column.medium]
 --
@@ -95,7 +95,7 @@ But with the interface, I have to upcast it like so...
 --
 
 [%auto-animate.columns]
-== Accept ``interface``s
+= Accept ``interface``s
 
 [.column]
 --

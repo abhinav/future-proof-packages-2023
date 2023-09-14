@@ -30,7 +30,7 @@ You can produce new outputs without disrupting callers.
 --
 
 [%auto-animate.columns]
-== Result objects
+= Result objects
 
 [.column, data=id=list]
 --

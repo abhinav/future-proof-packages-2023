@@ -32,7 +32,7 @@ without disrupting callers.
 --
 
 [%auto-animate.columns]
-== Parameter objects
+= Parameter objects
 
 [.column, data=id=list]
 --

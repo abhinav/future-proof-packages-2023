@@ -25,9 +25,9 @@ Let's talk about functions first.
 
 --
 
-include::expand-params.adoc[]
-include::expand-results.adoc[]
-include::expand-func-opts.adoc[]
+include::expand-params.adoc[leveloffset=+1]
+include::expand-results.adoc[leveloffset=+1]
+include::expand-func-opts.adoc[leveloffset=+1]
 
 = Expanding abstractions
 
@@ -42,7 +42,7 @@ There are two standard practices you can follow here
 to plan for expansion of abstractions.
 --
 
-include::expand-accept-iface.adoc[]
+include::expand-accept-iface.adoc[leveloffset=+1]
 include::expand-return-struct.adoc[]
 
 = Planning for expansion

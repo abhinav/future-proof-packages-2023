@@ -59,7 +59,7 @@ The general shape of functional options is:
 --
 
 [%auto-animate.columns]
-== Functional options
+= Functional options
 
 [.column.is-half]
 --
@@ -150,7 +150,7 @@ between the entities here.
 --
 
 [%auto-animate.columns.wrap]
-== Functional options
+= Functional options
 
 [.column.is-one-third]
 [pikchr, height=200px, data-id=diag]
