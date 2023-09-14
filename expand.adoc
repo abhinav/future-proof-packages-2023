@@ -43,7 +43,7 @@ to plan for expansion of abstractions.
 --
 
 include::expand-accept-iface.adoc[leveloffset=+1]
-include::expand-return-struct.adoc[]
+include::expand-return-struct.adoc[leveloffset=+1]
 
 = Planning for expansion
 
@@ -51,8 +51,7 @@ include::expand-table.adoc[]
 
 [.notes]
 --
-Okay, to summarize, to plan for expansion,
-our options are:
+So to summarize, to plan for expansion:
 
 * For function inputs and outputs, we have:
 ** Parameter objects, result objects, and functional options

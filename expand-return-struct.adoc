@@ -1,9 +1,13 @@
-[%auto-animate%auto-animate-restart.columns]
+[%auto-animate%auto-animate-restart.columns.wrap]
 = Return ``struct``s
 
-[.column.is-half%step]
+[.column.is-full]
+Return concrete implementations +
+*not* interfaces
+
+[.column.is-half]
 --
-Don't
+🙁
 
 [.medium]
 [source%linenums,go,data-id=iface]
@@ -18,15 +22,13 @@ func New() Client {
 
 type impl struct{/* ... */}
 
-func (*impl) List() (ListResult, error) {
-  /* ... */
-}
+func (*impl) List() (ListResult, error)
 ----
 --
 
-[.column.is-half%step]
+[.column.is-half]
 --
-Do
+🙂
 
 [.medium]
 [source%linenums,go,data-id=struct]
@@ -40,103 +42,66 @@ func New() *Client {
 }
 
 
-func (*Client) List() (ListResult, error) {
-  /* ... */
-}
+func (*Client) List() (ListResult, error)
 ----
 --
 
 [.notes]
 --
-Return structs.
-This is the other end of Accept Interfaces.
+This is the output end of abstractions.
 
-The idea is straightforward:
-when returning an instance of an abstraction --
-a complex object implementing various behaviors --
-don't do this (*step*) defining an interface and returning that.
-Instead, do this (*step*) return the concrete type.
+When producing abstractions as output,
+return concrete implementations.
+Don't write an interface for things you're producing.
 
-Consumers of this value will define an interface
+Consumers of the abstraction will define an interface
 if they need to -- per the previous section.
 
-Then, if you need to expand functionality --
-to return an object that does more --
-you can add a method to the returned object...
+This frees you up to add new functionality to the abstraction
+by simply adding a new method to the returned object.
 --
 
-[%auto-animate.columns]
+[%auto-animate.columns.wrap]
 = Return ``struct``s
 
+[.column.is-full]
+Extend by adding new methods
+
 [.column.is-half]
 --
-Don't
+🙁
 
 [.medium]
-[source%linenums,go,data-id=iface]
+[source%linenums,diff,data-id=iface]
 ----
-type Client interface {
-  List() (ListResult, error)
-  Put(PutRequest) error
-}
-
-func New() Client {
-  return &impl{/* ... */}
-}
-
-type impl struct{/* ... */}
-
-func (*impl) List() (ListResult, error) {
-  /* ... */
-}
-
-func (*impl) Put(PutRequest) error {
-  /* ... */
-}
+ type Client interface {
+   List() (ListResult, error)
++  Put(PutRequest) error /* BAD */
+ }
 ----
 
-[%step.small]
+[.medium.text-left]
 Disruptive: +
-Breaks mocks and other implementations
+Breaks other implementations +
+[.small]#(e.g. mocks, middleware)#
 --
 
 [.column.is-half]
 --
-Do
+🙂
 
 [.medium]
-[source%linenums,go,data-id=struct]
+[source%linenums,diff,data-id=struct]
 ----
-type Client struct {
-  /* ... */
-}
-
-func New() *Client {
-  return &Client{/* ... */}
-}
-
-
-func (*Client) List() (ListResult, error) {
-  /* ... */
-}
-
-func (*Client) Put(PutRequest) error {
-  /* ... */
-}
+ func (*Client) List() (ListResult, error)
++func (*Client) Put(PutRequest) error
 ----
 --
 
 [.notes]
 --
-Here, I'm adding a Put method to the client object.
-
-Note that attempting to do the same on the interface version (*step*)
-is disruptive because it breaks other implementations of that interface --
-including mocks and wrapper types.
-
-Again, as with interface upcasting, this is a bit specific in its usage.
-I'm intentionally referring to this as a tool rather than a solution.
-It doesn't fit everywhere.
+You can't do the same if you were returning the interface;
+adding a method to an interface is a disruptive change.
+It breaks other implementations of that interface,
+including mocks and middleware built around it.
 --
-
-// TODO: "Using" section necessary?
