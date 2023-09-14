@@ -8,45 +8,26 @@
 
 :root {
 	--r-heading2-size: 1.2em;
+	--r-code-font: "Iosevka", monospace;
 }
 
-.reveal code {
-	font-family: "Iosevka", monospace;
-}
-
-.reveal pre code {
-	font-size: 20px;
-	line-height: 22px;
-}
-
-.reveal .medium pre code {
-	font-size: 16px;
-	line-height: 18px;
-}
-
-.reveal .small pre code {
-	font-size: 12px;
-	line-height: 14px;
-}
-
-.medium p, span.medium {
+.medium {
 	font-size: 0.8em;
 }
 
-div.openblock.medium {
-	font-size: 0.8em;
-	line-height: 0.8em;
+/* div.openblock.medium { */
+/* 	font-size: 0.8em; */
+/* 	line-height: 0.8em; */
+/* } */
+
+.small {
+	font-size: 0.6em;
 }
 
-.small p, span.small {
-	font-size: 0.6em;
-	vertical-align: middle;
-}
-
-div.openblock.small {
-	font-size: 0.6em;
-	line-height: 0.6em;
-}
+/* div.openblock.small { */
+/* 	font-size: 0.6em; */
+/* 	line-height: 0.6em; */
+/* } */
 
 .attribution {
 	position: absolute;
