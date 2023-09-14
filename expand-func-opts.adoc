@@ -1,15 +1,22 @@
-[%auto-animate.columns]
+[%auto-animate%auto-animate-restart.columns]
 = Functional options
 
 [.column.is-half]
 --
-[source%linenums,go,data-id=Option,step=1]
-----
-type Option func(*clientOptions)
+🙂::
+* Flexible
+* Customizable
+🙁::
+* Complex
+--
+
+[.column.is-half]
+--
+[source%linenums,go,data-id=New]
 ----
 
-[source%linenums,go,data-id=New,step=2]
-----
+type Option func(*clientOptions)
+
 func New(opts ...Option) *Client {
   var options clientOptions
   for _, opt := range opts {
@@ -18,14 +25,17 @@ func New(opts ...Option) *Client {
   /* ... */
 }
 ----
---
 
-[.column.is-half]
---
-[source%linenums.medium,go,data-id=options,step=1]
+[source%linenums.medium,go,data-id=options]
 ----
 type clientOptions struct {
-  /* ... */
+  logger *slog.Logger
+}
+
+func WithLogger(l *slog.Logger) Option {
+  return func(o *clientOptions) {
+    o.logger = l
+  }
 }
 ----
 --
@@ -35,16 +45,17 @@ type clientOptions struct {
 Finally, there's Functional Options.
 This is a pretty popular pattern that provides
 a flexible, super-customizable DSL
-to pass parameters or even extract results to a function.
+to pass parameters and extract results from a function.
+
+It's also a bit messy and complex.
 
 The general shape of functional options is:
 
-* There's an Option type that manipulates a private data structure
-* The function the options are for accepts a variable number of these
-  and applies them over an instance of the private data structure
-* For each option,
-  you add a field to the private data structure,
-  and an Option constructor that sets that field.
+* There's an Option type that manipulates a data structure -- usually private.
+* The function this is for accepts a variable number of these options.
+  It instantiates the private data structure and applies the options to it.
+* For each option, you add a field to the private data structure,
+  and a function to build that option.
 --
 
 [%auto-animate.columns]
@@ -52,13 +63,11 @@ The general shape of functional options is:
 
 [.column.is-half]
 --
-[source%linenums,go,data-id=Option]
-----
-type Option func(*clientOptions)
-----
-
 [source%linenums,go,data-id=New]
 ----
+
+type Option func(*clientOptions)
+
 func New(opts ...Option) *Client {
   var options clientOptions
   for _, opt := range opts {
@@ -67,6 +76,39 @@ func New(opts ...Option) *Client {
   /* ... */
 }
 ----
+
+[pikchr, height=200px, data-id=diag]
+....
+movewid = 0.3in
+boxrad = 0.05in
+linerad = 0.1in
+lineht = 0.3in
+
+right
+box "WithLogger" mono fit wid 0.9in
+move
+box "WithHTTPClient" mono same
+move
+Dots: box "..." mono fit invis
+
+New: box "New(...Option)" mono fit wid 0.9in with n at movewid south of WithHTTPClient.s
+Mid: dot invis at 1/2 way between last box.n and WithHTTPClient.s
+
+arrow chop from WithLogger go down until even with Mid then right to Mid then to last box
+arrow chop from WithHTTPClient to last box
+arrow chop from Dots go down until even with Mid then left to Mid then to last box
+
+move to New.s
+Options: box "clientOptions" mono same with n at movewid s of New.s
+arrow chop dotted from 0.1in west of New.s down until even with last.n
+arrow <- chop dotted from 0.1in east of New.s down until even with last box.n
+
+arrow chop dotted from Options.w left until even with 0.1in west of WithLogger \
+  then up until even with WithLogger.s
+arrow chop dotted from WithLogger to WithHTTPClient
+arrow chop dotted from WithHTTPClient to Dots
+arrow chop dotted from 0.1in east of Dots.s down until even with Options then to Options
+....
 --
 
 [.column.is-half]
@@ -95,186 +137,245 @@ func WithHTTPClient(c *http.Client) Option {
 
 [.notes]
 --
-There's room for unlimited growth here.
+There's room for unlimited growth here at the cost of complexity.
 
-A quick note about the `Option` type.
+That diagram demonstrates roughly the relationships
+between the entities here.
+
+* WithLogger, WithHTTPClient, and other options feed into New.
+* New constructs clientOptions,
+  and feeds that back into WithLogger and friends.
+* Each option modifies the clientOptions struct,
+  leaving us with the consumable version at the end.
 --
 
-[%auto-animate.columns]
+[%auto-animate.columns.wrap]
 == Functional options
 
-[.column.is-half]
---
-[source%linenums,go,data-id=Option]
-----
-type Option func(*clientOptions)
-----
---
-
-[.column.is-half]
---
-[source%linenums.medium,go,data-id=options]
-----
-func WithLogger(l *slog.Logger) Option {
-  return func(o *clientOptions) {
-    o.logger = l
-  }
-}
-----
---
-
-[.notes]
---
-The type's shape is also up to you.
-In the example above, I used a `func`,
-but there's nothing stopping it from being an interface instead.
---
-
-[%auto-animate.columns]
-== Functional options
-
-[.column.is-half]
---
-[source%linenums,go,data-id=Option]
-----
-type Option interface {
-  apply(*clientOptions)
-}
-----
-
-[source%linenums.medium,go,step=1]
-----
-func (o *loggerOption) String() string {
-  return fmt.Sprintf("WithLogger(%v)", o.l)
-}
-----
---
-
-[.column.is-half]
---
-[source%linenums.medium,go,data-id=options]
-----
-type loggerOption struct{ l *slog.Logger }
-
-func WithLogger(l *slog.Logger) Option {
-  return &loggerOption{l}
-}
-
-func (o *loggerOption) apply(co *clientOptions) {
-  co.logger = o.l
-}
-----
---
-
-[.notes]
---
-Doing so allows you to provide
-a readable string representation of the options (*step*),
-if you want.
-
-// TODO: move to next to diagram?
-
-Interface or not, the pattern is quite flexible:
-
-* You can add an option that takes a pointer to something
-  and fills that with a result when the operation finishes.
-  This is how you can produce new outputs from functions
-  that use functional options.
-* You can provide options that are composed of other options,
-  or transform, scope, or unset other options.
-* You can even decide that options are fallible,
-  and have the option type return an error,
-  which you then inspect in the function that consumes it.
-
-All in all, this is a pretty powerful tool.
---
-
-== !
-
-// TODO: make sure we like the diagram
-
-[pikchr, height=500px]
+[.column.is-one-third]
+[pikchr, height=200px, data-id=diag]
 ....
 movewid = 0.3in
 boxrad = 0.05in
 linerad = 0.1in
+lineht = 0.3in
 
-down
-box "WithLogger" fit wid 0.9in
+right
+box "WithLogger" mono fit wid 0.9in
 move
-box "WithHTTPClient" same
+box "WithHTTPClient" mono same
 move
-Dots: box "..." same
+Dots: box "..." mono fit invis
 
-box "New" at 1in east of 2nd box fit
-arrow from 1st box right then to New.nw chop
-arrow from 2nd box to New chop
-arrow from 3rd box right then to New.sw chop
+New: box "New(...Option)" mono fit wid 0.9in with n at movewid south of WithHTTPClient.s
+Mid: dot invis at 1/2 way between last box.n and WithHTTPClient.s
 
-Options: box "clientOptions" fit at (New.x, WithLogger.y+movewid)
+arrow chop from WithLogger go down until even with Mid then right to Mid then to last box
+arrow chop from WithHTTPClient to last box
+arrow chop from Dots go down until even with Mid then left to Mid then to last box
 
-arrow dotted chop \
-  from last box left until even with WithLogger \
-  then down to WithLogger
-arrow dotted chop from WithLogger to WithHTTPClient
-arrow dotted chop from WithHTTPClient to Dots
-arrow dotted chop from Dots down movewid \
-  then right until even with New \
-  then up to New
+move to New.s
+Options: box "clientOptions" mono same with n at movewid s of New.s
+arrow chop dotted from 0.1in west of New.s down until even with last.n
+arrow <- chop dotted from 0.1in east of New.s down until even with last box.n
 
-line chop invis from Options left until even with WithLogger \
-  "defaults" above
-line chop invis from movewid south of Dots right until even with New \
-  "final" above
+arrow chop dotted from Options.w left until even with 0.1in west of WithLogger \
+  then up until even with WithLogger.s
+arrow chop dotted from WithLogger to WithHTTPClient
+arrow chop dotted from WithHTTPClient to Dots
+arrow chop dotted from 0.1in east of Dots.s down until even with Options then to Options
 ....
 
-[.columns.wrap]
-== Using functional options
-
-[.column.is-half.medium]
+[%step.column.is-one-third]
 --
-Don't use by default
+🙁
 
+[.medium]
 * High boilerplate
 * Harder to test
 * Corner cases
 --
 
-[.column.is-half.medium]
+[%step.column.is-one-third]
 --
-Good for
+🙂
 
+[.medium]
 * Several options
-* Few required parameters
+* Few required inputs +
+  [.step.medium]#*not* as options#
 * Composability
 --
 
-[.column.is-full%step]
-Prefer parameter objects
+[%step.column.is-full]
+--
+Don't use by default. Prefer parameter objects.
+--
 
 [.notes]
 --
-Some tips on using functional options:
+I could have a longer discussion about functional options,
+but for lack of time, I'll summarize it: (*step*)
 
-* First, don't use by default.
-  That is, don't reach for this tool first.
-  Functional options are great when they fit, but otherwise:
-** The cost in boilerplate is very high
-** For consumers, they make testing difficult
-** There are corner cases in how options combine
-   that are usually not a problem:
-*** What happens if loggers are provided twice?
-    Do you overwrite or merge?
-*** If you merge, how do you unset an option that a caller has supplied?
-** Remember, these are just opaque interfaces or function references.
-   They aren't comparable or introspectable.
-   Harder to test, harder to inspect and modify.
-* Functional options are usually a good fit for functions where:
-** you have a *bunch* of options -- and these must be optional.
-   No required options --
-** and you have very few required parameters.
-** If the operations that the options perform are composable,
-   functional options are probably a good fit.
+* Functional options require a high amount of boilerplate
+* It's harder for consumers to test their usage of APIs
+  that use functional options.
+  For example, is my mock matching against the options or their effect?
+** Remember that these objects are just function references.
+   You cannot inspect or compare them.
+* Options come with corner cases that people don't often think about.
+  What happens if I provide the logger option twice?
+  Is that a replacement or a merge?
+  If it's a merge, how do I un-provide a logger that someone else provided
+  to the options slice?
 
-Basically, (*step*) prefer parameter objects by default
+On the good side (*step*), functional options are probably a good fit if
+you intend to have *many* many options and very few required inputs.
+(*step*)
+Required inputs must not be options -- the names should make that obvious.
+
+(*step*)
+Again, functional options are a great tool when they fit,
+but that's not the default.
+Don't reach for them by default. Prefer parameter objects.
 --
+
+// [%auto-animate.columns]
+// == Functional options
+//
+// [.column.is-half]
+// --
+// [source%linenums,go,data-id=Option]
+// ----
+// type Option func(*clientOptions)
+// ----
+// --
+//
+// [.column.is-half]
+// --
+// [source%linenums.medium,go,data-id=options]
+// ----
+// func WithLogger(l *slog.Logger) Option {
+//   return func(o *clientOptions) {
+//     o.logger = l
+//   }
+// }
+// ----
+// --
+//
+// [.notes]
+// --
+// The type's shape is also up to you.
+// In the example above, I used a `func`,
+// but there's nothing stopping it from being an interface instead.
+// --
+//
+// [%auto-animate.columns]
+// == Functional options
+//
+// [.column.is-half]
+// --
+// [source%linenums,go,data-id=Option]
+// ----
+// type Option interface {
+//   apply(*clientOptions)
+// }
+// ----
+//
+// [source%linenums.medium,go,step=1]
+// ----
+// func (o *loggerOption) String() string {
+//   return fmt.Sprintf("WithLogger(%v)", o.l)
+// }
+// ----
+// --
+//
+// [.column.is-half]
+// --
+// [source%linenums.medium,go,data-id=options]
+// ----
+// type loggerOption struct{ l *slog.Logger }
+//
+// func WithLogger(l *slog.Logger) Option {
+//   return &loggerOption{l}
+// }
+//
+// func (o *loggerOption) apply(co *clientOptions) {
+//   co.logger = o.l
+// }
+// ----
+// --
+//
+// [.notes]
+// --
+// Doing so allows you to provide
+// a readable string representation of the options (*step*),
+// if you want.
+//
+// // TODO: move to next to diagram?
+//
+// Interface or not, the pattern is quite flexible:
+//
+// * You can add an option that takes a pointer to something
+//   and fills that with a result when the operation finishes.
+//   This is how you can produce new outputs from functions
+//   that use functional options.
+// * You can provide options that are composed of other options,
+//   or transform, scope, or unset other options.
+// * You can even decide that options are fallible,
+//   and have the option type return an error,
+//   which you then inspect in the function that consumes it.
+//
+// All in all, this is a pretty powerful tool.
+// --
+//
+// [.columns.wrap]
+// == Using functional options
+//
+// [.column.is-half.medium]
+// --
+// Don't use by default
+//
+// * High boilerplate
+// * Harder to test
+// * Corner cases
+// --
+//
+// [.column.is-half.medium]
+// --
+// Good for
+//
+// * Several options
+// * Few required parameters
+// * Composability
+// --
+//
+// [.column.is-full%step]
+// Prefer parameter objects
+//
+// [.notes]
+// --
+// Some tips on using functional options:
+//
+// * First, don't use by default.
+//   That is, don't reach for this tool first.
+//   Functional options are great when they fit, but otherwise:
+// ** The cost in boilerplate is very high
+// ** For consumers, they make testing difficult
+// ** There are corner cases in how options combine
+//    that are usually not a problem:
+// *** What happens if loggers are provided twice?
+//     Do you overwrite or merge?
+// *** If you merge, how do you unset an option that a caller has supplied?
+// ** Remember, these are just opaque interfaces or function references.
+//    They aren't comparable or introspectable.
+//    Harder to test, harder to inspect and modify.
+// * Functional options are usually a good fit for functions where:
+// ** you have a *bunch* of options -- and these must be optional.
+//    No required options --
+// ** and you have very few required parameters.
+// ** If the operations that the options perform are composable,
+//    functional options are probably a good fit.
+//
+// Basically, (*step*) prefer parameter objects by default
+// --
