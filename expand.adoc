@@ -1,0 +1,63 @@
+= Planning for expansion
+
+* Functions
+* Abstractions
+
+[.notes]
+--
+The first step towards future-proofing is planning for expansion.
+Designing functions and abstractions in a way
+so that they can do more in the future.
+
+I'll talk about expansion on two levels:
+expanding functions, and expanding abstractions.
+--
+
+= Expanding functions
+
+* Parameter objects
+* Result objects
+* Functional options
+
+[.notes]
+--
+Let's talk about functions first.
+
+--
+
+include::expand-params.adoc[]
+include::expand-results.adoc[]
+include::expand-func-opts.adoc[]
+
+= Expanding abstractions
+
+* Accept interfaces
+* Return structs
+
+[.notes]
+--
+I just covered tools for expanding function inputs and outputs.
+
+I'll cover abstractions now.
+--
+
+include::expand-accept-iface.adoc[]
+include::expand-return-struct.adoc[]
+
+= Planning for expansion
+
+include::expand-table.adoc[]
+
+[.notes]
+--
+Okay, to summarize, to plan for expansion,
+our options are:
+
+* For function inputs and outputs, we have:
+** Parameter objects, result objects, and functional options
+* For received and produced abstractions, we have:
+** accepting interfaces and upcasting them
+** returning structs and adding methods to them
+--
+
+include::side-initialize.adoc[]

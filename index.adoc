@@ -46,7 +46,7 @@ include::concept.adoc[leveloffset=+1]
 So how can we go about future-proofing packages?
 --
 
-include::tool.adoc[leveloffset=+1]
+include::expand.adoc[leveloffset=+1]
 include::fix.adoc[leveloffset=+1]
 
 include::conclusion.adoc[leveloffset=+1]

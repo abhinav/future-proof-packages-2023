@@ -118,7 +118,7 @@ Start on the outside:
 
 == Plan for expansion
 
-include::expansion-table.adoc[]
+include::expand-table.adoc[]
 
 [.notes]
 --
