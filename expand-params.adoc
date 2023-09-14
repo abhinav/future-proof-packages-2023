@@ -1,9 +1,19 @@
-[%auto-animate]
+[%auto-animate.columns]
 = Parameter objects
 
+[.column.medium, data=id=list]
+--
+Put the inputs into a struct
+--
+
+[.column.medium]
 [source%linenums,go,data-id=new]
 ----
-func New(url string, token string) *Client {
+type ClientConfig struct {
+  URL string
+}
+
+func New(cfg *ClientConfig) *Client {
   return &Client{
     /* ... */
   }
@@ -12,121 +22,90 @@ func New(url string, token string) *Client {
 
 [.notes]
 --
-Parameter objects.
-This is a fairly straightforward concept.
-
-The idea is that you take the parameters of your function...
---
-
-[%auto-animate.columns]
-== Parameter objects
-
-[.column.is-half]
---
-[source%linenums,go,data-id=new]
-----
-func New(cfg *Config) *Client {
-  return &Client{
-    /* ... */
-  }
-}
-----
---
-
-[.column.is-half]
---
-[source%linenums,go,data-id=config]
-----
-type Config struct {
-  URL   string
-  Token string
-}
-----
---
-
-
-[.notes]
---
-...and put them in a struct
-with an exported field for each parameter.
+Parameter objects is a simple idea.
+If you expect to need more parameters in the future,
+put the parameters in a struct
+and accept that instead of positional arguments.
 
 This gives you the ability to add new *optional* parameters
 without disrupting callers.
-
-For example, suppose I wanted to start logging:
 --
 
 [%auto-animate.columns]
 == Parameter objects
 
-[.column.is-half]
+[.column, data=id=list]
 --
+Put the inputs into a struct
+
+[%step.medium]
+* Use for >3 parameters +
+  [.step.medium]#not counting `context.Context`#
+* New parameters must be optional
+--
+
+[.column.medium]
 [source%linenums,go,data-id=new]
 ----
-func New(cfg *Config) *Client {
+type ClientConfig struct {
+  URL   string
+  Token string
+  Log   *slog.Logger
+}
+
+func New(cfg *ClientConfig) *Client {
   log := cfg.Log
   if log == nil {
     log = DiscardLogger
   }
-
   return &Client{
     log: log,
     /* ... */
   }
 }
 ----
---
-
-[.column.is-half]
---
-[source%linenums,go,data-id=config]
-----
-type Config struct {
-  URL   string
-  Token string
-  Log   *slog.Logger
-}
-----
---
 
 [.notes]
 --
-I could add a new `Log` field to `Config`,
-and handle the case when it's nil in the constructor.
+* (*step*) Parameter objects are usually a good idea
+  for functions that cross the three parameter mark
+  (*step*) not counting the context.Context (if any).
+* (*step*) The new parameters *must* be optional;
+  otherwise, the change is disruptive.
 --
 
-[.columns]
-== Using parameter objects
-
-[.column.text-left.medium]
-Use for >3 parameters +
-[.step.small]#not counting `context.Context`#
-
-[.column.text-center.medium]
-New parameters must be optional
-
-[.column.text-right.medium]
-Use the zero value
-
-[.notes]
---
-Some quick tips for using parameter objects:
-
-* These are usually a good idea
-  for functions that cross the three parameter mark (*step*)
-  not counting the context argument, if present.
-* Secondly, new parameters *must* be optional;
-  this might be obvious but it's worth calling out.
-* You can use the zero value of a type to help you define the new parameter.
-  You want the zero value of the new field to match the old behavior
-  or a reasonable fallback.
-** For example, in the previous example I added a logger parameter.
-   The zero value of `slog.Logger` is nil.
-   I used that to provide a no-op logger to match the old behavior.
-   Falling back to slog's default global logger was also an option there.
-** Especially consider the zero value when adding primitive fields.
-   For example, if you're adding an opt-in or opt-out for a feature,
-   first consider what the old behavior is:
-   was the feature previously enabled or disabled?
-   That informs whether the new field is EnableFeature or DisableFeature.
---
+// [.columns]
+// == Using parameter objects
+//
+// [.column.text-left.medium]
+// Use for >3 parameters +
+// [.step.small]#not counting `context.Context`#
+//
+// [.column.text-center.medium]
+// New parameters must be optional
+//
+// [.column.text-right.medium]
+// Use the zero value
+//
+// [.notes]
+// --
+// Some quick tips for using parameter objects:
+//
+// * These are usually a good idea
+//   for functions that cross the three parameter mark (*step*)
+//   not counting the context argument, if present.
+// * Secondly, new parameters *must* be optional;
+//   this might be obvious but it's worth calling out.
+// * You can use the zero value of a type to help you define the new parameter.
+//   You want the zero value of the new field to match the old behavior
+//   or a reasonable fallback.
+// ** For example, in the previous example I added a logger parameter.
+//    The zero value of `slog.Logger` is nil.
+//    I used that to provide a no-op logger to match the old behavior.
+//    Falling back to slog's default global logger was also an option there.
+// ** Especially consider the zero value when adding primitive fields.
+//    For example, if you're adding an opt-in or opt-out for a feature,
+//    first consider what the old behavior is:
+//    was the feature previously enabled or disabled?
+//    That informs whether the new field is EnableFeature or DisableFeature.
+// --
