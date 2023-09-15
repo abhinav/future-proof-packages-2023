@@ -1,155 +1,174 @@
 [%auto-animate.columns]
 = String typing
 
-[.column.medium]
+[.column]
 --
-[source%linenums,go,data-id=isProto]
+[.medium]
+Over-reliance on strings
+
+[source%linenums,go,data-id=isHTTP]
 ----
 func isHTTP(addr string) bool {
-  ok := strings.HasPrefix(addr, "http://")
-  return ok
+  return strings.HasPrefix(addr, "http://") ||
+    strings.HasPrefix(addr, "https://")
 }
 ----
 --
 
-[.column.medium]
+[.column]
 --
 [source%linenums,go,data-id=download]
 ----
 func download(addr string) {
-   if isHTTP(addr) {
-      http.Get(addr)
-   } else {
-     log.Panic("unsupported:", addr)
-   }
-   /* ... */
+  if isHTTP(addr) {
+    http.Get(addr)
+  } else {
+    log.Panic("unsupported:", addr)
+  }
+  /* ... */
 }
 ----
 --
 
 [.notes]
 --
-My system needs to download a file.
-I implement a `download` function --
-it takes a URL, makes sure that it's HTTP, and downloads it.
+String typing. This is when you use strings everywhere.
 
-(Forgive the error handling in this example.)
+Here's a hypothetical snippet of code,
+not at all inspired by actual production code:
+a function that takes a string, and if it's an HTTP URL, downloads it.
 
-Otherwise, this is straightforward.
-Except https exists.
+Forgive the error handling in this example,
+but other than that, this is pretty simple.
+
+I would say this is already problematic because
+we're interpreting the structure inside 'addr' twice.
+But let me make it messier. Suppose we also add SSH support.
 --
 
 [%auto-animate.columns]
 == String typing
 
-// NOTE: If this example changes, concept-flow must too.
+// NOTE: If this example changes significantly, concept-flow must too.
 
-[.column.medium]
+[.column]
 --
-[source%linenums,go,data-id=isProto]
+Over-reliance on strings
+
+[source%linenums,go,data-id=isHTTP]
 ----
 func isHTTP(addr string) bool {
-  ok := strings.HasPrefix(addr, "http://")
-  ok ||= strings.HasPrefix(addr, "https://")
-  return ok
+  return strings.HasPrefix(addr, "http://") ||
+    strings.HasPrefix(addr, "https://")
 }
 ----
---
 
-[.column.medium]
---
-[source%linenums,go,data-id=download]
+[source%linenums,go,data-id=ssh]
 ----
-func download(addr string) {
-   if isHTTP(addr) {
-      http.Get(addr)
-   } else {
-     log.Panic("unsupported:", addr)
-   }
-   /* ... */
-}
-----
---
-
-[.notes]
---
-This is already a bit problematic.
-But imagine I add support for downloading from SSH.
---
-
-[%auto-animate.columns]
-== String typing
-
-[.column.medium]
---
-[source%linenums,go,data-id=isProto]
-----
-func isHTTP(addr string) bool {
-  ok := strings.HasPrefix(addr, "http://")
-  ok ||= strings.HasPrefix(addr, "https://")
-  return ok
-}
-
 func isSSH(addr string) bool {
-  ok := strings.HasPrefix(addr, "ssh://")
-  return ok
-}
-----
---
-
-[.column.medium]
---
-[source%linenums,go,data-id=download]
-----
-func download(addr string) {
-   if isHTTP(addr) {
-      http.Get(addr)
-   } else if isSSH(addr) {
-      sshDownload(addr)
-   } else {
-     log.Panic("unsupported:", addr)
-   }
-   /* ... */
+  return strings.HasPrefix(addr, "ssh://")
 }
 
 func sshDownload(addr string) {
-   addr = strings.TrimPrefix(addr, "ssh://")
-   /* ... */
+  addr = strings.TrimPrefix(addr, "ssh://")
+  /* ... */
+}
+----
+--
+
+[.column]
+--
+[source%linenums,go,data-id=download]
+----
+func download(addr string) {
+  if isHTTP(addr) {
+    http.Get(addr)
+  } else if isSSH(addr) {
+    sshDownload(addr)
+  } else {
+    log.Panic("unsupported:", addr)
+  }
+  /* ... */
 }
 ----
 --
 
 [.notes]
 --
-Not only am I matching on the string in download,
-I'm doing it again inside `sshDownload`.
+Now I'm interpreting the structure inside addr a bunch of times:
 
-This example isn't entirely hypothetical;
-this is stuff I've seen in the wild.
+* once each in isSSH and sshDownload
+* twice in isHTTP
+* once again down the line in http.Get
 
-There's a better way...
+This is easily breakable. There's a better way.
 --
 
+[.columns.wrap]
 == String typing
 
-> Parse, don't validate
->
-> -- https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/[Alexis King]
+:url-parse-early: https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/
 
-// TODO: diagram
+[.column.is-half]
+--
+> Parse, don't validate
+
+[.small.text-right]
+-- link:{url-parse-early}[Alexis King]
+
+[.medium]
+* Turn `string` into `struct`
+* `struct` value is evidence of validity
+* [.step, step=2]#Eliminate chaos early#
+--
+
+[.column.is-half]
+--
+[step=1]
+[pikchr]
+....
+down
+L1: line dotted go down 0.5in
+box "Parse" mono fit rad 0.05in
+line same
+
+text "Chaos" big with e at 0.2in w of L1.n+(0, -0.1in)
+text "Order" big with w at 0.2in e of L1.n+(0, -0.1in)
+
+text "\"https://example.com/magic.zip\"" at 0.25in south of Chaos+(-0.5in,0)
+arrow chop thin rad 0.1in from last down until even with Parse then to Parse
+
+move to 0.7in east of Parse+(0, -0.2in)
+down
+HTTPS: box "https" fit
+box "example.com" fit with nw at last.sw
+box "magic.zip" fit with nw at last.sw
+
+arrow chop thin rad 0.1in from Parse go right until even with HTTPS then to HTTPS
+....
+--
 
 [.notes]
 --
-You may have heard of this, or a variant of this before.
-Parse, not validate.
+You may have already heard this, or a variant of this before:
+Parse, don't validate.
 
-The blog post I'm referencing is more detailed,
-but here's how I visualize it:
-I take chaotic data (in this case, a string) and pass it through a box.
-It either gets rejected, or the box reorganizes it into a richer format.
+The idea, simplified, is this:
+when you check if a string is valid,
+don't leave it a string afterwards.
+Turn it into a different structure
+that represents the validity of the string.
+If you have an object of that type,
+you can assume it came from a valid string.
 
-And I do that *as early as I possibly can*
-so that the rest of my code has as much information available as possible.
+I like to visualize it like this (*step*):
+
+* There is chaotic data on the left.
+  It's annoying to deal with and I don't want it.
+* If it successfully passes through Parse,
+  It becomes ordered data -- easy to operate on.
+* (*step*) Aim to convert chaos to order
+  as soon as it enters your program
 
 Going back to the example:
 --
@@ -159,38 +178,42 @@ Going back to the example:
 
 [.column]
 --
-[source%linenums.medium,go,data-id=dont]
+Over-reliance on strings
+
+[source%linenums,go,data-id=isHTTP]
 ----
-func download(addr string) {
-   if isHTTP(addr) {
-      http.Get(addr)
-   } else if isSSH(addr) {
-      sshDownload(addr)
-   } else {
-     log.Panic("unsupported:", addr)
-   }
-   /* ... */
+func isHTTP(addr string) bool {
+  return strings.HasPrefix(addr, "http://") ||
+    strings.HasPrefix(addr, "https://")
+}
+----
+
+[source%linenums,go,data-id=ssh]
+----
+func isSSH(addr string) bool {
+  return strings.HasPrefix(addr, "ssh://")
+}
+
+func sshDownload(addr string) {
+  addr = strings.TrimPrefix(addr, "ssh://")
+  /* ... */
 }
 ----
 --
 
-[.column%step]
+[.column]
 --
-[source%linenums.medium,go,data-id=do]
+[source%linenums,go,data-id=download]
 ----
-func download(addrs string) {
-   addr, err := url.Parse(addrs)
-   if err != nil {
-      log.Panic(err)
-   }
-   if isHTTP(addr) {
-      http.Get(addrs)
-   } else if isSSH(addr) {
-      sshDownload(addr)
-   } else {
-     log.Panic("unsupported:", addr)
-   }
-   /* ... */
+func download(addr string) {
+  if isHTTP(addr) {
+    http.Get(addr)
+  } else if isSSH(addr) {
+    sshDownload(addr)
+  } else {
+    log.Panic("unsupported:", addr)
+  }
+  /* ... */
 }
 ----
 --
@@ -198,12 +221,7 @@ func download(addrs string) {
 [.notes]
 --
 I should forget that `addr` is a string as early as I can.
-I can use `net/url.Parse` here... (*step*)
-
-That's better.
-I convert the string into a richer representation at the entry point,
-and then I use that same information everywhere.
-I should also update my helper functions to run on URLs...
+In this case, I can use `net/url.Parse` to do that.
 --
 
 [%auto-animate.columns]
@@ -211,111 +229,117 @@ I should also update my helper functions to run on URLs...
 
 [.column]
 --
-[source%linenums.medium,go,data-id=helpers]
+Chaos to order
+
+[source%linenums,go,data-id=isHTTP,highlight="1"]
 ----
 func isHTTP(addr *url.URL) bool {
-  ok := addr.Scheme == "http"
-  ok ||= addr.Scheme == "https"
-  return ok
+  return addr.Scheme == "http" ||
+    addr.Scheme == "https"
 }
+----
 
+[source%linenums,go,data-id=ssh,highlight="1,5"]
+----
 func isSSH(addr *url.URL) bool {
-  ok := addr.Scheme == "ssh"
-  return ok
+  return addr.Scheme == "ssh"
 }
 
 func sshDownload(addr *url.URL) {
-   /* ... */
+  /* ... */
 }
 ----
 --
 
 [.column]
 --
-[source%linenums.medium,go,data-id=do]
+[source%linenums,go,data-id=download, highlight="1-2,6,8-9"]
 ----
 func download(addrs string) {
-   addr, err := url.Parse(addrs)
-   if err != nil {
-      log.Panic(err)
-   }
-   if isHTTP(addr) {
-      http.Get(addrs)
-   } else if isSSH(addr) {
-      sshDownload(addr)
-   } else {
-     log.Panic("unsupported:", addr)
-   }
-   /* ... */
-}
-----
---
-
-
-[.notes]
---
-At this point, it's also worth questioning
-why `isHTTP` and `isSSH` even need to exist.
-We can just inspect the URL scheme inline.
---
-
-[%auto-animate.columns]
-== String typing
-
-[.column]
---
-[source%linenums.medium,go,data-id=helpers]
-----
-func httpGet(addr *url.URL) {
-   /* ... */
-}
-
-func sshDownload(addr *url.URL) {
-   /* ... */
-}
-----
---
-
-[.column]
---
-[source%linenums.medium,go,data-id=do]
-----
-func download(addrs string) {
-   addr, err := url.Parse(addrs)
-   if err != nil {
-      log.Panic(err)
-   }
-   switch addr.Scheme {
-   case "http", "https":
-      httpGet(addr)
-   case "ssh":
-      sshDownload(addr)
-   default:
-     log.Panic("unsupported:", addr)
-   }
-   /* ... */
+  addr, err := url.Parse(addrs)
+  if err != nil {
+    log.Panic(err)
+  }
+  if isHTTP(addr) {
+    http.Get(addrs)
+  } else if isSSH(addr) {
+    sshDownload(addr)
+  } else {
+    log.Panic("unsupported:", addr)
+  }
+  /* ... */
 }
 ----
 --
 
 [.notes]
 --
-Ah, that's better.
+I convert the string to a URL at the entry point,
+and then the same parsed representation is inspected
+instead of dealing with chaotic data repeatedly.
 
 In this example, `url.Parse` already existed,
-but the point I'm making here doesn't hold just for that.
+but the point I'm making here doesn't hold just for that --
+or for just strings for that matter.
 --
+
+// [%auto-animate.columns]
+// == String typing
+//
+// [.column]
+// --
+// [source%linenums.medium,go,data-id=helpers]
+// ----
+// func httpGet(addr *url.URL) {
+//   /* ... */
+// }
+//
+// func sshDownload(addr *url.URL) {
+//   /* ... */
+// }
+// ----
+// --
+//
+// [.column]
+// --
+// [source%linenums.medium,go,data-id=do]
+// ----
+// func download(addrs string) {
+//   addr, err := url.Parse(addrs)
+//   if err != nil {
+//     log.Panic(err)
+//   }
+//   switch addr.Scheme {
+//   case "http", "https":
+//     httpGet(addr)
+//   case "ssh":
+//     sshDownload(addr)
+//   default:
+//     log.Panic("unsupported:", addr)
+//   }
+//   /* ... */
+// }
+// ----
+// --
+//
+// [.notes]
+// --
+// Ah, that's better.
+//
+// In this example, `url.Parse` already existed,
+// but the point I'm making here doesn't hold just for that.
+// --
 
 [.columns.wrap]
 == String typing
 
-[.column.is-one-third.small]
-Untyped
+[.column.is-one-third.medium]
+Chaos
 
-[.column.is-two-thirds.small]
-Typed
+[.column.is-two-thirds.medium]
+Order
 
-[.column.is-one-third]
+[.column.is-one-third.medium]
 --
 [source, go]
 ----
@@ -387,21 +411,24 @@ func Parse(string) Template
 [source, go]
 ----
 tmpl := Parse(s)
-tmpl.Render(map[string]string{"VAR": val})
+tmpl.Render(
+  map[string]string{"VAR": val},
+)
 ----
 --
 
 
 [.notes]
 --
-Anything where you receive chaotic data as input,
-and do something ordered with it is in scope.
+Anytime you're dealing with chaotic data as input,
+it's a good idea to convert it to order *once* at the entry point
+and never touch it again.
 
 * Matching on URLs? Parse it.
 * Storing UUIDs? Parse it into the 128-bit number it is.
 * Comparing timestamps? Is that milliseconds or seconds?
-  At some point, the two blocks will disagree on that,
-  and everything will break.
+  At some point, two pieces of code will have
+  different answers to that question and everything will break.
   Convert it to a `time.Time` at the entry point.
 * Even for home-grown, string-replacement based templating,
   if it leaks outside, it can be worth it to parse it into a structure early

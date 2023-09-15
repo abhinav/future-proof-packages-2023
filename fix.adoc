@@ -4,25 +4,13 @@
 --
 Finding and fixing problems.
 
-First, just to recap,
-I said earlier that packages aren't future-proof
-if changing them causes disruptions,
-and I claimed that that's a symptom of a design that leaks complexity.
+Quick reminder:
+I said earlier that packages cause disruptions
+because of a design that leaks complexity.
 
-So how do we go about fixing these leaks?
-I will talk about this at two levels:
-
-* First, low-level closer to the code.
-  Patterns you should keep an eye out for
-  that *probably* leak complexity.
-* After that, I'll zoom out and talk about design at a higher level.
-
-As I get into the first section,
-please be aware that I'll be making generalizations.
-The way to interpret this is
-"code that looks like this tends to leak complexity".
-
-// TODO: probably don't need to hedge here.
+In this section,
+I'll talk about patterns that tend to cause leaks,
+and how you could fix them.
 
 Okay, let's get into it.
 
@@ -35,18 +23,42 @@ Okay, let's get into it.
 // * Bidirectional channels at boundaries / channels are rare
 --
 
-= Over-reliance on primitives
+[.columns]
+= Built-in obsession
+
+[.column]
+--
+Reluctance to declare types,
+instead preferring built-in types
+
+[.medium, step=2]
+* String typing
+* Maps at boundaries
+* Boolean overuse
+--
+
+[.column, step=1]
+--
+image::adds-complexity.png[height=400px]
+--
 
 [.notes]
 --
-Something that makes it easy to leak complexity is
-an over-reliance on primitive types in your core logic.
+One way to leak complexity is an over-reliance on built-in types.
+`string`, `bool`, `map`, etc. -- they're so easy to use.
+So someone can end up in a mindset of using only them,
+instead of declaring new types or domain objects,
+because it might (*step*, *air-quotes*) "add complexity".
 
-strings, bools, and ints are available everywhere -- they're so easy to use --
-so I use them everywhere because defining a type "adds complexity" to my code.
-As a result of that, I end up leaking that complexity outside.
+This results in leaking implementation details and complexity outside --
+these would otherwise be hidden.
 
-I think this is better demonstrated with an example.
+This practice can manifest in a few ways.
+I'll talk about a couple of them:
+
+* (*step*) String typing: Using strings everywhere.
+* (*step*) Maps at boundaries: Using maps where a struct would be better
+* (*step*) Boolean overuse: Using booleans where an enum would be better
 --
 
 include::fix-string.adoc[]
