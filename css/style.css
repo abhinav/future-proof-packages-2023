@@ -74,3 +74,5 @@ table.noborder,
 table.noborder td,
 table.noborder th
 { border: 0; }
+
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}

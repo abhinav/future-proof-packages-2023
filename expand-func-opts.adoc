@@ -4,9 +4,11 @@
 [.column.is-half]
 --
 🙂::
+[none]
 * Flexible
 * Customizable
 🙁::
+[none]
 * Complex
 --
 
