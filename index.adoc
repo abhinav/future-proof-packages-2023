@@ -26,7 +26,7 @@ Abhinav Gupta
 :highlightjsdir: highlight
 :highlightjs-theme: css/highlight.css
 
-[.small.text-right]
+[.medium.text-right]
 {revdate}
 
 [.notes]

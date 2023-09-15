@@ -6,18 +6,20 @@
 I'm Abhinav
 
 [.medium]
+====
 Gopher @ Rippling
 
-[.small]
+[.medium]
 Previously: Pulumi, Uber
+====
 --
 
 [.column.is-two-thirds.has-text-left]
 --
 [%hardbreaks]
-icon:globe[size=fw] https://abhinavg.net[abhinavg.net]
-icon:github-alt[size=fw] https://github.com/abhinav[@abhinav]
-icon:mastodon[size=fw, set=fab] https://hachyderm.io/@abhinav[@\abhinav@hachyderm.io]
+🌐 https://abhinavg.net[abhinavg.net]
+🐙 https://github.com/abhinav[@abhinav]
+🐘 https://hachyderm.io/@abhinav[@\abhinav@hachyderm.io]
 --
 
 [.notes]
