@@ -45,12 +45,11 @@ Put the inputs into a struct
 --
 
 [.column.medium]
-[source%linenums,go,data-id=new]
+[source%linenums,go,data-id=new,highlight="1-|7-10"]
 ----
 type ClientConfig struct {
-  URL   string
-  Token string
-  Log   *slog.Logger
+  URL string
+  Log *slog.Logger
 }
 
 func New(cfg *ClientConfig) *Client {
@@ -70,7 +69,7 @@ func New(cfg *ClientConfig) *Client {
 * (*step*) Parameter objects are usually a good idea
   for functions that cross the three parameter mark
   (*step*) not counting the context.Context (if any).
-* (*step*) The new parameters *must* be optional;
+* (*step*) (*step*) The new parameters *must* be optional;
   otherwise, the change is disruptive.
 --
 

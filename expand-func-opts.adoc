@@ -14,9 +14,8 @@
 
 [.column.is-half]
 --
-[source%linenums,go,data-id=New]
+[source%linenums,go,data-id=New,highlight="1-|1|3|4-7"]
 ----
-
 type Option func(*clientOptions)
 
 func New(opts ...Option) *Client {
@@ -28,7 +27,7 @@ func New(opts ...Option) *Client {
 }
 ----
 
-[source%linenums.medium,go,data-id=options]
+[source%linenums.medium,go,data-id=options,highlight="1-|2|5,7"]
 ----
 type clientOptions struct {
   logger *slog.Logger
@@ -53,11 +52,11 @@ It's also a bit messy and complex.
 
 The general shape of functional options is:
 
-* There's an Option type that manipulates a data structure -- usually private.
-* The function this is for accepts a variable number of these options.
-  It instantiates the private data structure and applies the options to it.
-* For each option, you add a field to the private data structure,
-  and a function to build that option.
+* (*step*) There's an Option type that manipulates a data structure -- usually private.
+* (*step*) The function this is for accepts a variable number of these options.
+  (*step*) It instantiates the private data structure and applies the options to it.
+* (*step*) For each option, you add a field to the private data structure,
+  (*step*) and a function to build that option.
 --
 
 [%auto-animate.columns]
