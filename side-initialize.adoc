@@ -86,14 +86,13 @@ It's hard to miss validation there, and you get something super easy to use.
 When you can't do this, it's time to write constructors.
 --
 
-[.columns.wrap]
 == Constructors
 
-[.column.is-one-third]
---
-Positional arguments
+[cols="1,1a,1", frame=none]
+|====
 
-[source,go]
+| Positional arguments
+| [source,go]
 ----
 func NewCore(
   enc Encoder,
@@ -101,48 +100,28 @@ func NewCore(
   lvl LevelEnabler,
 ) Core
 ----
---
+| 3 or fewer inputs
 
-[.column.is-one-third]
---
-Parameter objects
-
-[source,go]
+| Parameter objects
+| [source,go]
 ----
 func NewJSONEncoder(
   cfg EncoderConfig,
 ) Encoder
 ----
---
+| 4 or more inputs
 
-[.column.is-one-third]
---
-Functional options
-
-[source,go]
+| Functional options
+| [source,go]
 ----
 func New(
   core zapcore.Core,
   opts ...Option,
 ) *Logger
 ----
---
+| Only if worth it
 
-[.column.is-one-third.medium]
---
-3 or fewer
-arguments
---
-
-[.column.is-one-third.medium]
---
-4 or more parameters
---
-
-[.column.is-one-third.medium]
---
-Only if worth it
---
+|====
 
 [.notes]
 --

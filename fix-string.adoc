@@ -1,5 +1,5 @@
 [%auto-animate.columns]
-= String typing
+= {fix-string}
 
 [.column]
 --
@@ -32,7 +32,7 @@ func download(addr string) {
 
 [.notes]
 --
-String typing. This is when you use strings everywhere.
+{fix-string}. This is when you use strings everywhere.
 
 Here's a hypothetical snippet of code,
 not at all inspired by actual production code:
@@ -47,7 +47,7 @@ But let me make it messier. Suppose we also add SSH support.
 --
 
 [%auto-animate.columns]
-== String typing
+== {fix-string}
 
 // NOTE: If this example changes significantly, concept-flow must too.
 
@@ -105,7 +105,7 @@ This is easily breakable. There's a better way.
 --
 
 [.columns.wrap]
-== String typing
+== {fix-string}
 
 :url-parse-early: https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/
 
@@ -174,7 +174,7 @@ Going back to the example:
 --
 
 [%auto-animate.columns]
-== String typing
+== {fix-string}
 
 [.column]
 --
@@ -225,7 +225,7 @@ In this case, I can use `net/url.Parse` to do that.
 --
 
 [%auto-animate.columns]
-== String typing
+== {fix-string}
 
 [.column]
 --
@@ -284,7 +284,7 @@ or for just strings for that matter.
 --
 
 // [%auto-animate.columns]
-// == String typing
+// == {fix-string}
 //
 // [.column]
 // --
@@ -331,92 +331,61 @@ or for just strings for that matter.
 // --
 
 [.columns.wrap]
-== String typing
+== {fix-string}
 
-[.column.is-one-third.medium.text-right]
-Chaos
+[cols="1a,1a,1a", frame=none]
+|====
+| Chaos 2+| Order
 
-[.column.is-two-thirds.medium.text-left]
-| Order
 
-[.column.is-one-third.medium]
---
-[source, go]
+
+| [source.medium, go]
 ----
 strings.HasPrefix(addr, "ssh://")
 ----
---
-
-[.column.is-two-thirds]
---
-[source, go]
+2+| [source, go]
 ----
 u, err := url.Parse(addr)
 ----
---
 
-[.column.is-one-third]
---
-[source, go]
+| [source, go]
 ----
 var uuid string
 ----
---
-
-[.column.is-two-thirds]
---
-[source, go]
+2+| [source, go]
 ----
 type UUID [16]byte
 func ParseUUID(string) (UUID, error)
 ----
---
 
-[.column.is-one-third]
---
-[source, go]
+| [source, go]
 ----
 var ts int64
 ----
---
-
-[.column.is-two-thirds]
---
-[source, go]
+2+| [source, go]
 ----
 t := time.UnixMilli(ts)
 ----
---
 
-[.column.is-one-third]
---
-[source, go]
+| [source.medium, go]
 ----
 strings.Replace(s, "%VAR%", val)
 ----
---
-
-[.column.is-one-third.medium]
---
-[source, go]
+| [source.medium, go]
 ----
 type Node struct{ Var, Str string }
 type Template []Node
 func Parse(string) Template
 ----
---
-
-[.column.is-one-third.medium]
---
-[source, go]
+| [source.medium, go]
 ----
 tmpl := Parse(s)
 tmpl.Render(
   map[string]string{"VAR": val},
 )
 ----
---
 
+|====
 
 [.notes]
 --

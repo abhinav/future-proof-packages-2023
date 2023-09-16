@@ -1,74 +1,90 @@
-= Maps
+[.columns%auto-animate%auto-animate-restart]
+= {fix-map}
 
-[.notes]
+[.column.medium]
 --
-Maps. They're great.
-But they also make it easy to leak complexity
-if you're not paying attention.
+Over-reliance on maps
 
-Let me share some examples.
+[%step.text-left,step=2]
+Uninformative type
+
+[%step%hardbreaks.text-left,step=4]
+Business constraint in signature
+[.small]#Will uniqueness always be required?#
 --
 
-[%auto-animate%auto-animate-restart]
-== Maps at boundaries
-
-[source%linenums,go,data-id=BulkRegister]
+[%step.column, step=1]
+--
+[source%linenums.medium,go,data-id=BulkRegister]
 ----
 func BulkRegister(users map[string]string) error {
   /* ... */
 }
 ----
 
-[source,go]
+[source%step,go, step=3]
 ----
-func Register(login, email string) error {
+func Register(email, login string) error {
   /* ... */
 }
 ----
-
-[%step]
---
-* Uninformative type
-* Will uniqueness always be required?
 --
 
 [.notes]
 --
+Overuse of maps is another easy way to leak complexity.
+Let me share an example. (*step*)
+
 We have a function that creates user accounts in bulk.
-User logins are unique, so we made it accept a map from login to email address.
+User logins are unique, so we made it accept a map.
 
-I'm wary of anytime I see a map cross a package boundary.
-Especially if the map has an uninformative type like `map[string]string`.
-
-* What's the map key? What's the value?
-  You can't tell by looking at the signature.
+* (*step*) Right off the bat,
+  this hurts maintainability with that uninformative type signature.
+  What's the map key? What's the value?
   Is it from login to email address, or email address to login?
-  Even `map[string]anything` doesn't tell me what the key is.
-* Does it actually have to be unique on the key?
-  If it's user login, yeah, probably.
-** But if it's email address?
-   Is there a future where we support multiple accounts
-   on the same email address? Many services do.
-** This will be disruptive when we change that;
-   it'll probably break our data model down the line.
+  You can't tell by looking at the signature.
+** (*step*) If you have the `Register` function handy,
+    you might be able to guess that it's from email to login.
+** Regardless, I'm wary of anytime I see a map cross a package boundary.
+* (*step*) Next,
+  it leaks a mutable business constraint in the immutable type signature.
+** Does the email address actually have to be unique?
+   Will it forever be required to be unique?
+   Many service support multiple accounts from the same email address.
+   If we ever decide to do that, we'll have a pretty disruptive change
+   on our hands.
 
 At a boundary like this,
-it might be best to accept a slice of structured information,
-and keep the map an internal detail...
+it's best to accept a slice of structured information,
+and handle uniqueness requirements internally.
 --
 
-[%auto-animate]
-== Maps at boundaries
+[.columns%auto-animate]
+== {fix-map}
 
-[source%linenums,go,data-id=BulkRegister]
+[.column]
+--
+Over-reliance on maps
+
+[.medium.text-left]
+Uninformative type
+
+[%hardbreaks.medium.text-left]
+Business constraint in signature
+[.small]#Will uniqueness always be required?#
+--
+
+[.column]
+--
+[source.medium%linenums,go,data-id=BulkRegister]
 ----
 func BulkRegister(reqs []RegisterRequest) error {
-  logins := make(map[string]struct{})
+  emails := make(map[string]struct{})
   for _, r := range reqs {
-    if _, used := logins[r.Login]; used {
-      return fmt.Errorf("login already used: %v", r.Login)
+    if _, used := emails[r.Email]; used {
+      return fmt.Errorf("email already used: %v", r.Email)
     }
-    logins[r.Login] = struct{}{}
+    emails[r.Email] = struct{}{}
   }
   /* ... */
 }
@@ -76,291 +92,255 @@ func BulkRegister(reqs []RegisterRequest) error {
 
 [source,go]
 ----
-type RegisterRequest struct{ Login, Email string }
-----
-
-[.notes]
---
-We build up the map at the entry point, verify uniqueness,
-and then move on.
-
-The function signature is much more informative,
-and there's no confusion on where the login vs email goes.
-If the email was required to be unique, we could also check that here.
-Or not -- if it wasn't required.
---
-
-[.columns.wrap]
-== Uninformative types
-
-[.column.small.is-one-third]
-Bad
-
-[.column.small.is-one-third]
-Good
-
-[.column.small.is-one-third]
---
-// blank
---
-
-[.column.is-one-third]
---
-[source,go]
-----
-map[string]string
-----
---
-
-[.column.is-one-third]
---
-[source,go]
-----
-[]RegisterRequest
-----
---
-
-[.column.is-one-third]
---
-[source.medium,go]
-----
 type RegisterRequest struct {
-  Login, Email string
+  Email, Login string
 }
 ----
 --
 
-[.column.is-one-third]
+[.notes]
 --
-[source,go]
+Now we're accepting a slice of structs built just for this purpose.
+We verify uniqueness at the entry point, and move on.
+The function signature is much more informative,
+and there's no confusion on where the login vs email goes.
+
+The obfuscation from map overuse can go pretty far.
+--
+
+[.columns.wrap]
+== {fix-map}
+
+[cols="1a,1a,1a", frame=none]
+|====
+| Bad 2+| Good
+
+| [source,go]
 ----
 map[string][]string
 ----
---
-
-[.column.is-one-third]
---
-[source,go]
+| [source,go]
 ----
 []PackageCoverage
 ----
---
-
-[.column.is-one-third]
---
-[source.medium,go]
+| [source.medium,go]
 ----
 type PackageCoverage struct {
   ImportPath string
   CoverFiles []string
 }
 ----
---
 
-[.column.is-one-third]
---
-[source,go]
+| [source,go]
 ----
 map[string]map[string]int
 ----
---
-
-[.column.is-one-third]
---
-[source,go]
+| [source,go]
 ----
 []RateLimit
 ----
---
-
-[.column.is-one-third]
---
-[source.medium,go]
+| [source.medium,go]
 ----
 type RateLimit struct {
-  Caller string
-  Callee string
-  RPS    int
+  From, To string
+  RPS      int
 }
 ----
---
+
+| [source,go]
+----
+map[string]*HealthCheck
+----
+2+| [source,go]
+----
+[]*HealthCheck
+----
+
+|====
+
 
 [.notes]
 --
-A note on uninformative types.
-`map[string]string` isn't the only culprit.
-There are countless others.
-Here are a few with what they actually represent --
-some of these are inspired by real production code.
+Here are a couple examples inspired by real code.
 
-The last one has the highest loss of information
-in the type signature here.
+* On the left is the map that type that was accepted or returned.
+* On the right is the slice it was replaced with,
+  with no loss in functionality
 
-One of takeaways I'm hoping to convey with the previous examples is that
-when the map is an implementation detail (which it often is)
-the boundary should deal with a more specific data model.
+The last one is interesting because the data model didn't change at all.
+We just dropped the uniqueness requirement for the name of the health check.
+The name was only used in error messages;
+there was no reason for it to be unique.
+
+Just to clarify, my point here isn't, "maps are bad, actually,"
+but that:
+
+* Map overuse can lead leak complexity and internal details.
+* Maps crossing boundaries deserve scrutiny.
+* Often you'll find that map is an implementation detail you can hide away.
 --
 
-[%auto-animate%auto-animate-restart.columns]
-== Unnecessary uniqueness
-
-[.column]
---
-[source%linenums,go,data-id=State]
-----
-package health
-
-type State struct {
-  /* ... */
-}
-
-func (*State) Handler() http.Handler
-----
-
-[source%step,go]
-----
-mux.Handle("/health", s.Handler())
-----
---
-
-[.column]
---
-[source%linenums%step.medium,go,data-id=Check]
-----
-func (*State) Check(n string) (*Check, error) {
-   /* ... */
-}
-
-type Check struct{/* ... */}
-
-func (*Check) SetHealthy(bool)
-----
-
-[source%step,go]
-----
-dbCheck, err := state.Check("MyDB")
-/* ... */
-for range time.Tick(10 * time.Minute) {
-   ok := db.Ping() == nil
-   dbCheck.SetHealthy(ok)
-}
-----
---
-
-[.notes]
---
-Let me share another definitely-hypothetical and not-at-all
-inspired-by-real-code example.
-
-This one is interesting because the way we leak the map
-even without having it in a public API anywhere.
-
-I have a health composable health checking system.
-There's a central "health state" type.
-It provides an HTTP handler (*step*) that reports whether it's okay.
-This will be registered with the HTTP server.
-
-Health state supports deriving (*step*) any number of named checks from it,
-for use in different components that have their own checks to perform.
-After startup, (*step*) components will periodically check if they're still working,
-and report their status to this object.
---
-
-[%auto-animate.columns]
-== Unnecessary uniqueness
-
-[.column]
---
-[source%linenums,go,data-id=State]
-----
-type State struct {
-  checks map[string]*Check
-  /* ... */
-}
-----
---
-
-[.column]
---
-[source%linenums.medium,go,data-id=Check]
-----
-func (s *State) Check(n string) (*Check, error) {
-   if _, ok := s.checks[n]; ok {
-      return nil, errors.New("already taken")
-   }
-   /* ... */
-   s.checks[n] = c
-   return c, nil
-}
-----
---
-
-[.notes]
---
-`State` stores the checks in a map
-so it requires the names to be unique.
-
-Except this is completely unnecessary.
-Does the health check name actually have to be unique?
-What's it even used for?
-In this definitely-hypothetical API,
-it was used exclusively for error reporting:
-when the health state reports false, we want to know what failed.
-
-That's really not a good reason to enforce uniqueness here.
-This is a leak of an internal detail.
-We thought checks have a name,
-so they should be in a map,
-so they should be unique.
-
-Let's fix it.
-It's a pretty simple fix: drop the unnecessary requirement
-by turning the map into a slice.
---
-
-[%auto-animate.columns]
-== Unnecessary uniqueness
-
-[.column]
---
-[source%linenums,go,data-id=State]
-----
-type State struct {
-  checks []*Check
-  /* ... */
-}
-----
---
-
-[.column]
---
-[source%linenums.medium,go,data-id=Check]
-----
-func (s *State) Check(n string) (*Check, error) {
-   /* ... */
-   s.checks = append(s.checks, c)
-   return c, nil
-}
-----
---
-
-[.notes]
---
-Checks already know their names (or at least they should).
-So what if two checks report a similar name in their errors?
-They're still separate unique objects with their own state.
---
-
-== Maps summary
-
-* Crossing boundaries deserves scrutiny
-* Usually an implementation detail
-
-[.notes]
---
-Just to reiterate, my point here isn't "maps are bad actually,"
-but that maps crossing boundaries deserve extreme scrutiny.
-
-Often, you'll find that the map is an implementation detail,
-and not something your data model needs to leak.
---
+// [%auto-animate%auto-animate-restart.columns]
+// == {fix-map}
+//
+// [.column]
+// --
+// [source%linenums,go,data-id=State]
+// ----
+// package health
+//
+// type State struct {
+//   /* ... */
+// }
+//
+// func (*State) Handler() http.Handler
+// ----
+//
+// [source%step,go]
+// ----
+// mux.Handle("/health", s.Handler())
+// ----
+// --
+//
+// [.column]
+// --
+// [source%linenums%step.medium,go,data-id=Check]
+// ----
+// func (*State) Check(n string) (*Check, error) {
+//   /* ... */
+// }
+//
+// type Check struct{/* ... */}
+//
+// func (*Check) SetHealthy(bool)
+// ----
+//
+// [source%step,go]
+// ----
+// dbCheck, err := state.Check("MyDB")
+// /* ... */
+// for range time.Tick(10 * time.Minute) {
+//   ok := db.Ping() == nil
+//   dbCheck.SetHealthy(ok)
+// }
+// ----
+// --
+//
+// [.notes]
+// --
+// Another way that map overuse can manifest is enforcing unnecessary uniqueness.
+// The previous example had hints of this,
+// but I want to share another
+// definitely-hypothetical and not-inspired-by-real-code example.
+//
+// This one is interesting because the way we leak the map
+// even without having it in a public API anywhere.
+//
+// I have a health composable health checking system.
+// There's a central "health state" type.
+// It provides an HTTP handler (*step*) that reports whether it's okay.
+// This will be registered with the HTTP server.
+//
+// Health state supports deriving (*step*) any number of named checks from it,
+// for use in different components that have their own checks to perform.
+// After startup, (*step*) components will periodically check if they're still working,
+// and report their status to this object.
+// --
+//
+// [%auto-animate.columns]
+// == Unnecessary uniqueness
+//
+// [.column]
+// --
+// [source%linenums,go,data-id=State]
+// ----
+// type State struct {
+//   checks map[string]*Check
+//   /* ... */
+// }
+// ----
+// --
+//
+// [.column]
+// --
+// [source%linenums.medium,go,data-id=Check]
+// ----
+// func (s *State) Check(n string) (*Check, error) {
+//   if _, ok := s.checks[n]; ok {
+//     return nil, errors.New("already taken")
+//   }
+//   /* ... */
+//   s.checks[n] = c
+//   return c, nil
+// }
+// ----
+// --
+//
+// [.notes]
+// --
+// `State` stores the checks in a map
+// so it requires the names to be unique.
+//
+// Except this is completely unnecessary.
+// Does the health check name actually have to be unique?
+// What's it even used for?
+// In this definitely-hypothetical API,
+// it was used exclusively for error reporting:
+// when the health state reports false, we want to know what failed.
+//
+// That's really not a good reason to enforce uniqueness here.
+// This is a leak of an internal detail.
+// We thought checks have a name,
+// so they should be in a map,
+// so they should be unique.
+//
+// Let's fix it.
+// It's a pretty simple fix: drop the unnecessary requirement
+// by turning the map into a slice.
+// --
+//
+// [%auto-animate.columns]
+// == Unnecessary uniqueness
+//
+// [.column]
+// --
+// [source%linenums,go,data-id=State]
+// ----
+// type State struct {
+//   checks []*Check
+//   /* ... */
+// }
+// ----
+// --
+//
+// [.column]
+// --
+// [source%linenums.medium,go,data-id=Check]
+// ----
+// func (s *State) Check(n string) (*Check, error) {
+//   /* ... */
+//   s.checks = append(s.checks, c)
+//   return c, nil
+// }
+// ----
+// --
+//
+// [.notes]
+// --
+// Checks already know their names (or at least they should).
+// So what if two checks report a similar name in their errors?
+// They're still separate unique objects with their own state.
+// --
+//
+// == Maps summary
+//
+// * Crossing boundaries deserves scrutiny
+// * Usually an implementation detail
+// [.notes]
+// --
+// Just to reiterate, my point here isn't "maps are bad actually,"
+// but that maps crossing boundaries deserve extreme scrutiny.
+//
+// Often, you'll find that the map is an implementation detail,
+// and not something your data model needs to leak.
+// --

@@ -26,14 +26,17 @@ Okay, let's get into it.
 [.columns]
 = Built-in obsession
 
+:fix-string: String overuse
+:fix-map: Map overuse
+
 [.column]
 --
 Reluctance to declare types,
 instead preferring built-in types
 
 [.medium, step=2]
-* String typing
-* Maps at boundaries
+* {fix-string}
+* {fix-map}
 * Boolean overuse
 --
 
