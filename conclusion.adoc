@@ -11,21 +11,33 @@ causes disruption
 
 [.column]
 --
-* Find the abstraction
-* Watch the flow
 * Plan for expansion
+* Chaos to order early
+* Find the abstraction
+* Write deep modules
+* Flow in one direction
 --
 
 [.notes]
 --
+TODO
+
 So in conclusion!
 
+* Future-proof code isn't disruptive
 * Leaking complexity causes disruptive code
-* You can tame this complexity by finding the right abstraction
-** with deep modules a consistent flow of information
-** and a plan for expansion
+* To tame this complexity, you should:
+** plan for your packages to expand without disruption
+   using the previously discussed tools
+** convert chaos to order as close to the entry point as you can
+** build a deep abstraction around your business logic
+   instead of stitching together shallow functions,
+** and ensure that information flows consistently in one direction
+   without backtracking
 
-Hope you all found this informative.
+I've been Abhinav Gupta,
+and I hope you all found this last quarter hour informative.
+Thank you!
 
-Thanks!
+And as a I leave...
 --

@@ -333,11 +333,11 @@ or for just strings for that matter.
 [.columns.wrap]
 == String typing
 
-[.column.is-one-third.medium]
+[.column.is-one-third.medium.text-right]
 Chaos
 
-[.column.is-two-thirds.medium]
-Order
+[.column.is-two-thirds.medium.text-left]
+| Order
 
 [.column.is-one-third.medium]
 --

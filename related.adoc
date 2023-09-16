@@ -6,7 +6,8 @@ _A Philosophy of Software Design_ by John Ousterhout
 
 [.notes]
 --
-Lastly, on my way out, I highly recommend checking out this book.
+I highly recommend checking out this book.
 
-It helped me better articulate some of the ideas I had for this talk.
+It helped me better articulate some of the ideas I had for this talk,
+and is surprisingly short for how much wisdom it packs.
 --
