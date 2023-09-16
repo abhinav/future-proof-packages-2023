@@ -28,6 +28,7 @@ Okay, let's get into it.
 
 :fix-string: String overuse
 :fix-map: Map overuse
+:fix-bool: Boolean overuse
 
 [.column]
 --
@@ -37,7 +38,7 @@ instead preferring built-in types
 [.medium, step=2]
 * {fix-string}
 * {fix-map}
-* Boolean overuse
+* {fix-bool}
 --
 
 [.column, step=1]
@@ -66,7 +67,7 @@ I'll talk about a couple of them:
 
 include::fix-string.adoc[]
 include::fix-map.adoc[]
-include::fix-serialized-types.adoc[]
+// include::fix-serialized-types.adoc[] TODO: maybe in flow of information?
 include::fix-bool.adoc[]
 include::fix-callback.adoc[]
 // TODO: maybe: closures vs objects

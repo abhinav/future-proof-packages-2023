@@ -1,14 +1,22 @@
-= Overly specific booleans
+[.columns%auto-animate%auto-animate-restart]
+= {fix-bool}
 
-[source%step,go]
+[.column.medium]
+--
+[data-id=subtitle]
+Overly specific booleans
+--
+
+[.column]
+[source%linenums%step,go]
 ----
 type SiteGen struct {
-   /* ... */
+  /* ... */
 }
 
 func (g *SiteGen) RelativeURL(dst *Page) string {
-   u := /* ... */
-   return u + "/"
+  u := /* ... */
+  return u + "/"
 }
 
 g.RelativeURL(p) // "path/to/dst/"
@@ -19,37 +27,42 @@ g.RelativeURL(p) // "path/to/dst/"
 In similar vein to string typing is overly specific booleans.
 This is pretty common.
 
-I have functionality, and it works fine.
-A user wants to customize something for their specific need.
+Something exists and it works fine.
+Someone wants a pretty specific customization.
 To keep the fingerprint of this request small,
-I add a boolean flag for that case.
+you add a boolean flag for that specific request.
 
-This is a trap, and again, best demonstrated with an example.
-(*step*)
+Let me demonstrate. (*step*)
 
-Suppose I'm building a static website generator.
-I want the generated HTML to be relocatable,
-so I generate relative URLs to other pages.
-
-I chose to make these URLs always end with a trailing slash.
+Suppose I have a static website generator.
+It uses relative URLs to reference other pages.
+These URLs always end with a trailing slash.
 
 However, a user complains that their static website host
-does not like these trailing slashes and they'd like an opt-out.
+does not like these trailing slashes and they'd like to opt-out.
 --
 
-[.columns]
-== Overly specific booleans
+[.columns.wrap%auto-animate]
+== {fix-bool}
+
+[.column.is-full]
+--
+[data-id=subtitle]
+Overly specific booleans
+--
 
 [.column%step]
 --
 [source,go]
 ----
 func (...) RelativeURL(
-   dst *Page,
-   slash bool,
+  dst *Page,
+  slash bool,
 ) string
 ----
 
+[%hardbreaks]
+Disruptive
 Poorly scoped
 --
 
@@ -76,67 +89,72 @@ type SiteGen struct {
 }
 ----
 
-Rigid
+[.step.strike, step=4]#Good# +
+[.step, step=4]#Not terrible#
 --
 
 [.notes]
 --
-Some options for what I could do there:
+Let's consider some options for the opt-out.
 
 * (*step*) Add a `slash` parameter to RelativeURL.
-** This is a non-starter. It's disruptive.
-   Every call to `RelativeURL` across the code base will have to be fixed.
-   If there are interfaces matching RelativeURL,
-   they and their implementations will also have to be fixed.
-** On top of that, and arguably more importantly, it's also poorly scoped:
+** This will disrupt all calls to `RelativeURL` across the code base.
+   That already makes it a non-starter.
+** On top of that, it's also poorly scoped:
 *** Even without looking at its implementation,
-    we can guess from ``SiteGen``'s name that it's the site generator.
-    It's scoped to a single website.
-*** On the other hand,
-    `RelativeURL` will be called many times during the process of generating.
-*** Whether URLs end with slashes is not something that changes for each URL;
-    it's a site-level property. It's site-scoped, not URL scoped.
-* (*step*) Okay, let's move that into a `SiteGen` level boolean.
+    we can guess that `SiteGen` is used once per website.
+    On the other hand, `RelativeURL` will be used many times per website.
+*** The `slash` parameter will not change between these calls because
+    whether relative URLs should use slashes
+    is not something that changes for each URL;
+    you decide it once when you're generating the site.
+    It's site-scoped, not URL scoped.
+* (*step*) Okay, we could move it into a `SiteGen` level boolean.
 ** That's still not good enough.
    It's disruptive because the zero value -- the default value --
-   of this new optional field is the new behavior, not the old.
-   You might recall from the parameter objects discussion
-   that new fields should keep the zero value in mind.
+   of this new optional field is to *not* add the slashes,
+   which changes behavior for all existing uses of `SiteGen`.
 * (*step*) Fine, let's flip it. An `OmitSlash` field.
-** That's better, but it's still not good.
-** It's rigid. By being so specific, it limits any room for expansion.
-   What if in the future we want to support adding `.html` as an option?
+** That's good, (*step*) riiiight?
+** (*step*) It's... Not great. Not terrible.
+** One of its problems is that it's rigid and limiting.
+   By being so specific, it limits what we can do in the future.
+   What if we want to support adding `.html` as an option?
    Would that be another boolean? `AddHTML`?
    What happens when both booleans are set?
 
-What's a better option?
-To figure that out, we have to stop thinking of this in isolation.
-This behavior has to be considered as part of the bigger SiteGen abstraction.
-The choice isn't a binary "add a slash or not",
-but "how do you want your links to be rendered"?
+To figure out a better option,
+we have to stop thinking of this feature in isolation.
+The behavior has to be considered as part of the bigger SiteGen abstraction.
 
-And we have a great tool to pick from one of N already...
+How about, instead of a binary choice of "add a slash or not,"
+we think about it as "this is how links SiteGen should render links."
+
+Perhaps "which of these N methods of rendering links should I use?"
+And there's a standard tool for picking one of N...
 --
 
-[%auto-animate.columns]
-== Enums
+[%auto-animate%auto-animate-restart.columns]
+== {fix-bool}
 
-[.column, step=1]
+[.column]
 --
-[source%linenums,go,data-id=LinkStyle]
+Use an enum
+
+[source%linenums,go,data-id=LinkStyle,highlight="1-|1|4"]
 ----
 type LinkStyle int
 
 const (
-   LinkStyleDir   LinkStyle = iota
-   LinkStylePlain
+  LinkStyleDir   LinkStyle = iota
+  LinkStylePlain
 )
 ----
 --
 
-[.column, step=1]
+[.column]
 --
-[source%linenums,go,data-id=SiteGen]
+[source%linenums,go,data-id=SiteGen,highlight="1-|3"]
 ----
 type SiteGen struct {
   /* ... */
@@ -149,28 +167,33 @@ type SiteGen struct {
 --
 Enums.
 
-I define an enum of how links should be rendered (*step*)
-and plug that into my site generator (*step*).
+With enums, I'm able to
 
-Note that the zero value is LinkStyleDir -- which adds trailing slashes --
-because that's my original behavior. No disruption.
+* (*step*) Define the concept of a link style
+  that represents how links should be rendered.
+* (*step*) Note that the zero value of link style is directory --
+  the original behavior -- so that this change isn't disruptive
+* I can then incorporate this (*step*) into my site generator
+  as a site-level option
 
-When in the future I add the .html version...
+Modeling the concept allows us to introduce new link styles.
 --
 
 [%auto-animate.columns]
-== Enums
+== {fix-bool}
 
 [.column]
 --
+Use an enum
+
 [source%linenums,go,data-id=LinkStyle]
 ----
 type LinkStyle int
 
 const (
-   LinkStyleDir   LinkStyle = iota
-   LinkStylePlain
-   LinkStyleHTML
+  LinkStyleDir   LinkStyle = iota
+  LinkStylePlain
+  LinkStyleHTML
 )
 ----
 --
@@ -188,21 +211,17 @@ type SiteGen struct {
 
 [.notes]
 --
-That's just another entry in the enum.
+One with a trailing ".html", for example.
 
-A significant advantage of modeling this behavior like this
-is that this RelativeURL method probably isn't the only place
-where I need to know our link rendering scheme.
-Especially with the .html version, that changes
-file names and directory paths that the system generates.
-
-Before I go further, I should say -- this is pretty good.
-Enums are a good fit for this.
-
-But there's another direction we could've gone with this.
-Suppose that the array of behaviors we wanted to support
-was too varied and we don't want to hard-code them.
-
-Instead of introducing an enum, we could've allowed the caller
-to inject the behavior. Something like..
+// TODO: drop and introduce enums separately for callbacks
+//
+// Before I go further, I should say -- this is pretty good.
+// Enums are a good fit for this.
+//
+// But there's another direction we could've gone with this.
+// Suppose that the array of behaviors we wanted to support
+// was too varied and we don't want to hard-code them.
+//
+// Instead of introducing an enum, we could've allowed the caller
+// to inject the behavior. Something like..
 --
