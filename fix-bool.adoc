@@ -212,16 +212,4 @@ type SiteGen struct {
 [.notes]
 --
 One with a trailing ".html", for example.
-
-// TODO: drop and introduce enums separately for callbacks
-//
-// Before I go further, I should say -- this is pretty good.
-// Enums are a good fit for this.
-//
-// But there's another direction we could've gone with this.
-// Suppose that the array of behaviors we wanted to support
-// was too varied and we don't want to hard-code them.
-//
-// Instead of introducing an enum, we could've allowed the caller
-// to inject the behavior. Something like..
 --

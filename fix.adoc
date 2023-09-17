@@ -74,6 +74,15 @@ include::fix-callback.adoc[]
 // ** You can implement a class a closure doesn't mean you should.
 // ** Isolate concepts, give them names, add interfaces (middleware example)
 // *** Closure want to be objects when they grow up
+
+= Interface misuse
+
+[.notes]
+--
+I just spent some time selling interfaces.
+Now let's talk about how to misuse them.
+--
+
 include::fix-premature-iface.adoc[]
 include::fix-big-iface.adoc[]
 include::fix-global.adoc[]
