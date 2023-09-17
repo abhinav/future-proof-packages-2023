@@ -1,12 +1,22 @@
-[.columns.wrap]
-= Unwarranted interfaces
+[%auto-animate.columns.wrap]
+= {fix-iface}
 
 [.column.is-half]
 --
-[.small]
-Don't
+Premature interface
 
-[source.medium,go]
+[%step.medium]
+* *Unnecessary* +
+  Interfaces match dynamically
+* *Inflexible* +
+  New methods are disruptive
+* *Complex* +
+  Constructor is required
+====
+--
+
+[.column.is-half]
+[source%linenums, go, data-id=impl]
 ----
 type Client interface {
   List() ([]*Post, error)
@@ -22,14 +32,61 @@ func (*impl) List() ([]*Post, error) {
   /* ... */
 }
 ----
+
+[.notes]
+--
+Premature interfaces.
+
+This is a pretty common thing.
+We're defining an abstraction,
+so we define it as an interface,
+and keep the implementation private.
+
+I want to advise against this as your default choice
+because
+
+. (*step*) It's unnecessary.
+  Go matches interfaces dynamically,
+  so a type doesn't need to declare interfaces it implements
+  at declaration time.
+. (*step*) It introduces inflexibility.
+  We cannot expand the interface easily.
+  Adding new methods to this interface is a disruptive change
+  because it'll break other implementations.
+.. And if that's not a concern because there aren't other implementations,
+   then we go back to: it's unnecessary.
+. (*step*) It comes with a minimum required complexity.
+  You *have* to define a constructor;
+  there's no way to use the zero value or plain object directly.
+
+Looking back to the expansion section, the fix is to...
 --
 
-[.column.is-half, step=2]
---
-[.small]
-Do
+[%auto-animate.columns.wrap]
+= {fix-iface}
 
-[source%linenums.medium,go,data-id=struct]
+[.column.is-half]
+--
+Use a struct
+
+[.medium%step]
+* Producers expose concrete types
+* Consumers define interfaces
+
+[source%step,go]
+----
+type PostClient interface {
+  List() ([]*Post, error)
+}
+
+func NewHandler(pc PostClient) *Handler {
+  /* ... */
+}
+----
+--
+
+[.column.is-half]
+[source%linenums, go, data-id=impl]
 ----
 type Client struct{/* ... */}
 
@@ -42,89 +99,25 @@ func (*Client) List() ([]*Post, error) {
 }
 ----
 
-[source%linenums.medium,go,data-id=iface,step=3]
-----
-type PostClient interface {
-  List() ([]*Post, error)
-}
-
-func NewHandler(pc PostClient) *Handler {
-  /* ... */
-}
-----
---
-
-[column.medium.is-full.fade-in-then-semi-out, step=1]
---
-Accept interfaces, return structs
---
-
 [.notes]
 --
-Unwarranted interfaces.
+Use a struct instead.
 
-I already covered this to some degree in "return structs" earlier,
-but I want to call it out explicitly.
+Or more generally, as a default:
 
-I'm talking about code that takes this shape:
-a constructor that returns an interface defined right above,
-and returns a private implementation defined down below.
+* (*step*) Producers of abstractions export concrete types.
+  If they have a constructor, they return the concrete type from it.
+* (*step*) Consumers of abstractions can define interfaces as needed.
+  For example... (*step*).
 
-You might make this choice if you're coming from another language
-where interfaces that a type satisfies must be specified
-when the type is declared.
-Maybe you want the interface in place
-so that you can mock this object later,
-in other objects that consume it.
-
-Either way, there's a better way to go at this.
-
-I mentioned this before in the tools section as two separate points
-but it bears repeating as its own mantra... (*step*)
-
-Accept interfaces, return structs.
-
-This is not a hard-and-fast rule, and there's nuance to it,
-so for this discussion, I'm narrowing it down to
-objects with business logic on them
-that we've wrapped an interface around.
-
-The idea is this:
-For complex objects with lots of behavior,
-don't prematurely declare and return an interface.
-Instead (*step*) export and return the concrete type
-that implements the functionality.
-
-Why? It lets you expand the abstraction.
-It lets you add more functionality on the object
-without disrupting consumers --
-adding new methods to an interface is disruptive.
-
-What if a consumer needs to mock this object?
-That's fine (*step*) they can declare their own interface for it.
+I want to clarify that this isn't a rule, but more like a guideline.
+Change your default choice to this,
+and it'll be the right choice most of the times.
 --
 
-[.columns]
-== Unwarranted interfaces
+= {fix-iface}
 
-[.column]
-Producers expose concrete types
-
-[.column]
-Consumers define interfaces
-
-[.notes]
---
-In short, by default, for complex abstractions,
-producers expose the concrete types,
-and the consumers define interfaces for the functionality that they need.
-
-I'm effectively saying that a package that produces a complex abstraction
-should not define an interface for that abstraction.
-At least, not usually. When should it?
---
-
-== When should producers define interfaces?
+Producers may define interfaces for...
 
 * Single operation interfaces
 * Multiple implementations
@@ -133,19 +126,22 @@ At least, not usually. When should it?
 
 [.notes]
 --
-When can producers of abstractions define their own interfaces?
-I'm sure there are others, but a couple I can think of are:
+Of course, there are cases where producers of abstractions
+*should* define their interfaces.
+
+Here's a non-exhaustive list of some of them:
 
 * Interfaces that represent a single operation --
   basically just a step above a function reference.
   Think back to the callbacks vs interfaces part of this talk.
-* You've got multiple implementations of the interface
+* Or, the package defines multiple implementations of the interface,
   and it's common for consumers to be polymorphic over these implementations.
-* You expect consumers to commonly wrap the abstraction you're producing
-  before using it or passing it on.
+* Consumers regularly wrap the abstraction you before using it or passing it on.
+  Think middleware.
 
 Again, I'm sure there are others;
 I don't have the time to make this comprehensive.
 
-The point I'm making is that by default, don't declare that interface.
+The point I'm making is that by default,
+producers of abstractions should not declare the interface for them.
 --

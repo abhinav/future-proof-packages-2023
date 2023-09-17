@@ -3,7 +3,7 @@
 [%conceal]
 = {fix-callback}
 
-=== [.step]#But wait, there's more#
+[.step]#But wait, there's more#
 
 [.notes]
 --
@@ -211,4 +211,115 @@ func (g *SiteGen) RelativeURL(dst *Page) string {
 [.notes]
 --
 I can upcast it like discussed before.
+--
+
+[%auto-animate%auto-animate-restart.columns]
+== {fix-callback}
+
+[.column.is-half]
+--
+Tangent: Functional options
+
+[.medium]
+Implemented with callbacks
+--
+
+[.column.is-half]
+--
+[source%linenums, go, data-id=New]
+----
+func New(opts ...Option) *Client {
+  var options clientOptions
+  for _, opt := range opts {
+    opt(&options)
+  }
+  /* ... */
+}
+
+type clientOptions struct {
+  logger *slog.Logger
+  /* ... */
+}
+----
+
+[source%linenums.medium, go, data-id=Options]
+----
+type Option func(*clientOptions)
+
+func WithLogger(l *slog.Logger) Option {
+  return func(o *clientOptions) {
+    o.logger = l
+  }
+}
+----
+--
+
+
+[.notes]
+--
+Quick tangent on functional options.
+You can and should apply this practice to functional options.
+Instead of implementing functional options as callbacks...
+--
+
+[%auto-animate.columns]
+== {fix-callback}
+
+[.column.is-half]
+--
+Tangent: Functional options
+
+[.medium]
+Implemented with interfaces
+
+[source%linenums, go, data-id=New]
+----
+func New(opts ...Option) *Client {
+  var options clientOptions
+  for _, opt := range opts {
+    opt.apply(&options)
+  }
+  /* ... */
+}
+
+type clientOptions struct {
+  logger *slog.Logger
+  /* ... */
+}
+----
+--
+[.column.is-half]
+--
+[source%linenums.medium, go, data-id=Options]
+----
+type Option interface{ apply(*clientOptions) }
+
+func WithLogger(l *slog.Logger) Option {
+  return &withLogger{l}
+}
+
+type withLogger struct{ log *slog.Logger }
+
+func (l *withLogger) apply(o *clientOptions) {
+  o.logger = l.log
+}
+----
+
+[source%linenums%step.medium, go]
+----
+func (l *withLogger) String() string {
+  return fmt.Sprintf("WithLogger(%v)", l.log)
+}
+----
+--
+
+[.notes]
+--
+Implement them as interfaces.
+
+Yeah, it increases the amount of boilerplate per option,
+but in exchange you get comparable options that you can inspect;
+this becomes important when you have to debug an issue.
+
+As an added bonus (*step*) you can make the options printable too.
 --

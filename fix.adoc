@@ -75,16 +75,20 @@ include::fix-callback.adoc[]
 // ** Isolate concepts, give them names, add interfaces (middleware example)
 // *** Closure want to be objects when they grow up
 
-= Interface misuse
+:fix-iface: Interface misuse
+
+[%auto-animate%auto-animate-restart]
+= {fix-iface}
 
 [.notes]
 --
 I just spent some time selling interfaces.
-Now let's talk about how to misuse them.
+Now let's talk about misusing them.
 --
 
 include::fix-premature-iface.adoc[]
 include::fix-big-iface.adoc[]
+
 include::fix-global.adoc[]
 
 = Zooming out
