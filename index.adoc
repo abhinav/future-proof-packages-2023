@@ -48,6 +48,6 @@ So how can we go about future-proofing packages?
 
 include::expand.adoc[leveloffset=+1]
 include::fix.adoc[leveloffset=+1]
-
+include::design.adoc[leveloffset=+1]
 include::conclusion.adoc[leveloffset=+1]
 include::related.adoc[leveloffset=+1]
