@@ -1,225 +1,225 @@
-[.columns]
-= Really long functions
-
-[.column]
-[pikchr, height=500px]
-....
-boxwid = 1in; movewid = 0.5in; right
-
-P: box ht 2in
-....
-
-[.column%step]
-[pikchr, height=500px]
-....
-boxwid = 1in; movewid = 0.5in; right
-
-Q: box ht 2in
-
-markPos = 0
-define markAt {
-  markPos += $2
-  line from ($1.nw.x, $1.nw.y-markPos) right until even with $1.e
-}
-
-markAt(Q, 0.5in)
-markAt(Q, 0.3in)
-markAt(Q, 0.6in)
-markAt(Q, 0.4in)
-....
-
-[.column%step]
-[pikchr, height=500px]
-....
-boxwid = 1in; movewid = 0.5in; right
-
-down
-A: box ht 0.5in
-move 0.1in
-B: box ht 0.3in
-move 0.1in
-C: box ht 0.6in
-move 0.1in
-D: box ht 0.2in
-move 0.1in
-E: box ht 0.4in
-....
-
-[.notes]
---
-Let me share an example.
-
-So if you have a long function,
-the obvious advice is (*step*)
-find the N separate things it does,
-and split it into separate functions for those.
-
-I'm here to suggest that don't *just* do that -- don't stop there.
-There's usually some shared information between these functions;
-that's why they were all part of one big function.
---
-
-[.columns]
-== Really long functions
-
-[.column]
---
-[pikchr, height=350px]
-....
-boxwid = 1in; movewid = 0.5in; right
-
-down
-A: box ht 0.5in
-move 0.1in
-B: box ht 0.3in
-move 0.1in
-C: box ht 0.6in
-move 0.1in
-D: box ht 0.2in
-move 0.1in
-E: box ht 0.4in
-
-Q: box invis with nw at A.nw ht A.n.y-E.s.y
-
-O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
-M: dot invis at 0.5 way between O.e and Q.w
-
-linerad = 0.1in
-// arrowFromO(direction, dst)
-define arrowFromO {
-  arrow chop from O to M then $1 until even with $2 then to $2
-}
-arrowFromO(up, A)
-arrow chop from O right until even with C
-arrowFromO(down, E)
-
-arrow from A.e right 0.15in then down until even with B then to B.e
-arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
-....
---
-
-[.column%step]
---
-[pikchr, height=350px]
-....
-boxwid = 1.0in; movewid = 0.5in; right
-
-down
-A: box ht 0.5in
-move 0.1in
-B: box ht 0.3in
-move 0.1in
-C: box ht 0.6in
-move 0.1in
-D: box ht 0.2in
-move 0.1in
-E: box ht 0.4in
-
-Q: box invis with nw at A.nw wid A.wid ht A.n.y-E.s.y
-
-O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
-M: dot invis at 0.5 way between O.e and Q.w
-
-define splitAt {
-  line from $2 east of $1.nw down $1.ht
-}
-splitAt(A, 0.2in)
-splitAt(B, 0.2in)
-splitAt(C, 0.2in)
-splitAt(D, 0.2in)
-splitAt(E, 0.2in)
-
-linerad = 0.1in
-// arrowFromO(direction, dst)
-define arrowFromO {
-  arrow chop from O to M then $1 until even with $2 then to $2
-}
-arrowFromO(up, A)
-arrow chop from O right until even with C
-arrowFromO(down, E)
-
-arrow from A.e right 0.15in then down until even with B then to B.e
-arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
-....
-
-[source,go]
-----
-func f(a, b) []X {
-  c, x1 := g(a)
-  d, x2 := h(b)
-  x3 := i(a, b, c, d)
-  return [x1, x2, x3]
-}
-----
---
-
-[.column%step]
---
-[pikchr, height=350px]
-....
-boxwid = 0.7in; movewid = 0.5in; right
-
-down
-A: box ht 0.5in
-move 0.1in
-B: box ht 0.3in
-move 0.1in
-C: box ht 0.6in
-move 0.1in
-D: box ht 0.2in
-move 0.1in
-E: box ht 0.4in
-
-Q: box invis with nw at A.nw wid A.wid ht A.n.y-E.s.y
-O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
-box wid 0.3in ht 0.3in with ne at last .nw
-
-M: dot invis at 0.5 way between O.e and Q.w
-
-linerad = 0.1in
-// arrowFromO(direction, dst)
-define arrowFromO {
-  arrow chop $3 from O to M then $1 until even with $2 then to $2
-}
-arrowFromO(up, A)
-arrow chop from O right until even with C
-arrowFromO(down, E)
-
-arrow chop dashed from B.w left until even with O then to O
-arrow chop dashed from D.w left until even with O then to O
-....
-
-[source,go]
-----
-func f(a, b) []X {
-  st := thing{A: a, B: b}
-  c := st.g()
-  d := st.h()
-  st.i(c, d)
-  return st.xs
-}
-----
---
-
-[.notes]
---
-So if you just split the function, cool,
-now the original function is calling say 3 of the extracted functions,
-which are maybe calling 2 others.
-That's not bad.
-
-But there's more we can do here.
-These extracted functions probably have some shared state. (*step*)
-For example, they probably have some parameters shared between all,
-and maybe they all feed back to the result somehow.
-
-This is a good place to start introducing an abstraction.
-For example,
-
-* you can extract the parameters that are shared --
-  the parameters with large scope --
-  into a struct
-* then you can turn these functions into methods on that struct,
-  accessing shared information,
-  as well as feeding results back to the struct.
---
+// [.columns]
+// = Really long functions
+//
+// [.column]
+// [pikchr, height=500px]
+// ....
+// boxwid = 1in; movewid = 0.5in; right
+//
+// P: box ht 2in
+// ....
+//
+// [.column%step]
+// [pikchr, height=500px]
+// ....
+// boxwid = 1in; movewid = 0.5in; right
+//
+// Q: box ht 2in
+//
+// markPos = 0
+// define markAt {
+//   markPos += $2
+//   line from ($1.nw.x, $1.nw.y-markPos) right until even with $1.e
+// }
+//
+// markAt(Q, 0.5in)
+// markAt(Q, 0.3in)
+// markAt(Q, 0.6in)
+// markAt(Q, 0.4in)
+// ....
+//
+// [.column%step]
+// [pikchr, height=500px]
+// ....
+// boxwid = 1in; movewid = 0.5in; right
+//
+// down
+// A: box ht 0.5in
+// move 0.1in
+// B: box ht 0.3in
+// move 0.1in
+// C: box ht 0.6in
+// move 0.1in
+// D: box ht 0.2in
+// move 0.1in
+// E: box ht 0.4in
+// ....
+//
+// [.notes]
+// --
+// Let me share an example.
+//
+// So if you have a long function,
+// the obvious advice is (*step*)
+// find the N separate things it does,
+// and split it into separate functions for those.
+//
+// I'm here to suggest that don't *just* do that -- don't stop there.
+// There's usually some shared information between these functions;
+// that's why they were all part of one big function.
+// --
+//
+// [.columns]
+// == Really long functions
+//
+// [.column]
+// --
+// [pikchr, height=350px]
+// ....
+// boxwid = 1in; movewid = 0.5in; right
+//
+// down
+// A: box ht 0.5in
+// move 0.1in
+// B: box ht 0.3in
+// move 0.1in
+// C: box ht 0.6in
+// move 0.1in
+// D: box ht 0.2in
+// move 0.1in
+// E: box ht 0.4in
+//
+// Q: box invis with nw at A.nw ht A.n.y-E.s.y
+//
+// O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
+// M: dot invis at 0.5 way between O.e and Q.w
+//
+// linerad = 0.1in
+// // arrowFromO(direction, dst)
+// define arrowFromO {
+//   arrow chop from O to M then $1 until even with $2 then to $2
+// }
+// arrowFromO(up, A)
+// arrow chop from O right until even with C
+// arrowFromO(down, E)
+//
+// arrow from A.e right 0.15in then down until even with B then to B.e
+// arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
+// ....
+// --
+//
+// [.column%step]
+// --
+// [pikchr, height=350px]
+// ....
+// boxwid = 1.0in; movewid = 0.5in; right
+//
+// down
+// A: box ht 0.5in
+// move 0.1in
+// B: box ht 0.3in
+// move 0.1in
+// C: box ht 0.6in
+// move 0.1in
+// D: box ht 0.2in
+// move 0.1in
+// E: box ht 0.4in
+//
+// Q: box invis with nw at A.nw wid A.wid ht A.n.y-E.s.y
+//
+// O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
+// M: dot invis at 0.5 way between O.e and Q.w
+//
+// define splitAt {
+//   line from $2 east of $1.nw down $1.ht
+// }
+// splitAt(A, 0.2in)
+// splitAt(B, 0.2in)
+// splitAt(C, 0.2in)
+// splitAt(D, 0.2in)
+// splitAt(E, 0.2in)
+//
+// linerad = 0.1in
+// // arrowFromO(direction, dst)
+// define arrowFromO {
+//   arrow chop from O to M then $1 until even with $2 then to $2
+// }
+// arrowFromO(up, A)
+// arrow chop from O right until even with C
+// arrowFromO(down, E)
+//
+// arrow from A.e right 0.15in then down until even with B then to B.e
+// arrow from 0.1 south of C.e right 0.15in then down until even with D then to D.e
+// ....
+//
+// [source,go]
+// ----
+// func f(a, b) []X {
+//   c, x1 := g(a)
+//   d, x2 := h(b)
+//   x3 := i(a, b, c, d)
+//   return [x1, x2, x3]
+// }
+// ----
+// --
+//
+// [.column%step]
+// --
+// [pikchr, height=350px]
+// ....
+// boxwid = 0.7in; movewid = 0.5in; right
+//
+// down
+// A: box ht 0.5in
+// move 0.1in
+// B: box ht 0.3in
+// move 0.1in
+// C: box ht 0.6in
+// move 0.1in
+// D: box ht 0.2in
+// move 0.1in
+// E: box ht 0.4in
+//
+// Q: box invis with nw at A.nw wid A.wid ht A.n.y-E.s.y
+// O: box wid 0.3in ht 0.3in with e at movewid west of Q.w
+// box wid 0.3in ht 0.3in with ne at last .nw
+//
+// M: dot invis at 0.5 way between O.e and Q.w
+//
+// linerad = 0.1in
+// // arrowFromO(direction, dst)
+// define arrowFromO {
+//   arrow chop $3 from O to M then $1 until even with $2 then to $2
+// }
+// arrowFromO(up, A)
+// arrow chop from O right until even with C
+// arrowFromO(down, E)
+//
+// arrow chop dashed from B.w left until even with O then to O
+// arrow chop dashed from D.w left until even with O then to O
+// ....
+//
+// [source,go]
+// ----
+// func f(a, b) []X {
+//   st := thing{A: a, B: b}
+//   c := st.g()
+//   d := st.h()
+//   st.i(c, d)
+//   return st.xs
+// }
+// ----
+// --
+//
+// [.notes]
+// --
+// So if you just split the function, cool,
+// now the original function is calling say 3 of the extracted functions,
+// which are maybe calling 2 others.
+// That's not bad.
+//
+// But there's more we can do here.
+// These extracted functions probably have some shared state. (*step*)
+// For example, they probably have some parameters shared between all,
+// and maybe they all feed back to the result somehow.
+//
+// This is a good place to start introducing an abstraction.
+// For example,
+//
+// * you can extract the parameters that are shared --
+//   the parameters with large scope --
+//   into a struct
+// * then you can turn these functions into methods on that struct,
+//   accessing shared information,
+//   as well as feeding results back to the struct.
+// --

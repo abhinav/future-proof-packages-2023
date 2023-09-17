@@ -128,9 +128,7 @@ flow of information, scope, surface area, and depth.
 You can use those to help you find the abstraction.
 --
 
-// TODO: curry might be a better follow to long funcs
-
-include::fix-long-funcs.adoc[]
+// include::fix-long-funcs.adoc[]
 include::fix-conds.adoc[]
 include::fix-curry.adoc[]
 
