@@ -24,6 +24,18 @@
 	font-size: 0.6em;
 }
 
+.large {
+  font-size: var(--r-heading3-size);
+  font-family: var(--r-heading-font);
+}
+
+.x-large {
+  font-size: var(--r-heading1-size);
+  font-family: var(--r-heading-font);
+}
+
+
+
 /* div.openblock.small { */
 /* 	font-size: 0.6em; */
 /* 	line-height: 0.6em; */

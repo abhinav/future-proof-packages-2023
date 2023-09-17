@@ -3,6 +3,7 @@
 [%conceal]
 = {fix-callback}
 
+[.large]
 [.step]#But wait, there's more#
 
 [.notes]

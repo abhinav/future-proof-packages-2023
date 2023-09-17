@@ -1,10 +1,8 @@
 [%auto-animate.columns.wrap]
-= {fix-iface}
+= {fix-premature-iface}
 
 [.column.is-half]
 --
-Premature interface
-
 [%step.medium]
 * *Unnecessary* +
   Interfaces match dynamically
@@ -12,7 +10,6 @@ Premature interface
   New methods are disruptive
 * *Complex* +
   Constructor is required
-====
 --
 
 [.column.is-half]
@@ -63,7 +60,7 @@ Looking back to the expansion section, the fix is to...
 --
 
 [%auto-animate.columns.wrap]
-= {fix-iface}
+== {fix-premature-iface}
 
 [.column.is-half]
 --
@@ -115,7 +112,7 @@ Change your default choice to this,
 and it'll be the right choice most of the times.
 --
 
-= {fix-iface}
+== {fix-premature-iface}
 
 Producers may define interfaces for...
 

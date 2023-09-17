@@ -75,15 +75,27 @@ include::fix-callback.adoc[]
 // ** Isolate concepts, give them names, add interfaces (middleware example)
 // *** Closure want to be objects when they grow up
 
-:fix-iface: Interface misuse
+= Interface misuse
 
-[%auto-animate%auto-animate-restart]
-= {fix-iface}
+:fix-premature-iface: Premature interfaces
+:fix-big-iface: Big interfaces
+
+[%step]
+* {fix-premature-iface}
+* {fix-big-iface}
 
 [.notes]
 --
 I just spent some time selling interfaces.
 Now let's talk about misusing them.
+
+I'm going to cover two topics:
+
+* Premature interfaces:
+  When packages define interfaces before they need to
+* and big interfaces:
+  when packages define interfaces that are larger
+  than they need to be
 --
 
 include::fix-premature-iface.adoc[]

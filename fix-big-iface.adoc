@@ -1,56 +1,67 @@
-= Big interfaces
+[.columns]
+= {fix-big-iface}
 
-[%step]
+[.column]
 --
-> The bigger the interface, the weaker the abstraction.
+Big interfaces cause +
+a tight coupling +
+between abstractions
+--
+
+[.column.is-two-thirds%step]
+--
+> The bigger the interface, +
+> the weaker the abstraction.
 >
 > -- Rob Pike, https://www.youtube.com/watch?v=PAAkCSZUG1c&t=5m17s&themeRefresh=1[Gopherfest 2015]
 --
 
 [.notes]
 --
-Once we're defining interfaces,
-one risk to be aware of is overly large interfaces.
+Another way to misuse interfaces for abstractions
+is by defining a really big interface.
 
 Big interfaces indicate a tight coupling
 between the producer of the abstraction and the consumer.
 Or as Rob Pike put it, (*step*)
 the bigger the interface, the weaker the abstraction.
 
-Aim to make interfaces smaller.
-Let me cover a couple tips to help with that.
+I want to share a couple tips to help you achieve smaller interfaces.
+--
+
+== {fix-big-iface}
+
+Making interfaces smaller
+
+* Follow the request path
+* Use functions
+* Build a strong core
+
+[.notes]
+--
+* First: Follow the request path.
+  Think about methods of the interface
+  that are going to be called multiple times
+  versus once.
+* Second: use functions.
+  You'll find that some of the functionality of the interface,
+  could be implemented as a function.
+* Third: Wrap the interface in a richer struct.
+
+This is all better demonstrated through examples,
+so let me run through one:
 --
 
 [.columns]
 == Follow the request path
 
-[.column%step]
+[.column]
 --
-[source.medium,go]
-----
-type RedisStore struct{ /* ... */ }
+[.medium]
+Add methods from +
+the request path
 
-func NewRedisStore(addr string) *RedisStore {
-  /* ... */
-}
-
-func (*RedisStore) Get(string) (string, error) {
-  /* ... */
-}
-
-func (*RedisStore) Set(k, v string) error {
-  /* ... */
-}
-
-func (*RedisStore) Close() {
-  /* ... */
-}
-----
---
-
-[.column%step]
---
-[source,go]
+[source%step,go]
 ----
 type Store interface {
   Get(string) (string, error)
@@ -58,47 +69,75 @@ type Store interface {
 }
 ----
 
+[%step.medium]
 No `Close()`
 
 [source%step,go]
 ----
 s := NewRedisStore(addr)
 defer s.Close()
-consume(s)
+run(s)
 // Given,
-//   func consume(Store)
+//   func run(Store)
+----
+--
+
+[.column]
+--
+[source,go]
+----
+type RedisStore struct{ /* ... */ }
+
+func NewRedisStore(addr string) *RedisStore
+
+func (*RedisStore) Get(string) (string, error)
+
+func (*RedisStore) Set(k, v string) error
+
+func (*RedisStore) Close()
 ----
 --
 
 [.notes]
 --
+Follow the request path.
+
 When deciding what goes on the interface,
 don't just list all the methods of the object on the interface.
-
 Think about the request path:
 methods of the object that consumers will want to call --
 probably many times.
 
-For example, (*step*) suppose you have a Redis-based key-value store.
-You have Get and Set, and maybe a Close method to clean up the connection.
+For example, suppose we have this key-value store backed by Redis.
+It has Get and Set methods as you might expect,
+and a Close method to close the store and clean up resources.
 
-The interface for the key value store should include (*step*):
-Get, Set, but not Close.
+What should go in the interface?
+Follow the request path says:
 
-Close is not part of the request path for a regular consumer.
-They'll call Get and Set, but not Close.
-Plus, if you think about it, not every store will have a Close method.
-An in-memory data store won't have a meaningful close method.
+ * (*step*) only Get and Set
+ * (*step*) no Close
 
-So leave Close out of the interface.
-It's accessible only if you have the actual `RedisStore` object,
-which you do (*step*) outside the request path -- when you instantiated it.
+Why?
+
+* Close is not part of the request path --
+  it won't be called many times.
+  It will be called exactly once (*step*)
+  probably in main, when we set up the Redis store.
+* Plus if you think about it, not every Store will have a Close method.
+  An in-memory data store probably won't.
+
+So we leave Close out of the interface.
 --
 
-[%auto-animate]
-== Compose with functions
+[.columns.wrap]
+== Use functions
 
-[source%linenums,go,data-id=SetMany]
+[.column.is-full.medium%step]
+Convenience methods stay out of the interface
+
+[.column.is-two-thirds]
+[source%linenums,go,data-id=SetMany,highlight="1-|3"]
 ----
 func (s *RedisStore) SetMany(ks, vs []string) error {
   for i, k := range ks {
@@ -113,21 +152,27 @@ func (s *RedisStore) SetMany(ks, vs []string) error {
 
 [.notes]
 --
-This brings up the question of convenient functionality
-that you added to your abstraction.
+Okay, but what about convenience methods?
+Suppose the RedisStore also has a `SetMany` method.
+That's on the request path.
+Should it go on the interface?
 
-Suppose the Redis Store also supported a SetMany method.
-We could add this to the Store interface -- it's on the hot path --
-but also note that the implementation is entirely composed
-from the API we already expose from the Store interface.
+Note that the implementation of SetMany
+isn't doing anything special.
+It just calls `Set`.
 
-We could just turn it into a function...
+So, (*step*) (*step*) don't put it on the interface.
+Instead, turn it into a function that operates on any Store.
 --
 
-[%auto-animate]
-== Compose with functions
+[%auto-animate.columns.wrap]
+== Use functions
 
-[source%linenums,go,data-id=SetMany]
+[.column.is-full.medium]
+Convenience methods stay out of the interface
+
+[.column.is-half]
+[source%linenums,go,data-id=SetMany, highlight="1,3"]
 ----
 func SetMany(s Store, ks, vs []string) error {
   for i, k := range ks {
@@ -140,25 +185,39 @@ func SetMany(s Store, ks, vs []string) error {
 }
 ----
 
+[.column.is-half]
+--
+[source%step, go, data-id=RedisSetMany]
+----
+func (s *RedisStore) SetMany(
+  ks, vs []string,
+) error {
+  return s.redisc.superFastSetMany(ks, vs)
+}
+----
+--
+
 [.notes]
 --
-As an added benefit, this works with any Store,
-not just RedisStore.
+(Wait a second to make the change obvious.)
 
-But of course, this isn't completely realistic;
-redis probably has more optimal way of setting many items.
+Of course, this isn't completely realistic.
+The RedisStore probably had a more optimal way
+of setting many items (*step*) using Redis-specific functionality.
 
-I'd like for RedisStore to use that instead.
-
-I can do that with a tool we discussed before: upcasting.
+That's not a problem;
+we can support an optional upgrade path for SetMany with upcasting.
 --
 
 [%auto-animate.columns.wrap]
-== Compose with functions
+== Use functions
 
-[.column.is-full]
+[.column.is-full.medium]
+Convenience methods stay out of the interface
+
+[.column.is-half]
 --
-[source%linenums,go,data-id=SetMany]
+[source%linenums,go,data-id=SetMany,highlight="2,3,6"]
 ----
 func SetMany(s Store, ks, vs []string) error {
   if sm, ok := s.(SetManyStore); ok {
@@ -184,95 +243,100 @@ type SetManyStore interface {
   SetMany(ks, vs []string) error
 }
 ----
+
+[source, go, data-id=RedisSetMany]
+----
+func (s *RedisStore) SetMany(
+  ks, vs []string,
+) error {
+  return s.redisc.superFastSetMany(ks, vs)
+}
+----
 --
 
-[.column.is-half%step]
---
-[source%linenums,go,data-id=RedisStoreSetMany]
-----
-func (*RedisStore) SetMany(
-  ks, vs []string,
-) error { /* ... */ }
-----
---
+[.column.is-full.medium]
+Upcast to upgrade
 
 [.notes]
 --
-I define a new interface with the SetMany method,
-and have the SetMany function check
-if this method exists on the Store.
+Here, we've defined a new interface SetManyStore,
+that RedisStore happens to implement.
 
-If it does, we can use the more optimized version (*step*)
-implemented by the RedisStore.
-
-Otherwise, we'll run the standard looping behavior
-for all other stores.
-
-This is pretty useful,
-but it's not the only way to get this extension point.
-In fact, in terms of ergonomics, it might not be cleanest experience
-to have to use this top level function with your Store.
-It's a bit hard on discoverability;
-your IDE won't just auto-complete it when you write `store.`.
-
-We can use the same technique, but with a wrapper struct instead...
+The SetMany function will attempt to use the optimal version
+if available, falling back to a for loop if not.
 --
 
-
-[%auto-animate.columns.wrap]
+[.columns.wrap]
 == Build a strong core
 
-[.column.is-full]
+[.column.is-full.medium]
+Wrap a small interface with powerful functionality
+
+[.column.is-half]
 --
-[source%linenums,go,data-id=SetMany]
+[source%linenums%step,go,data-id=DataStore, step=2]
 ----
 type DataStore struct{ s Store }
 
-func (d *DataStore) SetMany(ks, vs []string) error {
-  s := d.s
-  if sm, ok := s.(SetManyStore); ok {
-    return sm.SetMany(ks, vs)
-  }
-  for i, k := range ks {
-    /* ... */
-  }
-  return nil
-}
-----
---
-
-[.column.is-half]
---
-[source%linenums,go,data-id=SetManyStore]
-----
-type SetManyStore interface {
-  Store
-  SetMany(ks, vs []string) error
-}
-----
---
-
-[.column.is-half]
---
-[source%linenums.medium,go]
-----
-func (*DataStore) Get(k string) (string, error)
+func (*DataStore) Get(string) (string, error)
 func (*DataStore) Set(k, v string) error
 ----
 --
 
+[.column.is-half]
+--
+[source%step,go, step=1]
+----
+type Store interface {
+  Get(string) (string, error)
+  Set(k, v string) error
+}
+----
+--
+
+[.column]
+--
+[source%step%linenums,go,data-id=SetMany, step=3]
+----
+func (d *DataStore) SetMany(ks, vs []string) error {
+  if sm, ok := s.(SetManyStore); ok {
+    return sm.SetMany(ks, vs)
+  }
+  /* ... */
+}
+----
+--
+
+[.column]
+--
+[source%linenums,go,data-id=SetManyStore, step=3]
+----
+type SetManyStore interface {
+  Store
+  SetMany(ks, vs []string) error
+}
+----
+--
+
 [.notes]
 --
-Here, I declare a new DataStore type that wraps a regular Store.
+Lastly, build a strong core.
+What I mean by that is --
+start with a small, minimal interface, wrap it in a struct,
+and build more convenience, more powerful functionality around it.
 
-It implements Get and Set like a regular store,
-but it also implements SetMany using the same logic as before:
-if the wrapped store provides SetMany, use that,
-otherwise loop.
+For example,
 
-So you get the best of all worlds:
+* (*step*) Let's go back to the `Store` interface.
+* (*step*) We'll introduce a struct, `DataStore` that wraps it.
+  The struct implements Get and Set, so it's a valid Store as well.
+* (*step*) Then we can add a `SetMany` method to `DataStore`.
+  The SetMany method can use the same upgrade path
+  that we used for the SetMany function in the last example.
 
-* A small powerful interface
-* Upgrade the interface per implementation as needed
-* Operate on a rich object with convenient methods
+It gives us the best of all worlds:
+
+* Small, loosely coupled, interface
+* The ability to add new convenient methods as we see fit
+  with optional upgrade paths for implementations that want them
 --
