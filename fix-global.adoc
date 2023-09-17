@@ -12,11 +12,19 @@ I want to talk about...
 [.columns.wrap]
 == Implicit process globals
 
-[.column.medium.is-half]
+[%step.column.is-half]
 --
-[%hardbreaks]
-`os.Stdout`, `os.Stdin`, `os.Stderr`,
-`os.Getenv(k)`, `os.Setenv(k, v)`
+[.medium.text-left]
+Process globals include
+
+[source,go]
+----
+os.Stdout
+os.Stdin
+os.Stderr
+os.Getenv(k)
+os.Setenv(k, v)
+----
 --
 
 [.column.is-half]
@@ -31,10 +39,10 @@ return beBoring()
 ----
 --
 
-[.column.is-full]
+[.column.medium.is-full]
 --
 [%step]
-* Don't touch process state outside `main`
+* Don't touch process globals outside `main`
 * Isolate business logic from process state
 --
 
@@ -42,117 +50,108 @@ return beBoring()
 --
 Implicit process globals.
 
-Your environment variables, stdout, stdin, stderr, etc.
-These and more are all global state for your process.
+I'm referring to (*step*) standard out, standard in,
+environment variables, etc.
+These are all a form of global state for your program.
 
-It's incredibly easy to add a feature flag to your code
-with environment variables to test out experimental work.
-(*step*) If the environment variable is set,
-provide the new feature, otherwise don't.
-
-There's nothing wrong with this;
-using environment variables to enable features,
-or overriding default behaviors -- this is good.
-
-The claim I'm making is this: (*step*)
-reading or writing process global state outside the `main` package
-is a leak.
-
+It's easy to use these anywhere in your program.
 (*step*)
-You should aim to isolate your business logic from your process globals.
-Knowledge of your process state --
-environment variables, standard out, etc. --
-should remain inside main.
+If environment variable is set, use cool new feature.
+Log a message to standard out.
+
+There's nothing wrong about this in particular.
+However, I'd like to make the claim that (*step*)
+you should not read or write process globals
+outside the `main` package.
+
+(*step*) Instead, isolate your business logic
+from knowledge of the process state.
+No package besides `main` should know about the process state.
 --
 
-[.columns.wrap]
 == Implicit process globals
 
-[.column.is-one-third]
---
-[source,go]
+[.medium]
+Extract and inject process globals early in `main`
+
+[cols="1a,1a,1a", frame=none]
+|====
+
+| [source,go]
 ----
 os.Getenv("FEATURE_MAGIC")
 ----
---
-
-[.column.is-two-thirds%step]
---
-[source,go]
+2+| [source%step,go, step=1]
 ----
 func main() {
   feats := Features{Magic: os.Getenv("FEATURE_MAGIC")}
   run(feats)
 }
 ----
---
 
-[.column.is-one-third]
---
-[source,go]
+| [source,go]
 ----
 fmt.Println(
   "You're a wizard",
 )
 ----
---
-
-[.column.is-two-thirds%step]
---
-[source,go]
+| [source%step,go, step=2]
 ----
 func main() {
-  run(os.Stdout, /* ... */)
+  run(os.Stdout)
 }
-
-func run(stdout io.Writer, /* ... */)
 ----
---
+| [source%step,go, step=2]
+----
+func run(stdout io.Writer)
+----
 
-[.column.is-one-third]
---
-[source,go]
+| [source,go]
 ----
 os.Getenv
 ----
---
-
-[.column.is-two-thirds%step]
---
-[source,go]
+| [source%step,go, step=3]
 ----
 func main() {
-  run(os.Getenv, /* ... */)
+  run(os.Getenv)
 }
-
-func run(getenv func(string) string, /* ... */)
 ----
---
+| [source%step,go, step=3]
+----
+func run(
+  getenv func(string) string,
+)
+----
+
+|====
 
 [.notes]
 --
-A good way to do this is by extracting information from the process state
-as early as possible in main.
+A good way to do this is to extract information from your process globals
+as early as possible,
+and then inject it down where it's needed.
 
-For example, instead of hitting os.Getenv in your business logic,
-(*step*), early in main, extract all feature flags into a struct
-and pass that down to your logic.
+* Need to check for a feature flag? (*step*)
+  Extract all feature flags into a struct and pass that down.
+* Need to write messages to the user? (*step*)
+  Grab a reference to `os.Stdout`, and pass that down as an io.Writer.
+* Need to look up arbitrary environment variables?
+  That's okay; Go has function references.
+  (*step*) Inject a reference to `os.Getenv` down where it's needed.
 
-Similarly, (*step*) instead of printing to standard out directly,
-grab a reference to os.Stdout and pass that into your business logic.
+You're probably thinking that that `run` function
+will get pretty ungainly if we do this for everything.
 
-Obviously, I can't look up all environment variables at startup.
-What if I need to look up more at runtime? (*step*)
-That's fine, Go has function references.
-
-You might now be thinking that that `run` function is starting to get ungainly.
-Yeah, I agree. We can fix that.
+I agree. We can fix that.
 --
 
-[.columns]
+[.columns.wrap]
 == Implicit process globals
 
-[.column]
+[.column.is-full.medium]
+Inject process globals
+
+[.column.is-one-third]
 --
 [source,go]
 ----
@@ -166,7 +165,7 @@ func run(*cliParams)
 ----
 --
 
-[.column%step]
+[.column%step.is-two-thirds]
 --
 [source,go]
 ----
@@ -176,25 +175,22 @@ type CLI struct {
   Getenv func(string) string
 }
 
-func (*CLI) Run() (exitCode int)
+func (*CLI) Run(args []string) (exitCode int)
 ----
 --
 
 [.notes]
 --
-We talked about parameter objects before. That fits right in.
-(*step*) Or equivalently, an object with a Run method.
+We talked about parameter objects before.
+That fits right in.
 
-// TODO:
-// A pattern I like to use here a lot is (TODO show `mainCmd` pattern).
-// This adds these two integration points for me to test:
-//
-// * Inject a fake Getenv to test the parsing of environment into the struct
-// * In business logic, test just against the struct with no concern for
-//   environment
-//
-// You probably already do this with `os.Args`:
-// parse in main and pass the parsed command line arguments around.
-// A random business logic component will not typically access `os.Args` directly.
-// Just carry that over to Getenv, Setenv, Stdin, Stdout, Signal, and friends.
+Or equivalently, an object with a Run method.
+Maybe something like this: (*step*)
+It's roughly the same, except:
+
+* it accepts the command line arguments as parameters
+* it returns the exit code for `main` to exit with
+
+You might find that doing this makes it very easy to unit test
+your command line applications.
 --
