@@ -1,8 +1,7 @@
-[.medium]
 = What makes a package future-proof?
 
 [quote]
-The ability to evolve in functionality
+The ability to evolve in functionality +
 without disrupting the code base
 
 [.notes]

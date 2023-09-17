@@ -1,6 +1,6 @@
 [.medium, cols=">.^2h,^3,^3", frame=none]
 |====
-| | Input | Output
+| | 📥 Input | 📤 Output
 
 .2+| Functions
 | Parameter Objects

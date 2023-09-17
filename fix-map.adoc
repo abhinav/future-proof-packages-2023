@@ -113,7 +113,7 @@ The obfuscation from map overuse can go pretty far.
 
 [cols="1a,1a,1a", frame=none]
 |====
-| Bad 2+| Good
+^| 🙁 2+^| 🙂
 
 | [source,go]
 ----
@@ -163,21 +163,37 @@ map[string]*HealthCheck
 --
 Here are a couple examples inspired by real code.
 
-* On the left is the map that type that was accepted or returned.
-* On the right is the slice it was replaced with,
-  with no loss in functionality
+The left side has the map type
+that a function was accepting or returning.
+The right side has the slice it was replaced with,
+without any loss in functionality
 
-The last one is interesting because the data model didn't change at all.
-We just dropped the uniqueness requirement for the name of the health check.
-The name was only used in error messages;
-there was no reason for it to be unique.
+We have,
 
-Just to clarify, my point here isn't, "maps are bad, actually,"
-but that:
+* map of string to slice of strings:
+  This just listed a bunch of file names grouped by an import path.
+* a nested string map with an integer:
+  This was just a list of rate limit rules.
+  I really like this example because
+  there's just so much information lost about the problem at hand
+  by using a map there.
+* The last one was a mapping of component name to health check
+  for that component.
+** This one is interesting because the slice version is not
+   that much different from the map version.
+** The effect of this change was that we dropped
+   the completely unnecessary uniqueness requirement on the component name.
+   The name was used just for logging --
+   there was no business reason for it to be unique.
 
-* Map overuse can lead leak complexity and internal details.
-* Maps crossing boundaries deserve scrutiny.
-* Often you'll find that map is an implementation detail you can hide away.
+Just to clarify, I'm *not* trying to say "maps are bad, actually."
+The point I'm hoping to make is:
+
+* Map overuse leaks complexity and implementation details.
+  And it locks you into business constraints that won't always hold.
+* Therefore, maps crossing package boundaries deserve extreme scrutiny.
+  Often you'll find that the map is an implementation detail
+  that you can hide away.
 --
 
 // [%auto-animate%auto-animate-restart.columns]

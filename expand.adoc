@@ -22,7 +22,10 @@ expanding functions, and expanding abstractions.
 [.notes]
 --
 Let's talk about functions first.
-
+I'll cover three ideas here:
+Parameter objects,
+Result objects,
+and Functional options.
 --
 
 include::expand-params.adoc[leveloffset=+1]

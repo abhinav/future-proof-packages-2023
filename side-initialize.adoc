@@ -27,8 +27,8 @@ var (
 [.column.text-left]
 --
 [%hardbreaks]
-👍 Easy
-👍 Extend with exported fields
+🙂 Easy
+🙂 Extend with exported fields
 
 [.medium]
 Prefer when possible
@@ -62,8 +62,8 @@ type PrefixWriter struct {
 [.column.text-left]
 --
 [%hardbreaks]
-👍 Easy
-👎 Validate repeatedly
+🙂 Easy
+🙁 Validate repeatedly
 
 [.medium]
 Prefer for objects with 1-2 methods

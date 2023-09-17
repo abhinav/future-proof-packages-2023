@@ -90,7 +90,7 @@ box "WithLogger" mono fit wid 0.9in
 move
 box "WithHTTPClient" mono same
 move
-Dots: box "..." mono fit invis
+Dots: box "..." mono same
 
 New: box "New(...Option)" mono fit wid 0.9in with n at movewid south of WithHTTPClient.s
 Mid: dot invis at 1/2 way between last box.n and WithHTTPClient.s
@@ -166,7 +166,7 @@ box "WithLogger" mono fit wid 0.9in
 move
 box "WithHTTPClient" mono same
 move
-Dots: box "..." mono fit invis
+Dots: box "..." mono same
 
 New: box "New(...Option)" mono fit wid 0.9in with n at movewid south of WithHTTPClient.s
 Mid: dot invis at 1/2 way between last box.n and WithHTTPClient.s

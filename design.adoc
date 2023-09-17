@@ -122,8 +122,8 @@ issues:
 
 [.column.is-two-thirds.text-left]
 --
-👎 "This is what it does" +
-👍 "This is what it's supposed to do"
+🙁 "This is what it does" +
+🙂 "This is what it's supposed to do"
 --
 
 [.notes]

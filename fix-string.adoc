@@ -335,9 +335,7 @@ or for just strings for that matter.
 
 [cols="1a,1a,1a", frame=none]
 |====
-| Chaos 2+| Order
-
-
+^| 🙁 2+^| 🙂
 
 | [source.medium, go]
 ----

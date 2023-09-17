@@ -60,9 +60,9 @@ these would otherwise be hidden.
 This practice can manifest in a few ways.
 I'll talk about a couple of them:
 
-* (*step*) String typing: Using strings everywhere.
-* (*step*) Maps at boundaries: Using maps where a struct would be better
-* (*step*) Boolean overuse: Using booleans where an enum would be better
+* (*step*) {fix-string}
+* (*step*) {fix-map}
+* (*step*) {fix-bool}
 --
 
 include::fix-string.adoc[]
@@ -91,9 +91,9 @@ Now let's talk about misusing them.
 
 I'm going to cover two topics:
 
-* Premature interfaces:
+* (*step*) Premature interfaces:
   When packages define interfaces before they need to
-* and big interfaces:
+* (*step*) and big interfaces:
   when packages define interfaces that are larger
   than they need to be
 --

@@ -1,9 +1,9 @@
 [.columns]
 = Hello!
 
-[.column.is-one-third.has-text-left]
+[.column.is-one-third]
 --
-I'm Abhinav
+👋 I'm Abhinav
 
 [.medium]
 ====
@@ -14,12 +14,12 @@ Previously: Pulumi, Uber
 ====
 --
 
-[.column.is-two-thirds.has-text-left]
+[.column.is-two-thirds]
 --
-[%hardbreaks]
-🌐 https://abhinavg.net[abhinavg.net]
-🐙 https://github.com/abhinav[@abhinav]
-🐘 https://hachyderm.io/@abhinav[@\abhinav@hachyderm.io]
+[none]
+* 🌐 https://abhinavg.net[abhinavg.net]
+* 🐙 https://github.com/abhinav[@abhinav]
+* 🐘 https://hachyderm.io/@abhinav[@\abhinav@hachyderm.io]
 --
 
 [.notes]
