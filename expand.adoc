@@ -64,4 +64,4 @@ So to summarize, to plan for expansion:
 ** returning structs and adding methods to them
 --
 
-include::side-initialize.adoc[]
+// include::side-initialize.adoc[]

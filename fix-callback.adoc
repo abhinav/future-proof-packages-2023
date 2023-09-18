@@ -150,14 +150,9 @@ We replace the callback with a single method interface, LinkStyler,
 and turn the default implementations into separate types.
 The rest remains largely unchanged.
 
-Note that we could've also used the same type (like an enum)
-for the built-in styles, but there's only so much space
-on that slide.
-
-// This also allows me to re-use that LinkStyle enum from before.
-// I implement the interface for LinkStyle
-// and then my pre-defined list of behaviors has meaningful names
-// and comparable values for them.
+// Note that we could've also used the same type (like an enum)
+// for the built-in styles, but there's only so much space
+// on that slide.
 
 Anyway, if I decide to expand the abstraction...
 --
@@ -211,116 +206,119 @@ func (g *SiteGen) RelativeURL(dst *Page) string {
 
 [.notes]
 --
-I can upcast it like discussed before.
+I can upcast it like we discussed before.
+
+If the LinkStyler implements PageLinkStyler, use the new method.
+Otherwise, continue to use the old method.
 --
 
-[%auto-animate%auto-animate-restart.columns]
-== {fix-callback}
-
-[.column.is-half]
---
-Tangent: Functional options
-
-[.medium]
-Implemented with callbacks
---
-
-[.column.is-half]
---
-[source%linenums, go, data-id=New]
-----
-func New(opts ...Option) *Client {
-  var options clientOptions
-  for _, opt := range opts {
-    opt(&options)
-  }
-  /* ... */
-}
-
-type clientOptions struct {
-  logger *slog.Logger
-  /* ... */
-}
-----
-
-[source%linenums.medium, go, data-id=Options]
-----
-type Option func(*clientOptions)
-
-func WithLogger(l *slog.Logger) Option {
-  return func(o *clientOptions) {
-    o.logger = l
-  }
-}
-----
---
-
-
-[.notes]
---
-Quick tangent on functional options.
-You can and should apply this practice to functional options.
-Instead of implementing functional options as callbacks...
---
-
-[%auto-animate.columns]
-== {fix-callback}
-
-[.column.is-half]
---
-Tangent: Functional options
-
-[.medium]
-Implemented with interfaces
-
-[source%linenums, go, data-id=New]
-----
-func New(opts ...Option) *Client {
-  var options clientOptions
-  for _, opt := range opts {
-    opt.apply(&options)
-  }
-  /* ... */
-}
-
-type clientOptions struct {
-  logger *slog.Logger
-  /* ... */
-}
-----
---
-[.column.is-half]
---
-[source%linenums.medium, go, data-id=Options]
-----
-type Option interface{ apply(*clientOptions) }
-
-func WithLogger(l *slog.Logger) Option {
-  return &withLogger{l}
-}
-
-type withLogger struct{ log *slog.Logger }
-
-func (l *withLogger) apply(o *clientOptions) {
-  o.logger = l.log
-}
-----
-
-[source%linenums%step.medium, go]
-----
-func (l *withLogger) String() string {
-  return fmt.Sprintf("WithLogger(%v)", l.log)
-}
-----
---
-
-[.notes]
---
-Implement them as interfaces.
-
-Yeah, it increases the amount of boilerplate per option,
-but in exchange you get comparable options that you can inspect;
-this becomes important when you have to debug an issue.
-
-As an added bonus (*step*) you can make the options printable too.
---
+// [%auto-animate%auto-animate-restart.columns]
+// == {fix-callback}
+//
+// [.column.is-half]
+// --
+// Tangent: Functional options
+//
+// [.medium]
+// Implemented with callbacks
+// --
+//
+// [.column.is-half]
+// --
+// [source%linenums, go, data-id=New]
+// ----
+// func New(opts ...Option) *Client {
+//   var options clientOptions
+//   for _, opt := range opts {
+//     opt(&options)
+//   }
+//   /* ... */
+// }
+//
+// type clientOptions struct {
+//   logger *slog.Logger
+//   /* ... */
+// }
+// ----
+//
+// [source%linenums.medium, go, data-id=Options]
+// ----
+// type Option func(*clientOptions)
+//
+// func WithLogger(l *slog.Logger) Option {
+//   return func(o *clientOptions) {
+//     o.logger = l
+//   }
+// }
+// ----
+// --
+//
+//
+// [.notes]
+// --
+// Quick tangent on functional options.
+// You can and should apply this practice to functional options.
+// Instead of implementing functional options as callbacks...
+// --
+//
+// [%auto-animate.columns]
+// == {fix-callback}
+//
+// [.column.is-half]
+// --
+// Tangent: Functional options
+//
+// [.medium]
+// Implemented with interfaces
+//
+// [source%linenums, go, data-id=New]
+// ----
+// func New(opts ...Option) *Client {
+//   var options clientOptions
+//   for _, opt := range opts {
+//     opt.apply(&options)
+//   }
+//   /* ... */
+// }
+//
+// type clientOptions struct {
+//   logger *slog.Logger
+//   /* ... */
+// }
+// ----
+// --
+// [.column.is-half]
+// --
+// [source%linenums.medium, go, data-id=Options]
+// ----
+// type Option interface{ apply(*clientOptions) }
+//
+// func WithLogger(l *slog.Logger) Option {
+//   return &withLogger{l}
+// }
+//
+// type withLogger struct{ log *slog.Logger }
+//
+// func (l *withLogger) apply(o *clientOptions) {
+//   o.logger = l.log
+// }
+// ----
+//
+// [source%linenums%step.medium, go]
+// ----
+// func (l *withLogger) String() string {
+//   return fmt.Sprintf("WithLogger(%v)", l.log)
+// }
+// ----
+// --
+//
+// [.notes]
+// --
+// Implement them as interfaces.
+//
+// Yeah, it increases the amount of boilerplate per option,
+// but in exchange you get comparable options that you can inspect;
+// this becomes important when you have to debug an issue.
+//
+// As an added bonus (*step*) you can make the options printable too.
+// --

@@ -1,170 +1,170 @@
-= Initializing objects
-
-[.notes]
---
-As a tangent, I want to quickly talk about object initialization.
-
-I just mentioned parameter objects and functional options.
-These allow for two different ways to initialize complex objects.
-But they're not the only ways.
---
-
-[.columns]
-== Usable zero value
-
-[.column.is-one-third]
---
-[source, go]
-----
-var (
-  buff bytes.Buffer
-  lock sync.Mutex
-  tree MyTree[int]
-)
-----
---
-
-[.column.text-left]
---
-[%hardbreaks]
-🙂 Easy
-🙂 Extend with exported fields
-
-[.medium]
-Prefer when possible
---
-
-[.notes]
---
-For simple-enough objects, make is so that their zero value is usable --
-so that it's possible to declare it with just a `var`.
-These objects can still export fields to customize the default behaviors,
-but should be usable without doing so.
-
-Of course, objects that meet this criteria are not super common.
-There are usually at least one or two required dependencies.
---
-
-[.columns]
-== Exported required fields
-
-[.column]
---
-[source,go]
-----
-type PrefixWriter struct {
-  Writer io.Writer /* required */
-  Prefix string
-}
-----
---
-
-[.column.text-left]
---
-[%hardbreaks]
-🙂 Easy
-🙁 Validate repeatedly
-
-[.medium]
-Prefer for objects with 1-2 methods
---
-
-[.notes]
---
-In that case, we can still get away with vanilla structs;
-we just have to say which fields are required.
-
-This is easy to use,
-but it's a bit annoying if you have too many methods.
-Because there's no enforcement that the required fields are set,
-they have to be checked at every entry point -- every method.
-Someone will forget a method somewhere and then it'll explode at runtime.
-
-But I think this is worth it if you have only one or two methods.
-It's hard to miss validation there, and you get something super easy to use.
-
-When you can't do this, it's time to write constructors.
---
-
-== Constructors
-
-[cols="1,1a,1", frame=none]
-|====
-
-| Positional arguments
-| [source,go]
-----
-func NewCore(
-  enc Encoder,
-  ws  WriteSyncer,
-  lvl LevelEnabler,
-) Core
-----
-| 3 or fewer inputs
-
-| Parameter objects
-| [source,go]
-----
-func NewJSONEncoder(
-  cfg EncoderConfig,
-) Encoder
-----
-| 4 or more inputs
-
-| Functional options
-| [source,go]
-----
-func New(
-  core zapcore.Core,
-  opts ...Option,
-) *Logger
-----
-| Only if worth it
-
-|====
-
-[.notes]
---
-For constructors, prefer them in this order:
-
-* Use positional arguments for 3 or fewer inputs --
-  assuming that's all you'll ever need.
-* Use a parameter object if you have more inputs than that.
-* Use functional options if the boilerplate and complexity is worth it.
---
-
-[.columns.wrap]
-== Initializing objects
-
-[.column.is-full.medium]
-In-order, prefer...
-
-[.column.is-half]
---
-Plain objects
-
-. Usable zero value
-. Exported required fields
---
-
-[.column.is-half]
---
-Constructor
-
-[start=3]
-. Positional arguments
-. Parameter object
-. Functional options
---
-
-[.notes]
---
-So in summary, to initialize objects:
-
-* Prefer plain objects with a usable zero value
-  or with required fields if the number of methods is small.
-* Or if you need a constructor,
-  prefer positional arguments, parameter object, or functional options,
-  in that order depending on the number of arguments
-  and your appetite for complexity.
---
+// = Initializing objects
+//
+// [.notes]
+// --
+// As a tangent, I want to quickly talk about object initialization.
+//
+// I just mentioned parameter objects and functional options.
+// These allow for two different ways to initialize complex objects.
+// But they're not the only ways.
+// --
+//
+// [.columns]
+// == Usable zero value
+//
+// [.column.is-one-third]
+// --
+// [source, go]
+// ----
+// var (
+//   buff bytes.Buffer
+//   lock sync.Mutex
+//   tree MyTree[int]
+// )
+// ----
+// --
+//
+// [.column.text-left]
+// --
+// [%hardbreaks]
+// 🙂 Easy
+// 🙂 Extend with exported fields
+//
+// [.medium]
+// Prefer when possible
+// --
+//
+// [.notes]
+// --
+// For simple-enough objects, make is so that their zero value is usable --
+// so that it's possible to declare it with just a `var`.
+// These objects can still export fields to customize the default behaviors,
+// but should be usable without doing so.
+//
+// Of course, objects that meet this criteria are not super common.
+// There are usually at least one or two required dependencies.
+// --
+//
+// [.columns]
+// == Exported required fields
+//
+// [.column]
+// --
+// [source,go]
+// ----
+// type PrefixWriter struct {
+//   Writer io.Writer /* required */
+//   Prefix string
+// }
+// ----
+// --
+//
+// [.column.text-left]
+// --
+// [%hardbreaks]
+// 🙂 Easy
+// 🙁 Validate repeatedly
+//
+// [.medium]
+// Prefer for objects with 1-2 methods
+// --
+//
+// [.notes]
+// --
+// In that case, we can still get away with vanilla structs;
+// we just have to say which fields are required.
+//
+// This is easy to use,
+// but it's a bit annoying if you have too many methods.
+// Because there's no enforcement that the required fields are set,
+// they have to be checked at every entry point -- every method.
+// Someone will forget a method somewhere and then it'll explode at runtime.
+//
+// But I think this is worth it if you have only one or two methods.
+// It's hard to miss validation there, and you get something super easy to use.
+//
+// When you can't do this, it's time to write constructors.
+// --
+//
+// == Constructors
+//
+// [cols="1,1a,1", frame=none]
+// |====
+//
+// | Positional arguments
+// | [source,go]
+// ----
+// func NewCore(
+//   enc Encoder,
+//   ws  WriteSyncer,
+//   lvl LevelEnabler,
+// ) Core
+// ----
+// | 3 or fewer inputs
+//
+// | Parameter objects
+// | [source,go]
+// ----
+// func NewJSONEncoder(
+//   cfg EncoderConfig,
+// ) Encoder
+// ----
+// | 4 or more inputs
+//
+// | Functional options
+// | [source,go]
+// ----
+// func New(
+//   core zapcore.Core,
+//   opts ...Option,
+// ) *Logger
+// ----
+// | Only if worth it
+//
+// |====
+//
+// [.notes]
+// --
+// For constructors, prefer them in this order:
+//
+// * Use positional arguments for 3 or fewer inputs --
+//   assuming that's all you'll ever need.
+// * Use a parameter object if you have more inputs than that.
+// * Use functional options if the boilerplate and complexity is worth it.
+// --
+//
+// [.columns.wrap]
+// == Initializing objects
+//
+// [.column.is-full.medium]
+// In-order, prefer...
+//
+// [.column.is-half]
+// --
+// Plain objects
+//
+// . Usable zero value
+// . Exported required fields
+// --
+//
+// [.column.is-half]
+// --
+// Constructor
+//
+// [start=3]
+// . Positional arguments
+// . Parameter object
+// . Functional options
+// --
+//
+// [.notes]
+// --
+// So in summary, to initialize objects:
+//
+// * Prefer plain objects with a usable zero value
+//   or with required fields if the number of methods is small.
+// * Or if you need a constructor,
+//   prefer positional arguments, parameter object, or functional options,
+//   in that order depending on the number of arguments
+//   and your appetite for complexity.
+// --
