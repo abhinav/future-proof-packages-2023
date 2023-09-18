@@ -313,8 +313,6 @@ Don't reach for them by default. Prefer parameter objects.
 // a readable string representation of the options (*step*),
 // if you want.
 //
-// // TODO: move to next to diagram?
-//
 // Interface or not, the pattern is quite flexible:
 //
 // * You can add an option that takes a pointer to something

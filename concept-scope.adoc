@@ -7,6 +7,7 @@
 --
 *Application scope*
 
+[.medium]
 Does not change between requests
 
 * Command line arguments
@@ -17,6 +18,7 @@ Does not change between requests
 --
 *Request scope*
 
+[.medium]
 Changes for each request
 
 * HTTP request
@@ -25,34 +27,36 @@ Changes for each request
 
 [.notes]
 --
-I want to talk about the concept of scope.
-I don't mean this in terms of lexical scope,
-but more in terms of lifetime.
+Next, I want to talk about the concept of scope.
+
+Again, I'm just making up this term --
+if you know a more formal name for it, please come find me afterwards.
+
+By scope, I'm thinking not of lexical scope,
+but what lifetime a value is bound to.
 
 Consider two kinds of scope:
 
-* (*step*) Application scope is for values that don't really change
-  while your application is running.
+* (*step*) Application scope is for values that don't change between calls.
   Your `os.Args`, the process' environment variables, etc.
   Yes, we can mutate them, but practically,
   they're constant as far as any business logic in concerned.
-* (*step*) And request scope. Things that change per request.
+* (*step*) And request scope. Things that change per call.
   Obviously, this includes your HTTP request.
-  But what else?
-  Well, everything, really. Depends on how you look at it.
+  But what else? Well, everything, really. Depends on how you look at it.
 --
 
 == {concept-scope}
 
-Request scope is relative
+Scope is relative
 
 [%step]
 [pikchr, height=500px]
 ....
 // (0, 0) is the start of the arrow
 A: arrow <-> right 2.5in
-text "big scope" "(rarely changes)" with .e at last arrow.w
-text "small scope" "(changes often)" with .w at last arrow.e
+text "application scope" "(rarely changes)" with .e at last arrow.w
+text "request scope" "(changes often)" with .w at last arrow.e
 
 BigScope1: dot invis at (0, 0.75in)
 BigScope2: dot invis at (0, -0.75in)
@@ -79,42 +83,41 @@ text "http.Handler" mono with .s at last.n
 
 [.notes]
 --
-Whether something is request scope or not depends
-on which function you're looking at.
+Whether something is request scope or application scope depends
+on your point of view.
 
-I said your command line arguments were application scope.
-But to the command line parser, that's request scope.
+Command line arguments are application scope, yes.
+But from the point of view of a command line argument parser,
+they're request scope.
 
-So instead of a binary definition
-it might be useful to think of scope as a gradient.
-
+So instead of a binary definition, think of scope as a gradient.
 (*step*)
-Things on the left change less often than things on the right.
-Things on the left have a larger scope than things on the right.
 
-`flag.Parse` views this gradient from further left of `os.Args`,
-so from its point of view, `os.Args` is variable,
-while from the point of view of `http.Handler`, it's constant.
+* As we go from left to right, the scope of each value gets smaller
+  because it changes more often.
+* So things on the left are application scoped to those on the right,
+  and things on the right are request scoped to those on the left.
 
-This is something that's useful to think about
-as you're designing abstractions.
+For example, `flag.Parse` views this from further left of `os.Args`,
+so from its point of view, `os.Args` is request scope.
+On the other hand, `http.Handler` views it from further right,
+so from its point of view, `os.Args` is application scope.
 
-Things with bigger scope, that is, things that change less often,
-can be fields on an object instead of parameters of a function.
+Thinking about the relative scope of different values
+can be really helpful in writing code.
 --
 
 [.columns.wrap]
 == {concept-scope}
 
-[.column.is-half%step]
---
-*Designing structs*
+[cols="1h,2a,^2a"]
+|====
 
-[%hardbreaks.text-left]
+| Structs
+| [%hardbreaks.medium]
 Large scope: fields
 Small scope: parameters
-
-[pikchr]
+| [pikchr, width="80%"]
 ....
 // (0, 0) is the start of the arrow
 A: arrow <-> right 1.5in
@@ -128,15 +131,12 @@ text "RequestHandler" mono with .s at last.n
 dot at (A.e-0.3in, 0)
 line invis from last dot go 0.15in heading 135 "Request" mono aligned ljust
 ....
---
 
-[.column.is-half%step]
---
-*Designing interfaces*
-
-Request scoped methods on accepted interfaces
-
-[source,go]
+| Interfaces
+| [%hardbreaks.medium]
+Request-scoped methods
+on the interface
+| [source,go]
 ----
 type Store interface {
   Get(string) (string, error)
@@ -144,40 +144,34 @@ type Store interface {
 }
 ----
 
-[%step]
-====
-*Parameter ordering*
-
+| Parameters
+| [.medium]
 Sort by scope (big to small)
-
-[source,go]
+| [source,go]
 ----
-func GetUserDetails(
+func GetUser(
   org, username string,
-) *UserDetails {
-  /* ... */
-}
+) *User
 ----
-====
---
+
+|====
 
 [.notes]
 --
-It's valuable to think about the scope of values as you're writing code.
+For example,
 
-As an example, (*step*) you can use it to help you design structs,
-things with a scope larger than the object
-can become fields of the struct instead of parameters.
-
-Similarly, you can use it to design interfaces. (*step*)
-If you're defining a new interface for your input,
-only put request-scoped methods on it.
-Think back to the RedisStore example, and how the Store interface
-didn't have a Close method.
-
-Finally, you can even use it to
-help you decide on parameter ordering.
-(*step*) Just sort parameters by scope: larger to smaller.
-Things that change less often, go on the left,
-things that change more often, on the right.
+* Use it to help you decide which inputs become struct fields,
+  and which become method parameters.
+  Things with a scope larger than a single struct value
+  can become fields of the struct.
+  Others can become parameters of methods on the struct.
+* Similarly, use it to design interfaces.
+  Only request-scoped methods go on the interface.
+  Think back to the `RedisStore` example --
+  Get and Set are request scoped, Close is not.
+* Finally, you can even use the concept of scope
+  to help you decide on parameter ordering if you're unsure.
+  Just sort parameters by scope: larger to smaller.
+  Things that change less often, go on the left,
+  things that change more often, on the right.
 --
