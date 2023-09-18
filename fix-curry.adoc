@@ -1,4 +1,6 @@
-= Partial function application
+:fix-curry: 🚧 Partial function application
+
+= {fix-curry}
 
 Find large scoped function parameters +
 that are constant for an application
@@ -22,7 +24,7 @@ promising to provide the rest later.
 Let me demonstrate:
 --
 
-== Partial function application
+== {fix-curry}
 
 [pikchr, height=300px]
 ....
@@ -54,7 +56,7 @@ which has a bigger scope than the login name.
 --
 
 [.columns.wrap]
-== Partial function application
+== {fix-curry}
 
 [.column.is-full]
 [pikchr]

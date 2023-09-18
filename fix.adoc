@@ -26,16 +26,16 @@ Okay, let's get into it.
 [.columns]
 = Built-in obsession
 
-:fix-string: String overuse
-:fix-map: Map overuse
-:fix-bool: Boolean overuse
+:fix-string: 🧵 String overuse
+:fix-map: 🗺️ Map overuse
+:fix-bool: 🎂 Boolean overuse
 
 [.column]
 --
 Reluctance to declare types,
 instead preferring built-in types
 
-[.medium, step=2]
+[none, step=2]
 * {fix-string}
 * {fix-map}
 * {fix-bool}
@@ -75,12 +75,14 @@ include::fix-callback.adoc[]
 // ** Isolate concepts, give them names, add interfaces (middleware example)
 // *** Closure want to be objects when they grow up
 
+include::fix-global.adoc[]
+
 = Interface misuse
 
-:fix-premature-iface: Premature interfaces
-:fix-big-iface: Big interfaces
+:fix-premature-iface: 🥚 Premature interfaces
+:fix-big-iface: 🦖 Big interfaces
 
-[%step]
+[none%step]
 * {fix-premature-iface}
 * {fix-big-iface}
 
@@ -100,5 +102,3 @@ I'm going to cover two topics:
 
 include::fix-premature-iface.adoc[]
 include::fix-big-iface.adoc[]
-
-include::fix-global.adoc[]

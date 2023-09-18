@@ -9,8 +9,10 @@ That's not what I want to talk about.
 I want to talk about...
 --
 
+:process-globals: 🍝 Implicit process globals
+
 [.columns.wrap]
-== Implicit process globals
+== {process-globals}
 
 [%step.column.is-half]
 --
@@ -69,7 +71,7 @@ from knowledge of the process state.
 No package besides `main` should know about the process state.
 --
 
-== Implicit process globals
+== {process-globals}
 
 [.medium]
 Extract and inject process globals early in `main`
@@ -146,7 +148,7 @@ I agree. We can fix that.
 --
 
 [.columns.wrap]
-== Implicit process globals
+== {process-globals}
 
 [.column.is-full.medium]
 Inject process globals

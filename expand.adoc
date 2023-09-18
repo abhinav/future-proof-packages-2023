@@ -1,7 +1,8 @@
 = Planning for expansion
 
-* Functions
-* Abstractions
+[none]
+* 🧮 Functions
+* 💡 Abstractions
 
 [.notes]
 --
@@ -13,7 +14,7 @@ I'll talk about expansion on two levels:
 expanding functions, and expanding abstractions.
 --
 
-= Expanding functions
+= 🧮 Expanding functions
 
 * Parameter objects
 * Result objects
@@ -32,7 +33,7 @@ include::expand-params.adoc[leveloffset=+1]
 include::expand-results.adoc[leveloffset=+1]
 include::expand-func-opts.adoc[leveloffset=+1]
 
-= Expanding abstractions
+= 💡 Expanding abstractions
 
 * Accept interfaces
 * Return structs

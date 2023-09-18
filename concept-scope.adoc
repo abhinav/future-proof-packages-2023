@@ -1,5 +1,7 @@
+:concept-scope: 🔍 Scope
+
 [.columns]
-= Scope
+= {concept-scope}
 
 [.column%step]
 --
@@ -40,7 +42,9 @@ Consider two kinds of scope:
   Well, everything, really. Depends on how you look at it.
 --
 
-== Request scope is relative
+== {concept-scope}
+
+Request scope is relative
 
 [%step]
 [pikchr, height=500px]
@@ -100,7 +104,7 @@ can be fields on an object instead of parameters of a function.
 --
 
 [.columns.wrap]
-== Using scope
+== {concept-scope}
 
 [.column.is-half%step]
 --

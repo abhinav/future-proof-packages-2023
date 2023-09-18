@@ -1,4 +1,6 @@
-= Large scoped conditions
+:fix-conds: 🔭 Large scoped conditions
+
+= {fix-conds}
 
 *Remove* special cases based on conditions +
 that *don't change* in the *current context*
@@ -52,7 +54,7 @@ This might be better demonstrated with an example...
 --
 
 [%auto-animate.columns.wrap]
-== Large scoped conditions
+== {fix-conds}
 
 [.column.is-one-third]
 --
@@ -113,7 +115,7 @@ we did find one...
 --
 
 [%auto-animate.columns.wrap]
-== Large scoped conditions
+== {fix-conds}
 
 [.column.is-one-third]
 --

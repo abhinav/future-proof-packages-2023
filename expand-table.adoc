@@ -2,12 +2,12 @@
 |====
 | | 📥 Input | 📤 Output
 
-.2+| Functions
+.2+| 🧮 Functions
 | Parameter Objects
 | Result Objects
 2.+^d| Functional options
 
-| Abstractions
+| 💡 Abstractions
 | Accept interfaces
 | Return structs
 

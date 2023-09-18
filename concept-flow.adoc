@@ -1,4 +1,6 @@
-= Flow of information
+:concept-flow: 🌊 Flow of information
+
+= {concept-flow}
 
 [pikchr, width=75%]
 ....
@@ -23,7 +25,7 @@ Its shape may change as it passes through,
 but the information represented is similar if not the same.
 --
 
-== Flow of information
+== {concept-flow}
 
 [pikchr, width=80%]
 ....
@@ -77,7 +79,7 @@ the information flows through your application
 until it's consumed.
 --
 
-== Flow of information
+== {concept-flow}
 
 * Flow in one direction
 * No backtracking
@@ -160,7 +162,7 @@ On the other hand, parsing the string early consumes the string early,
 transforming it into better organized information.
 --
 
-== Flow of information
+== {concept-flow}
 
 [%step]
 --

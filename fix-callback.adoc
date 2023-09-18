@@ -1,10 +1,10 @@
-:fix-callback: Callback overuse
+:fix-callback: ➿ Callback overuse
 
 [%conceal]
 = {fix-callback}
 
 [.large]
-[.step]#But wait, there's more#
+[.step]#🗣️📢 But wait, there's more#
 
 [.notes]
 --
