@@ -1,10 +1,9 @@
-[%auto-animate]
 = Accept ``interface``s
 
 Dependencies should be interfaces +
 *not* concrete implementations
 
-[.noborder, cols=">.^1,<.^2a",frame=none]
+[cols="1,4a,4a",frame=none]
 |====
 
 | 🙁
@@ -12,11 +11,25 @@ Dependencies should be interfaces +
 ----
 func Parse(f *os.File) (Node, error)
 ----
+| [source,go]
+----
+func Login(c *Client) error
+----
 
 | 🙂
-| [source%linenums,go]
+| [source,go]
 ----
 func Parse(r io.Reader) (Node, error)
+----
+| [source,go]
+----
+func Login(c AuthClient) error
+----
+[source.medium,go]
+----
+type AuthClient interface {
+  Authenticate(Credentials) error
+}
 ----
 
 |====
@@ -27,53 +40,24 @@ When you're accepting an abstraction as input,
 it should be an interface, not a concrete implementation.
 Otherwise you're left with no room for expansion.
 
-This is generally a good choice if two components
-are very loosely coupled.
-For example, my parser doesn't *have* to know that it's reading from a file.
+For example,
 
-This doesn't apply only to interfaces that already exist.
+* My Parse function doesn't *have* to know that it's reading from a file.
+  It should operate on any `io.Reader`.
+* Similarly, my `Login` function doesn't *have* to know which Client type
+  it's using to make the authentication request.
+  It should accept anything that knows how to authenticate.
+
+Doing so gives us the ability to extend the abstraction with upcasting.
 --
 
-[%auto-animate]
-= Accept ``interface``s
-
-[.noborder, cols=">.^1,<.^2a",frame=none]
-|====
-
-| 🙁
-| [source,go]
-----
-func Login(c *http.Client) (Token, error)
-----
-
-| 🙂
-| [source%linenums,go]
-----
-type HTTPClient interface {
-  Do(*http.Request) (*http.Response, error)
-}
-
-func Login(c HTTPClient) (Token, error)
-----
-
-|====
-
-[.notes]
---
-You can define and accept interfaces even for types you don't own
-with only those methods that you need.
-
-Doing this allows you to extend your input with upcasting.
---
-
-[%auto-animate%auto-animate-restart.columns]
+[%auto-animate.columns]
 = Accept ``interface``s
 
 [.column.medium]
 --
 Extend by upcasting interfaces
 --
-
 
 [column]
 --
