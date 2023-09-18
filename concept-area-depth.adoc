@@ -21,13 +21,11 @@ line thick color 0xEE9B00 "surface area" above from 0.05in above last.nw right u
 Surface area refers to the things exported from a package.
 The part of a package that other packages can "touch".
 
-Each exported function, type, and method -- each entry point --
-adds to the surface area of the package.
+Every exported function, type, and method is an entry point to the package,
+so it adds to the surface area.
 
-Surface area does not necessarily correspond to how much functionality
-the package offers.
-
-That's a job for...
+Surface area does not correspond to how much functionality the package offers.
+That's a job for depth.
 --
 
 [.columns]
@@ -50,41 +48,39 @@ line thick color 0x0A9396 " depth" ljust from 0.05in east of last box.ne down un
 
 [.notes]
 --
-Building on the idea of packages as boxes with a surface area,
-depth refers to how much work is done by exported components in the package.
+Depth refers to how much work is done by exported components of a package.
+The deeper a package, the more work is being done.
 
-In combination, these represent the functionality offered by the package.
+In combination, these represent the total functionality offered by the package.
 --
 
 == {concept-area-depth}
 
-[pikchr, width=50%]
+[pikchr, height=400px]
 ....
 define areaAndDepth {
   line color 0xEE9B00 from $1.nw to $1.ne
   line color 0x0A9396 from $1.ne to $1.se
 }
 
-box "strings" fit width 2in
+box "strings" fit width 2in thin
 areaAndDepth(last box)
+text "Shallow and wide" with e at 0.3in west of last box.w
 
-box "archive/tar" fit ht 1in with nw at 0.1in south of last box.sw
+box "archive/tar" fit ht 1in thin with nw at 0.1in south of last box.sw
 areaAndDepth(last box)
+text "Narrow and deep" with e at 0.3in west of last box.w
 ....
 
 [.notes]
 --
-A package with lots of small helper functions has a wide surface area
-and is shallow in functionality.
+Consider two ends of the area-depth ratio:
 
-On the other hand, a package with only a handful of exported functions
-hiding a bunch of complex work
-has a narrow surface area and is deep in functionality.
-
-One isn't objectively better than the other.
-In real applications, there's a good balance to be had.
-
-However...
+* On one end, packages can be shallow and wide.
+  These will consist of lots of small helper functions.
+  Lots of little entry points each doing small amounts of work.
+* On the other end, they can be narrow and deep.
+  Few entry points, hiding away a large amount of work.
 --
 
 [.columns.wrap]
@@ -94,16 +90,16 @@ However...
 --
 Wide and shallow packages
 
-* frequent entry and exit
-* zigzagging
+* Frequent entry and exit
+* May cause zigzagging
 --
 
 [.column.is-half]
 --
 Narrow and deep packages
 
-* few entry points
-* hide complexity
+* Very few entry points
+* Upfront design work
 --
 
 [.column.is-full%step]
@@ -114,32 +110,35 @@ Business packages should be narrow and deep
 [.notes]
 --
 Just by virtue of their design,
-wide and shallow packages encourage frequent entry and exit -- zigzagging.
-While narrow and deep packages don't.
+wide and shallow packages encourage frequent entry and exit.
+This can cause zigzagging if you're not careful.
 
-Therefore, (*step*) business packages should aim to
-be narrow in surface area and deep in functionality.
+While narrow and deep packages don't --
+at the cost of some upfront design work.
+
+So when it comes to business logic,
+(*step*) business packages should aim to be
+narrow in surface area and deep in functionality.
 --
 
 [.columns]
-== Shallow business packages
+== {concept-area-depth}
+
+[.medium.column]
+--
+[.text-align]
+Might be wide and shallow if +
+there are top-level functions that
+
+* Do RPC and IO
+* Access global state
+* Have shared arguments
+* Are interrelated
+* [.step]#Are in 'util'#
+--
 
 [.column]
 --
-Top-level functions with:
-
-* RPC and IO
-* Global state
-* Many arguments
-* Interrelated
-
-[%step]
-Might be in a 'util'
---
-
-[.column]
---
-[%step]
 [pikchr]
 ....
 Shallow: [
@@ -170,33 +169,29 @@ arrow
 box "UserService" mono fit ht 0.75in
 arrow
 text "[]*User" mono
-] with .n at 1in south of Shallow.s
+] with .n at 0.5in south of Shallow.s
 
-text "Wide and shallow" big bold at 0.3in w of Shallow.nw
+text "Wide and shallow" big bold at 0.2in w of Shallow.nw+(0,0.05in)
 text "Deep and narrow" big bold at (last.x, Deep.n.y+0.1in)
 ....
 --
 
 [.notes]
 --
-There are other indicators,
-but your business package is probably wide and shallow if it:
+You probably have a business package that is wide and shallow
+if it matches the following general pattern.
 
-* has a bunch of functions that do complex business logic;
-  making RPCs, writing to disk
-* they rely on global state or have a *bunch* of arguments
-* and they're mostly interrelated:
-  information produced by one function is eventually passed into another
+* It has a bunch of top-level exported functions
+  implementing complex business logic --
+  you know, making HTTP requests, writing to disk, etc.
+* Some of these functions probably access global state at some point,
+  or maybe just have a tonne of parameters.
+* They are heavily interrelated; output of one function is input to another.
+* (*step*) They might even sit in a file or package named util.
 
-(*step*) They might all sit in a file or package called something util.
-
-
-For example (*step*), if I have a package that exports those functions --
-GetUserList, FilterUsers, UserIsAdmin --
-I will flow in and out of that package.
-It doesn't have a conceptual responsibility.
-
-On the other hand,
-if I find the purpose -- what is all this used for --
-and build a named abstraction around it, I get a narrower, deeper abstraction.
+To prevent something like this,
+we have to find a named abstraction for the purpose of those functions.
+What are they all for?
+Give that a name and a single entry point,
+and you might get a narrower, deeper abstraction out of that.
 --
