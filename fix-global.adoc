@@ -171,13 +171,13 @@ func run(*cliParams)
 --
 [source,go]
 ----
-type CLI struct {
+type App struct {
   Stdout io.Writer
   Stderr io.Writer
   Getenv func(string) string
 }
 
-func (*CLI) Run(args []string) (exitCode int)
+func (*App) Run(args []string) (exitCode int)
 ----
 --
 
@@ -186,13 +186,8 @@ func (*CLI) Run(args []string) (exitCode int)
 We talked about parameter objects before.
 That fits right in.
 
-Or equivalently, an object with a Run method.
-Maybe something like this: (*step*)
-It's roughly the same, except:
+Or equivalently, (*step*) an object with a Run method.
 
-* it accepts the command line arguments as parameters
-* it returns the exit code for `main` to exit with
-
-You might find that doing this makes it very easy to unit test
-your command line applications.
+Regardless, if you isolate your business logic from process globals,
+you'll find that it makes your application logic much easier to test.
 --

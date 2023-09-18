@@ -17,6 +17,7 @@ spline -> from movewid sw of A \
 
 [.notes]
 --
+First, I want to introduce this concept.
 I don't know if there's a formal name for this, but I've been calling it
 flow of information --
 the path that information takes to go through your application.
@@ -25,9 +26,10 @@ Its shape may change as it passes through,
 but the information represented is similar if not the same.
 --
 
+[%auto-animate]
 == {concept-flow}
 
-[pikchr, width=80%]
+[pikchr, width=800px]
 ....
 linewid = 0.2in
 linerad = 0.1in
@@ -40,11 +42,20 @@ CLI: [
   arrow
   func("flag.Parse()")
   line
-  data("CLIParams")
+  data("Options")
   arrow
   text "..."
 ]
+....
 
+[%step]
+[pikchr, width=900px]
+....
+linewid = 0.2in
+linerad = 0.1in
+
+define data { box $1 mono color 0x0A9396 rad 0.1in fit  }
+define func { box $1 mono color 0xCA6702 fit }
 HTTP: [
   Request: data("*http.Request")
 
@@ -64,25 +75,35 @@ HTTP: [
   func("Handle") at 0.2in e of (0.5 of the way between GetUserRequest.e and AuthToken.e)
   arrow chop from GetUserRequest right until even with Handle then to Handle
   arrow chop from AuthToken right until even with Handle then to Handle
-] with .n at 0.3in south of last.s
+]
 ....
+
+[.medium%step]
+Flow in one direction [.step]#without backtracking#
 
 [.notes]
 --
-For example, when you parse your CLI arguments,
-the information gets transformed, but it's still roughly the same information.
-Or at least, the part of it that you care about.
+For example, when you parse command line arguments,
+the slice of strings gets transformed to, say, an `Options` struct.
+It's roughly the same information,
+but with unimportant bits chipped away.
 
-Similarly, after parsing an HTTP request,
-and maybe extracting some information from headers,
-the information flows through your application
-until it's consumed.
+Similarly, (*step*)
+when you parse an HTTP request --
+maybe JSON decoding the body,
+and extracting some information from headers --
+it's again roughly the same information minus the unimportant bits.
+
+In both cases, (*step*) information flows in one direction.
+We don't touch the original list of command line arguments,
+or the original request body again.
+That is, (*step*) there's no backtracking.
 --
 
+[%auto-animate]
 == {concept-flow}
 
-* Flow in one direction
-* No backtracking
+Flow in one direction without backtracking
 
 [%step]
 [pikchr, width=80%]
@@ -90,76 +111,90 @@ until it's consumed.
 linewid = 0.2in
 lineht = 0.2in
 linerad = 0.1in
-movewid = 0.3in
+movewid = 0.2in
 
 define data { box $1 mono color 0x0A9396 rad 0.1in fit  }
 define func { box $1 mono color 0xCA6702 fit }
 
 A: [
+  right
   String: data("string")
   arrow
   SSH: func("isSSH")
-  down
-  move 0.2in
+  move
   Download: func("sshDownload")
-  right
-  line
-  data("string")
-  func("url.Parse") at (last.x, String.y)
-  right
+  move
+  URLParse: func("url.Parse")
   line
   data("url.URL")
   arrow
   text "..."
 
-  arrow from 3rd last box to 2nd last box chop
-  arrow chop from String down until even with Download then to Download
+  define fromString {
+    arrow chop from String up $2 then right until even with $1 then to $1
+  }
+  fromString(Download, 0.3in)
+  fromString(URLParse, 0.35in)
+
+  define toString {
+    arrow dashed chop from $1 down $2 then left until even with String then to String
+  }
+  toString(SSH, 0.3in)
+  toString(Download, 0.4in)
 ]
 
-B: [
+text "Bad" at movewid west of A.w
+....
+
+[%step]
+[pikchr, width=80%]
+....
+linewid = 0.2in
+lineht = 0.2in
+linerad = 0.1in
+movewid = 0.2in
+
+define data { box $1 mono color 0x0A9396 rad 0.1in fit  }
+define func { box $1 mono color 0xCA6702 fit }
+
+A: [
   right
   String: data("string")
   arrow
-  SSH: func("url.Parse")
+  URLParse: func("url.Parse")
   line
   URL: data("url.URL")
   arrow
-  SSH: func("isSSH")
-  down
-  move 0.2in
-  Download: func("sshDownload")
-  arrow chop from URL down until even with Download then to Download
-] with .n at 0.3in south of last.s
 
-text "Good" at movewid west of B.w
-text "Bad" at (Good.x, A.y)
+  SSH: func("isSSH")
+  arrow
+  Download: func("sshDownload")
+
+  line
+  text "..."
+]
+
+text "Good" at movewid west of A.w
 ....
 
 [.notes]
 --
-I'm bringing this up because it connects to some of the points I made earlier.
+Apply the same principle to chaotic data --
+strings and other primitives that hold structure.
+Interpret their structure once, and never go back to it.
 
-Information should flow in one direction.
-Inputs flow inwards, outputs flow outwards.
-You don't backtrack.
+Think back to the section about parsing.
+We had a function that matched the scheme -- HTTP or SSH --
+and downloaded a file.
 
-For example, you wouldn't go back and unmarshal the HTTP request again,
-or re-parse the command line flags.
+(*step*) Even narrowing to just the SSH flow,
+we backtrack to the string and re-interpret its meaning.
+Every function that touches the chaotic string
+has to interpret the structure of the string.
+It cannot *assume* that the string is a URL, it has to check.
 
-Apply the same principle when dealing with chaotic data
-like plain strings and other primitives.
-Transform that information into the shape your application needs
-as early as you can.
-
-Think back to the download example from ages ago. (*step*)
-Before we started parsing it,
-the string went to isSSH, then to sshDownload,
-still in its chaotic form,
-then sshDownload probably parsed it to extract useful information from it,
-so that it could eventually get consumed.
-
-On the other hand, parsing the string early consumes the string early,
-transforming it into better organized information.
+(*step*) Compare that with parsing the string early.
+Information flows forward and nobody touches the chaotic form again.
 --
 
 == {concept-flow}
@@ -188,13 +223,12 @@ Zigzagging flow indicates a leak
 
 [.notes]
 --
-The flow and its direction is important at the micro,
+The consistent flow of information is important at the micro level
 as well as the macro level.
+Consider how information flows between functions or packages?
+Is it flowing in one direction consistently or zigzagging (*step*)?
 
-How does information flow between functions or packages?
-Is it going in one direction or zigzagging (*step*)?
-
-If it's zigzagging like this,
-then there's probably a leak there and we should fix that.
-But first, we need to discuss a couple other items.
+If it's zigzagging,
+there's either a leak of complexity,
+or a very tight coupling between these objects.
 --

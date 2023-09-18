@@ -1,4 +1,4 @@
-= Designing abstractions
+= Zooming out
 
 [.notes]
 --
@@ -24,8 +24,8 @@ You can use those to help you find the abstraction.
 --
 
 // include::fix-long-funcs.adoc[]
-include::fix-conds.adoc[]
-include::fix-curry.adoc[]
+include::find-conds.adoc[]
+include::find-curry.adoc[]
 
 = Writing the abstraction
 
