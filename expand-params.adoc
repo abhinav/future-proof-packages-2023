@@ -6,7 +6,7 @@
 Put the inputs into a struct
 --
 
-[.column.medium]
+[.column]
 [source%linenums,go,data-id=new]
 ----
 type ClientConfig struct {
@@ -44,7 +44,7 @@ Put the inputs into a struct
 * New parameters must be optional
 --
 
-[.column.medium]
+[.column]
 [source%linenums,go,data-id=new,highlight="1-|7-10"]
 ----
 type ClientConfig struct {

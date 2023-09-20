@@ -7,15 +7,15 @@ Put the outputs into a struct
 --
 
 
-[.column.medium]
+[.column]
 [source%linenums,go,data-id=list]
 ----
-type ListPageResult struct {
+type ListResult struct {
   Items      []*Item
   ContinueAt ItemID
 }
 
-func ListPage(from *ItemID) (*ListPageResult, error) {
+func List(from *ItemID) (*ListResult, error) {
   /* ... */
 }
 ----
@@ -42,16 +42,16 @@ Put the outputs into a struct
 * Obvious field names
 --
 
-[.column.medium]
+[.column]
 [source%linenums,go,data-id=list]
 ----
-type ListPageResult struct {
+type ListResult struct {
   Items      []*Item
   ContinueAt ItemID
   Remaining  int
 }
 
-func ListPage(from *ItemID) (*ListPageResult, error) {
+func List(from *ItemID) (*ListResult, error) {
   /* ... */
 }
 ----

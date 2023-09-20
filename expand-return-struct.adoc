@@ -9,7 +9,6 @@ Return concrete implementations +
 --
 🙁
 
-[.medium]
 [source%linenums,go,data-id=iface]
 ----
 type Client interface {
@@ -30,17 +29,13 @@ func (*impl) List() (ListResult, error)
 --
 🙂
 
-[.medium]
 [source%linenums,go,data-id=struct]
 ----
-type Client struct {
-  /* ... */
-}
+type Client struct{ /* ... */ }
 
 func New() *Client {
   return &Client{/* ... */}
 }
-
 
 func (*Client) List() (ListResult, error)
 ----
@@ -71,7 +66,6 @@ Extend by adding new methods
 --
 🙁
 
-[.medium]
 [source%linenums,diff,data-id=iface]
 ----
  type Client interface {
@@ -80,7 +74,7 @@ Extend by adding new methods
  }
 ----
 
-[.medium.text-left]
+[.text-left]
 Disruptive: +
 Breaks other implementations +
 [.small]#(e.g. mocks, middleware)#
@@ -90,7 +84,6 @@ Breaks other implementations +
 --
 🙂
 
-[.medium]
 [source%linenums,diff,data-id=struct]
 ----
  func (*Client) List() (ListResult, error)
