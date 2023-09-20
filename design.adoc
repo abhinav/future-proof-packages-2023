@@ -27,159 +27,63 @@ You can use those to help you find the abstraction.
 include::find-conds.adoc[]
 include::find-curry.adoc[]
 
+[.columns.wrap]
 = Writing the abstraction
 
-[.notes]
+[.column.is-half.text-left%step]
 --
-Some tips for writing the abstraction once you've found it.
---
+*Start on the outside*
 
-== Start on the outside
-
-* Don't implement right away
-* Decide the contract first
-
-[.notes]
---
-Start on the outside:
-
-* Don't jump into the implementation right away.
-* Figure out the purpose of the abstraction,
-  and its contract before you start implementing it.
-** By contract, I mean, what's the input, what's the output --
-   where do the responsibilities of this object start versus end.
+[.medium]
+Design => Document => Implement
 --
 
-== Plan for expansion
-
-include::expand-table.adoc[]
-
-[.notes]
+[.column.is-half.text-right%step]
 --
-Use the tools we discussed earlier
-to plan for expansion of the abstraction, its inputs, and outputs.
---
+*Name things clearly*
 
-== Name things clearly
-
-* Don't be redundant
-* Don't build a kitchen sink
-** No 'helper' or 'util'
-* Consistency over all else
-
-[.notes]
---
-TODO
-
-* Kitchen sink
-** 'helper' is uninformative
-** 'util' will always be wide and shallow
-* Consistency
-** New terms have to be incorporated by a reader
-   into their mental model of an abstraction.
-** Re-use similar names for similar concepts.
-** If you have something called UserDetails already,
-   don't introduce PostData. Call it PostDetails.
+[.medium]
+Be consistent, re-use terms, +
+no kitchen sinks
 --
 
-== Document it
-
-* Write down the contract
-* No self-documenting code
-* Document all exported objects
-+
-[%step]
-[source,yaml]
-----
-# .golangci.yml
-
-issues:
-  # Re-enable requiring all exported entities
-  # to be documented.
-  exclude-use-default: false
-----
-
-[.notes]
+[.column.is-half%step]
 --
-* Document it. Many people miss this part.
-* There's no such thing as self-documenting code.
-* I'm personally a big fan of the old golint rule
-  that requires all exported things must be documented.
-  I still enable it in my code.
-** Revive has it enabled by default.
-** golangci-lint disables that check by default,
-   but you can enable it with this snippet (*step*),
-   although it drops a few other default exclusions too.
-   Personally, I haven't found that to be a problem.
+[.text-left]
+*Don't leak internals*
 --
 
-[.columns]
-== Make the implementation match the contract
-
-[.column.is-one-third]
+[.column.is-half.text-right%step]
 --
---
-
-[.column.is-two-thirds.text-left]
---
-🙁 "This is what it does" +
-🙂 "This is what it's supposed to do"
+*Don't add features, +
+integrate*
 --
 
 [.notes]
 --
-I may be repeating myself here,
-but it's important that the contract inform the implementation,
-not the other way around.
---
+Some tips for writing the abstraction once you've found it
 
-== Don't leak the implementation
-
-* Insulate internals from the outside world
-* Avoid primitive obsession
-* Define domain objects
-
-// TODO: diagram
-
-[.notes]
---
---
-
-== Don't backtrack the flow of information
-
-Information fed once should not be fed again
-
-// TODO: diagram
-
-[.notes]
---
---
-
-== Don't add features, incorporate
-
-* Features do not exist in isolation
-* Adjust the mental model
-+
-[source,go]
-----
-type SiteGen struct{ AddSlash bool }
-/* versus */
-type SiteGen struct{ LinkStyle LinkStyle }
-----
-* It's okay to say No
-
-[.notes]
---
-Don't just 'add' a feature.
-Features don't exist in isolation.
-Consider how the feature interacts with other features.
-
-See how it fits into your mental model of the abstraction.
-Can you adjust the mental model to account for it?
-Think back to the site generator example.
-An "AddSlash" boolean does not fit there for me,
-but an object responsible for styling links does.
-
-If it breaks the model, if you can't incorporate it,
-it's okay to say no.
+* (*step*) Start on the outside:
+  Decide the contract first, document it, and *then* implement it.
+* (*step*) Name things clearly:
+** Pick a consistent naming scheme,
+   and re-use terms for similar concepts of introducing new ones.
+** For example, if you have UserDetails already,
+   don't introduce PostData -- call it PostDetails.
+   Each new term is a new thing a user has to incorporate
+   into their mental model of the package.
+** Oh and don't create kitchen sink packages like 'util'.
+   That's what causes shallow and wide business code.
+// * (*step*) Use the tools discussed previously --
+//   parameter and result objects, functional options,
+//   accept interfaces, return structs --
+//   to plan for expansion of the abstractoin.
+* (*step*) Don't leak the implementation.
+  Define domain-specific data types,
+  and expose those from your abstraction.
+* (*step*) Lastly, don't just add a new feature.
+  Features don't exist in isolation.
+  Consider how the new feature interacts with other features,
+  and integrate it.
+  Don't just add an `OmitSlash` boolean, add a `LinkStyle` property.
 --

@@ -5,7 +5,7 @@
 --
 [%hardbreaks]
 Future-breaking code
-leaks complexity
+leaks complexity,
 causes disruption
 --
 
@@ -20,8 +20,6 @@ causes disruption
 
 [.notes]
 --
-TODO
-
 So in conclusion!
 
 * Future-proof code isn't disruptive
@@ -30,7 +28,7 @@ So in conclusion!
 ** plan for your packages to expand without disruption
    using the previously discussed tools
 ** convert chaos to order as close to the entry point as you can
-** build a deep abstraction around your business logic
+** find and build deep abstractions around your business logic
    instead of stitching together shallow functions,
 ** and ensure that information flows consistently in one direction
    without backtracking

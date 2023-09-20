@@ -3,9 +3,7 @@
 = {fix-curry}
 
 Find large scoped function parameters +
-that are constant for an application
-
-Wrap them into objects
+and wrap them into objects
 
 [.notes]
 --
@@ -14,11 +12,11 @@ partially filling in functions.
 
 Recall the idea of scope and how you can sort function parameters by scope.
 If you find that some of the larger scoped parameters
-don't really change in invocations to the function,
+don't really change in invocations to the function in a specific context,
 you can build an object holding those parameters,
 and turn the function into a method on that object.
 
-This is kind of like applying the function on the first parameter,
+This is kind of like applying the function on that parameter,
 promising to provide the rest later.
 
 Let me demonstrate:

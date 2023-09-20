@@ -14,7 +14,7 @@ and how you could fix them.
 
 Okay, let's get into it.
 
-// TODO Maybe:
+// Maybe:
 //
 // * Unstoppable goroutines
 // ** Add a means of stopping them -- context or otherwise
@@ -67,10 +67,10 @@ I'll talk about a couple of them:
 
 include::fix-string.adoc[]
 include::fix-map.adoc[]
-// include::fix-serialized-types.adoc[] TODO: maybe in flow of information?
+// include::fix-serialized-types.adoc[] maybe in flow of information?
 include::fix-bool.adoc[]
 include::fix-callback.adoc[]
-// TODO: maybe: closures vs objects
+// maybe: closures vs objects
 // ** You can implement a class a closure doesn't mean you should.
 // ** Isolate concepts, give them names, add interfaces (middleware example)
 // *** Closure want to be objects when they grow up
