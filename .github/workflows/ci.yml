@@ -44,6 +44,9 @@ jobs:
     needs: build
     if:  github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
 
+    permissions:
+      contents: write
+
     steps:
     - name: Download archives
       uses: actions/download-artifact@v3
