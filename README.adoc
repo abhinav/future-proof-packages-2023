@@ -4,7 +4,7 @@ This repository contains the source code for a presentation
 that I gave at Gophercon in September 2023.
 
 The rendered slides are available at
-https://abhinav.github.io/presentation-future-proof-packages-2023/.
+https://abhinav.github.io/future-proof-packages-2023/.
 
 == Building
 
