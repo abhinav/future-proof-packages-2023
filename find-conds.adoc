@@ -99,18 +99,17 @@ func (g *SiteGen) RelativeURL(dst *Page) string {
 
 [.notes]
 --
-Think back to the static website rendering example.
+Think back to the static website example.
 
-We declared an enum, LinkStyle, and placed it inside the struct, SiteGen,
-because it has scope larger than the struct.
-
+We placed LinkStyle enum into the SiteGen struct.
 If we left it at that, (*step*) SiteGen probably consumed it like this.
 An if-else or a switch statement rendering the link based on the style.
 
 This right here is a good place to find the abstraction.
 The outcome of that switch statement will never change
-for a single SiteGen object.
-So we should make this decision in an outer context,
+for a single SiteGen instance.
+
+We should make this decision in an outer context,
 and pass in something that SiteGen can use unconditionally.
 
 For example...
@@ -136,7 +135,7 @@ type SiteGen struct {
 ----
 func (g *SiteGen) RelativeURL(dst *Page) string {
   /* ... */
-  return g.LinkStyle.StyleLink(u)
+  return g.LinkStyler.StyleLink(u)
 }
 ----
 --
@@ -177,9 +176,9 @@ func (HTMLLinkStyler) StyleLink(u string) string {
 
 [.notes]
 --
-This might seem familiar.
+This might seem similar to an example we saw earlier:
 
-* (*step*) We've switched to a LinkStyler interface.
+* (*step*) We've switched a LinkStyler interface
 * (*step*) RelativeURL no longer evaluates the condition.
 * Something in the outer scope already decided for it,
   and passed in the right LinkStyler implementation

@@ -2,9 +2,10 @@
 
 [.notes]
 --
-So I've been talking about very specific code samples.
-As promised, I'm going to zoom out now.
-Now I want to talk about an application holistically.
+Zooming out.
+
+I've been talking about very specific code samples.
+I'm going to zoom out a bit and talk about applications as a whole.
 --
 
 include::concept-flow.adoc[]
@@ -15,12 +16,10 @@ include::concept-area-depth.adoc[]
 
 [.notes]
 --
-Okay, so I've mentioned this a couple times.
-The idea of finding the right abstraction to hide complexity.
-
-The concepts I just brought up:
-flow of information, scope, surface area, and depth.
-You can use those to help you find the abstraction.
+Okay so, the concepts I just talked about:
+flow, scope, surface area, and depth.
+They can help you find the right abstraction to hide complexity.
+Let me demonstrate with a couple examples.
 --
 
 // include::fix-long-funcs.adoc[]

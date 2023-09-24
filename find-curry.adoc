@@ -7,17 +7,17 @@ and wrap them into objects
 
 [.notes]
 --
-Another tool to help you find the abstraction is
-partially filling in functions.
+Next, there's the idea of partial function application.
 
-Recall the idea of scope and how you can sort function parameters by scope.
-If you find that some of the larger scoped parameters
-don't really change in invocations to the function in a specific context,
-you can build an object holding those parameters,
-and turn the function into a method on that object.
+Recall from the Scope section that we can sort function parameters by scope.
+You might sometimes find that some of the larger scoped parameters
+don't really change between invocations of the function in a specific context.
 
-This is kind of like applying the function on that parameter,
-promising to provide the rest later.
+That can be a good place to promote those parameters into an abstraction,
+and turn the function into a method on it.
+
+You can think of it like applying the function on those parameters,
+and promising to provide the rest later.
 
 Let me demonstrate:
 --

@@ -43,7 +43,8 @@ include::expand-func-opts.adoc[leveloffset=+1]
 Okay, that covers functions. Let's talk about abstractions.
 
 There are two standard practices you can follow here
-to plan for expansion of abstractions.
+to plan for expansion of abstractions:
+accept interfaces, and return structs.
 --
 
 include::expand-accept-iface.adoc[leveloffset=+1]
