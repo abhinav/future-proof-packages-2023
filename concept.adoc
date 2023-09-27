@@ -105,7 +105,7 @@ text "Leaking Complexity" big with s at Y.n
 
 * Complexity is inevitable
 * Good design hides complexity
-* Complexity leaks causes fragility
+* Complexity leaks cause fragility
 * Fragility causes disruption
 
 [.notes]
