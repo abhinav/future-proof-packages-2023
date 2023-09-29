@@ -51,3 +51,15 @@ include::fix.adoc[leveloffset=+1]
 include::design.adoc[leveloffset=+1]
 include::conclusion.adoc[leveloffset=+1]
 include::related.adoc[leveloffset=+1]
+
+== License
+
+:url-license: https://creativecommons.org/licenses/by-sa/4.0/
+
+image::https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-sa.svg[alt="CC-BY-SA-4.0", link={url-license}]
+
+[.notes]
+--
+This work is licensed under a
+{url-license}[Creative Commons Attribution-ShareAlike 4.0 International License].
+--

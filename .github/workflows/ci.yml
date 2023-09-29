@@ -11,6 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SPEAKER_NOTES: 1
+      CLOUDFLARE_WA_TOKEN: 085b42f4381f4b8999051fc40a656369
 
     steps:
       - name: Checkout
@@ -44,6 +47,9 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.output.page_url }}
+    concurrency:
+      group: "pages"
+      cancel-in-progress: true
 
     steps:
       - name: Deploy to GitHub Pages
