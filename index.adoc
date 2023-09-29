@@ -1,7 +1,7 @@
 = Future-Proof Go Packages
 Abhinav Gupta
 2023-09-27
-:revealjs_controls: false
+:revealjs_controls: true
 :revealjs_controlsTutorial: false
 :revealjs_hash: true
 :revealjs_navigationMode: linear
